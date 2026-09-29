@@ -1,0 +1,583 @@
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { db } from './db' 
+
+const CATEGORY_COVERS = {
+  "Obleas tradición de amaranto": "https://images.unsplash.com/photo-1600018593466-9b5133af00be?w=800&q=80",
+  "Platanitos crujientes": "https://images.unsplash.com/photo-1599859599960-9303531b4028?w=800&q=80",
+  "Cecina": "https://images.unsplash.com/photo-1599859599960-9303531b4028?w=800&q=80",
+};
+
+const formatProduct = (product) => {
+  const isSingle = product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+
+  const getCategoryColor = (category) => {
+    const cat = category.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (cat.includes('oblea')) return "#F17E92";
+    if (cat.includes('chocohojuela')) return "#3B2216";
+    if (cat.includes('chip')) return "#5B8A3C";
+    if (cat.includes('nube')) return "#F3D36B";
+    if (cat.includes('lenteja')) return "#953431";
+    if (cat.includes('platanito')) return "#E4B647";
+    if (cat.includes('cecina') || cat.includes('carne')) return "#2B1010";
+    return "#7B502B"; 
+  };
+
+  const getFlavorColor = (flavor) => {
+    const f = flavor.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    if (f.includes('natural')) return "bg-[#F3D36B] text-[#F8F6EF]";
+    if (f.includes('queso')) return "bg-[#ffce33] text-[#F8F6EF]";
+    if (f.includes('negra')) return "bg-[#3b2418] text-[#F8F6EF]";
+    if (f.includes('jalapeno')) return "bg-[#6e9550] text-[#F8F6EF]";
+    if (f.includes('fuego')) return "bg-[#bc584b] text-[#F8F6EF]";
+    if (f.includes('ranchero')) return "bg-[#c2774e] text-[#F8F6EF]";
+    if (f.includes('adobad')) return "bg-[#8b2c15] text-[#F8F6EF]";
+    if (f.includes('habanero')) return "bg-[#d97216] text-[#F8F6EF]";
+    if (f.includes('limon')) return "bg-[#5B8A3C] text-[#F8F6EF]";
+    return "bg-[#7B502B] text-[#F8F6EF]"; 
+  };
+
+  return {
+    title: product.category,
+    catColor: getCategoryColor(product.category),
+    badge: isSingle ? null : { text: product.name, colorClass: getFlavorColor(product.name) },
+    cartTitle: product.category,
+    cartSubtitle: isSingle ? null : product.name,
+    cartSubtitleColor: getFlavorColor(product.name),
+  };
+};
+
+function App() {
+  const [products, setProducts] = useState([])
+  const [clients, setClients] = useState([])
+  const [routes, setRoutes] = useState([]) 
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  
+  const [activeClient, setActiveClient] = useState(null)
+  const [cart, setCart] = useState([])
+  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isOfflineMode, setIsOfflineMode] = useState(false)
+  
+  const [selectedCategory, setSelectedCategory] = useState(null)
+  const [expandedWeights, setExpandedWeights] = useState({})
+  const [expandedLocations, setExpandedLocations] = useState({})
+
+  const [isAddingClient, setIsAddingClient] = useState(false)
+  const [isLocating, setIsLocating] = useState(false)
+  const [clientForm, setClientForm] = useState({
+    name: '', contact: '', phone_number: '', address: '', location: '', route_name: '', latitude: '', longitude: ''
+  })
+
+  useEffect(() => {
+    const syncOfflineData = async () => {
+      try {
+        const offlineClients = await db.sync_clients_queue.toArray();
+        for (const client of offlineClients) {
+          try {
+            const res = await axios.post('http://127.0.0.1:8000/clients', client);
+            if (res.data.status === 'success') await db.sync_clients_queue.delete(client.id);
+          } catch (err) { break; }
+        }
+      } catch (err) {}
+
+      try {
+        const offlineOrders = await db.sync_queue.toArray();
+        for (const order of offlineOrders) {
+          try {
+            const res = await axios.post('http://127.0.0.1:8000/orders', order);
+            if (res.data.status === 'success') await db.sync_queue.delete(order.id); 
+          } catch (err) { break; }
+        }
+      } catch (err) {}
+    };
+
+    const fetchInitialData = async () => {
+      try {
+        const [resProducts, resClients, resRoutes] = await Promise.all([
+          axios.get('http://127.0.0.1:8000/products'),
+          axios.get('http://127.0.0.1:8000/clients'),
+          axios.get('http://127.0.0.1:8000/routes')
+        ]);
+        
+        if (resProducts.data.status === 'success' && resClients.data.status === 'success' && resRoutes.data.status === 'success') {
+          setProducts(resProducts.data.data);
+          setClients(resClients.data.data);
+          setRoutes(resRoutes.data.data);
+          
+          await db.products.clear(); await db.products.bulkPut(resProducts.data.data);
+          await db.clients.clear(); await db.clients.bulkPut(resClients.data.data);
+          await db.routes.clear(); await db.routes.bulkPut(resRoutes.data.data);
+          
+          setIsOfflineMode(false);
+          syncOfflineData(); 
+        }
+      } catch (err) {
+        try {
+          const localProducts = await db.products.toArray();
+          const localClients = await db.clients.toArray();
+          const localRoutes = await db.routes.toArray();
+          
+          if (localProducts.length > 0 || localClients.length > 0) {
+            setProducts(localProducts);
+            setClients(localClients);
+            setRoutes(localRoutes);
+            setIsOfflineMode(true); 
+          } else {
+            setError("Sin conexión y sin base local.");
+          }
+        } catch (localErr) {
+          setError("Error en almacenamiento local.");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInitialData();
+  }, [])
+
+  const captureLocation = () => {
+    if (!navigator.geolocation) { alert("Tu dispositivo no soporta GPS."); return; }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setClientForm(prev => ({
+          ...prev,
+          latitude: position.coords.latitude.toFixed(6),
+          longitude: position.coords.longitude.toFixed(6)
+        }));
+        setIsLocating(false);
+      },
+      (error) => {
+        alert("No se pudo obtener la ubicación. Verifica los permisos de GPS.");
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+    );
+  };
+
+  const handleCreateClient = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const finalLatitude = clientForm.latitude !== '' ? parseFloat(clientForm.latitude) : null;
+    const finalLongitude = clientForm.longitude !== '' ? parseFloat(clientForm.longitude) : null;
+    const routeNameStr = (clientForm.route_name || "").trim();
+
+    const routeExists = (routes || []).some(r => r?.name?.toLowerCase() === routeNameStr.toLowerCase());
+    if (!routeExists && routeNameStr !== "") {
+      const newRoute = { id: crypto.randomUUID(), name: routeNameStr };
+      setRoutes(prev => [...(prev || []), newRoute].sort((a,b) => a.name.localeCompare(b.name)));
+      db.routes.add(newRoute).catch(() => {});
+    }
+
+    const newClient = {
+      ...clientForm,
+      route_name: routeNameStr,
+      latitude: finalLatitude,
+      longitude: finalLongitude,
+      id: crypto.randomUUID(),
+      is_active: true
+    };
+
+    try {
+      await axios.post('http://127.0.0.1:8000/clients', newClient);
+      await db.clients.add(newClient);
+      setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
+      alert('Cliente registrado exitosamente.');
+    } catch (error) {
+      try {
+        await db.clients.add(newClient);
+        await db.sync_clients_queue.add(newClient);
+        setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
+        alert('Modo sin conexión: El cliente fue guardado en el dispositivo y se sincronizará luego.');
+      } catch (dbError) {
+        alert('Error crítico de almacenamiento local.');
+      }
+    } finally {
+      setIsSubmitting(false);
+      setIsAddingClient(false);
+      setClientForm({ name: '', contact: '', phone_number: '', address: '', location: '', route_name: '', latitude: '', longitude: '' });
+    }
+  };
+
+  const groupedProducts = products.reduce((acc, product) => { if (!acc[product.category]) acc[product.category] = []; acc[product.category].push(product); return acc; }, {});
+  const categoryNames = Object.keys(groupedProducts).sort();
+
+  const groupedClients = clients.reduce((acc, client) => { if (!acc[client.location]) acc[client.location] = []; acc[client.location].push(client); return acc; }, {});
+  const locationNames = Object.keys(groupedClients).sort();
+
+  const addToCart = (product) => setCart(prevCart => {
+    const existing = prevCart.find(item => item.id === product.id);
+    if (existing) return prevCart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+    return [...prevCart, { ...product, quantity: 1 }];
+  });
+
+  const removeFromCart = (productId) => setCart(prevCart => {
+    const existing = prevCart.find(item => item.id === productId);
+    if (existing.quantity === 1) {
+      const newCart = prevCart.filter(item => item.id !== productId);
+      if (newCart.length === 0) setIsCartOpen(false);
+      return newCart;
+    }
+    return prevCart.map(item => item.id === productId ? { ...item, quantity: item.quantity - 1 } : item);
+  });
+
+  const handleSetQuantity = (product, value) => {
+    const q = value === '' ? 0 : parseInt(value, 10);
+    if (isNaN(q) || q < 0) return;
+    setCart(prevCart => {
+      if (q === 0) return prevCart.filter(item => item.id !== product.id);
+      if (prevCart.find(item => item.id === product.id)) return prevCart.map(item => item.id === product.id ? { ...item, quantity: q } : item);
+      return [...prevCart, { ...product, quantity: q }];
+    });
+  };
+
+  const clearCart = () => { setCart([]); setIsCartOpen(false); };
+
+  const openCategoryModal = (categoryName) => {
+    const initialWeightsState = {};
+    groupedProducts[categoryName].forEach(item => { initialWeightsState[item.weight_g || '0'] = true; });
+    setExpandedWeights(initialWeightsState); setSelectedCategory(categoryName);
+  };
+  const toggleWeight = (weightKey) => setExpandedWeights(prev => ({ ...prev, [weightKey]: !prev[weightKey] }));
+  const toggleLocation = (locationKey) => setExpandedLocations(prev => ({ ...prev, [locationKey]: !prev[locationKey] }));
+
+  const totalOrder = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleCheckout = async () => {
+    if (cart.length === 0 || !activeClient) return;
+    setIsSubmitting(true);
+    const payload = {
+      id: crypto.randomUUID(), client_id: activeClient.id, total_amount: totalOrder, created_at: new Date().toISOString(),
+      items: cart.map(item => ({ id: crypto.randomUUID(), product_id: item.id, quantity: item.quantity, unit_price: item.price, subtotal: item.price * item.quantity }))
+    };
+    try {
+      const res = await axios.post('http://127.0.0.1:8000/orders', payload);
+      if (res.data.status === 'success') { clearCart(); setActiveClient(null); }
+    } catch (error) {
+      try {
+        await db.sync_queue.add(payload);
+        clearCart(); setActiveClient(null);
+      } catch (dbError) { alert('Error de almacenamiento local.'); }
+    } finally { setIsSubmitting(false); }
+  };
+
+  return (
+    <div className="min-h-screen relative bg-brand-bg">
+      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
+        <header className="mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
+          <div>
+            <h1 className="text-5xl md:text-6xl tracking-tight mb-2 flex items-baseline gap-3">
+              <span className="font-calistoga text-brand-brown uppercase">Nahui</span>
+              <span className="font-satisfy text-brand-green text-6xl md:text-7xl lowercase relative top-2">Nature</span>
+            </h1>
+            <p className="text-brand-brown/70 font-medium mt-3 text-lg uppercase tracking-widest">Punto de Venta Móvil</p>
+          </div>
+          {isOfflineMode && (
+            <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full font-bold text-sm shadow-sm flex items-center gap-2 border border-amber-200 h-fit">
+              <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span></span>
+              Modo sin conexión
+            </div>
+          )}
+        </header>
+
+        {loading && <p className="text-brand-green font-bold text-lg animate-pulse">Cargando base de datos...</p>}
+        {error && <p className="text-red-500 font-bold text-lg">{error}</p>}
+
+        {!loading && !error && (
+          <>
+            {isAddingClient && !activeClient ? (
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                <div className="flex items-center gap-4 mb-6">
+                  <button onClick={() => setIsAddingClient(false)} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-brown hover:bg-gray-50 transition-colors">
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                  </button>
+                  <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Alta de Cliente</h2>
+                </div>
+
+                <form onSubmit={handleCreateClient} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 p-5 md:p-8 space-y-6">
+                  <div>
+                    <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4">1. Identidad del Negocio</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Nombre Comercial *</label>
+                        <input required type="text" value={clientForm.name} onChange={e => setClientForm({...clientForm, name: e.target.value})} placeholder="Ej. Abarrotes Doña Mary" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Nombre del Contacto</label>
+                        <input type="text" value={clientForm.contact} onChange={e => setClientForm({...clientForm, contact: e.target.value})} placeholder="Ej. María López" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Teléfono (WhatsApp)</label>
+                        <input type="tel" value={clientForm.phone_number} onChange={e => setClientForm({...clientForm, phone_number: e.target.value})} placeholder="Ej. 312 123 4567" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">2. Logística y Ruteo</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Comunidad / Colonia (Agrupador) *</label>
+                        <input required type="text" value={clientForm.location} onChange={e => setClientForm({...clientForm, location: e.target.value})} placeholder="Ej. Los Asmoles, Centro..." className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Ruta Asignada *</label>
+                        <input 
+                          required 
+                          type="text" 
+                          list="rutas-registradas"
+                          value={clientForm.route_name} 
+                          onChange={e => setClientForm({...clientForm, route_name: e.target.value})} 
+                          placeholder="Escribe o selecciona una ruta..." 
+                          className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors text-brand-brown"
+                        />
+                        <datalist id="rutas-registradas">
+                          {(routes || []).map(ruta => (
+                            <option key={ruta.id} value={ruta.name} />
+                          ))}
+                        </datalist>
+                        <p className="text-[10px] text-gray-400 mt-1.5 ml-1">Selecciona una existente o teclea una nueva.</p>
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-bold text-brand-brown mb-1">Dirección (Calle, Número o Referencia) *</label>
+                        <textarea required value={clientForm.address} onChange={e => setClientForm({...clientForm, address: e.target.value})} rows="2" placeholder="Ej. Av. Niños Héroes #123, o Referencia" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors resize-none"></textarea>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div>
+                    <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">3. Coordenadas Exactas</h3>
+                    <div className="flex flex-col items-start gap-4">
+                      <button type="button" onClick={captureLocation} disabled={isLocating} className={`flex items-center justify-center w-full md:w-auto gap-2 px-6 py-3.5 rounded-xl font-bold transition-all shadow-sm ${clientForm.latitude !== '' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-white border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white'}`}>
+                        {isLocating ? (
+                           <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        ) : clientForm.latitude !== '' ? (
+                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                        ) : (
+                           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                        )}
+                        {isLocating ? 'Obteniendo satélites...' : clientForm.latitude !== '' ? 'Ubicación Capturada (Puedes editarla abajo)' : 'Capturar Ubicación (En la calle)'}
+                      </button>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full bg-gray-50 p-4 rounded-xl border border-gray-100">
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Latitud (Manual / Google Maps)</label>
+                          <input type="number" step="any" value={clientForm.latitude} onChange={e => setClientForm({...clientForm, latitude: e.target.value})} placeholder="Ej. 19.2433" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-bold text-gray-500 mb-1">Longitud (Manual / Google Maps)</label>
+                          <input type="number" step="any" value={clientForm.longitude} onChange={e => setClientForm({...clientForm, longitude: e.target.value})} placeholder="Ej. -103.7251" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-brand-brown/10">
+                    <button type="submit" disabled={isSubmitting} className="w-full bg-brand-green text-white font-black text-lg py-4 rounded-xl hover:bg-brand-green-dark transition-colors shadow-lg active:scale-[0.99] uppercase tracking-wider">
+                      {isSubmitting ? 'Guardando...' : 'Guardar Cliente'}
+                    </button>
+                  </div>
+                </form>
+              </div>
+
+            ) : !activeClient ? (
+              <div className="animate-in fade-in duration-300">
+                <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-2xl font-calistoga text-brand-brown">Directorio</h2>
+                    <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{clients.length} tiendas</span>
+                  </div>
+                  <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 rounded-xl hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                    Nuevo Cliente
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  {locationNames.map(locationName => {
+                    const localClients = groupedClients[locationName];
+                    const isExpanded = expandedLocations[locationName];
+                    return (
+                      <div key={locationName} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden transition-all">
+                        <button onClick={() => toggleLocation(locationName)} className="w-full p-5 flex justify-between items-center hover:bg-brand-bg transition-colors">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+                            <div className="text-left"><h3 className="text-xl font-bold text-brand-brown">{locationName}</h3><p className="text-sm text-gray-500">{localClients.length} tiendas</p></div>
+                          </div>
+                          <svg className={`w-6 h-6 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        {isExpanded && (
+                          <div className="border-t border-gray-100 bg-brand-bg/30">
+                            {localClients.map(client => (
+                              <div key={client.id} className="p-4 border-b border-gray-100 last:border-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white transition-colors">
+                                <div>
+                                  <h4 className="text-lg font-black text-brand-green">{client.name}</h4>
+                                  <p className="text-sm text-brand-brown font-medium mt-0.5 flex items-start gap-1.5"><svg className="w-4 h-4 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{client.address || "Sin referencia"}</p>
+                                  <div className="flex flex-col gap-2 mt-2">
+                                    {client.contact && <p className="text-xs text-gray-500 flex items-center gap-1.5 font-medium"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>{client.contact}</p>}
+                                    {client.phone_number && (() => {
+                                      const cleanPhone = client.phone_number.replace(/\D/g, '');
+                                      const waLink = cleanPhone.length === 10 ? `https://wa.me/52${cleanPhone}` : `https://wa.me/${cleanPhone}`;
+                                      return (
+                                        <div className="flex items-center gap-2">
+                                          <a href={`tel:${cleanPhone}`} className="flex items-center gap-1.5 text-xs font-bold text-brand-green hover:bg-brand-green hover:text-white transition-colors bg-brand-green/10 px-2.5 py-1.5 rounded-lg"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>Llamar</a>
+                                          <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 rounded-lg shadow-sm"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>WhatsApp</a>
+                                        </div>
+                                      );
+                                    })()}
+                                  </div>
+                                </div>
+                                <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 rounded-xl hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm">Iniciar Venta</button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div className="animate-in fade-in zoom-in-95 duration-300">
+                <div className="bg-brand-brown text-white p-4 rounded-2xl mb-6 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                  <div>
+                    <p className="text-brand-bg text-sm uppercase tracking-widest font-bold mb-0.5">Vendiendo a:</p>
+                    <h2 className="text-2xl font-calistoga">{activeClient.name}</h2>
+                    <p className="text-sm opacity-90 mt-1.5 flex items-center gap-1.5"><svg className="w-4 h-4 mt-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{activeClient.location} • {activeClient.route_name}</p>
+                  </div>
+                  <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Cambiar Cliente</button>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {categoryNames.map(categoryName => {
+                    const items = groupedProducts[categoryName];
+                    const { catColor } = formatProduct(items[0]);
+                    const coverImage = CATEGORY_COVERS[categoryName];
+                    const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
+                    return (
+                      <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
+                        <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
+                        <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
+                          {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
+                          {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
+                        </div>
+                        <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variantes disponibles</p></div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+
+      {selectedCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setSelectedCategory(null)}></div>
+          <div className="bg-brand-bg w-full max-w-3xl max-h-[95vh] rounded-2xl sm:rounded-3xl shadow-2xl relative flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-white p-4 sm:p-6 border-b border-brand-brown/10 flex justify-between items-center shadow-sm z-10 flex-shrink-0">
+              <div><h2 className="text-2xl sm:text-3xl font-calistoga text-brand-brown leading-none">{selectedCategory}</h2><p className="text-brand-green font-bold text-xs sm:text-sm tracking-widest uppercase mt-1">Selecciona por gramaje</p></div>
+              <button onClick={() => setSelectedCategory(null)} className="bg-brand-bg text-brand-brown hover:bg-red-100 hover:text-red-500 w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>
+            </div>
+            <div className="p-2 sm:p-6 overflow-y-auto flex-1">
+              {Object.keys(groupedProducts[selectedCategory].reduce((acc, item) => { const w = item.weight_g || '0'; if (!acc[w]) acc[w] = []; acc[w].push(item); return acc; }, {})).sort((a,b) => Number(a) - Number(b)).map(weight => {
+                const subItems = groupedProducts[selectedCategory].filter(i => (i.weight_g || '0') == weight); const isExpanded = expandedWeights[weight];                return (
+                  <div key={weight} className="mb-4 bg-white rounded-xl shadow-sm border border-brand-brown/5 overflow-hidden">
+                    <button onClick={() => toggleWeight(weight)} className="w-full bg-brand-brown/5 p-4 flex justify-between items-center hover:bg-brand-brown/10 transition-colors"><span className="font-bold text-brand-brown text-lg">Presentación {weight}g <span className="text-brand-green text-sm ml-2">({subItems.length} sabores)</span></span><svg className={`w-5 h-5 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg></button>
+                    {isExpanded && (
+                      <div className="flex flex-col">
+                        {subItems.map(product => {
+                          const quantity = cart.find(item => item.id === product.id)?.quantity || 0; const { badge, catColor } = formatProduct(product);
+                          return (
+                            <div key={product.id} className="p-3 sm:p-4 border-b border-gray-100 flex flex-row items-center gap-3 sm:gap-4 hover:bg-gray-50 transition-colors">
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg relative flex-shrink-0 bg-brand-bg overflow-hidden flex items-center justify-center shadow-sm">
+                                {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover text-transparent" /> : <div className="w-full h-full flex items-center justify-center text-white" style={{ backgroundColor: catColor }}><span className="font-black text-2xl opacity-70 tracking-tighter">{product.name.substring(0,2).toUpperCase()}</span></div>}
+                              </div>
+                              <div className="flex-1 flex flex-col justify-center min-w-0">
+                                <div className="flex items-center gap-2 mb-1 flex-wrap">{badge ? <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow-sm whitespace-nowrap ${badge.colorClass}`}>{badge.text}</span> : <span className="text-xs font-bold text-brand-brown">ÚNICO</span>}</div>
+                                <span className="text-lg sm:text-xl font-black text-brand-green leading-none truncate">${product.price}</span>
+                              </div>
+                              <div className="w-[110px] sm:w-[130px] flex-shrink-0">
+                                {quantity > 0 ? (
+                                  <div className="flex items-center justify-between bg-white rounded-xl overflow-hidden border border-brand-green/40 h-[40px] sm:h-[44px] shadow-sm"><button onClick={() => removeFromCart(product.id)} className="w-8 sm:w-10 h-full flex items-center justify-center text-brand-green hover:bg-brand-green hover:text-white transition-colors text-xl font-bold">-</button><input type="number" value={quantity} onChange={(e) => handleSetQuantity(product, e.target.value)} className="w-full text-center font-bold text-brand-brown text-base sm:text-lg bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} /><button onClick={() => addToCart(product)} className="w-8 sm:w-10 h-full flex items-center justify-center text-brand-green hover:bg-brand-green hover:text-white transition-colors text-xl font-bold">+</button></div>
+                                ) : (
+                                  <button onClick={() => addToCart(product)} className="w-full h-[40px] sm:h-[44px] bg-white border-2 border-brand-green text-brand-green font-bold rounded-xl hover:bg-brand-green hover:text-white active:scale-[0.98] transition-all text-xs sm:text-sm uppercase tracking-wider shadow-sm">Agregar</button>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="bg-white border-t border-brand-brown/10 p-3 sm:p-4 flex justify-center flex-shrink-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+              <button onClick={() => setSelectedCategory(null)} className="w-full sm:w-auto bg-brand-brown text-white font-bold py-3 px-8 rounded-xl hover:bg-brand-brown/90 transition-colors uppercase tracking-wider text-sm shadow-md active:scale-95">Volver a Categorías</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {cart.length > 0 && (
+        <button onClick={() => setIsCartOpen(true)} className="fixed bottom-8 right-8 z-40 bg-brand-green hover:bg-brand-green-dark text-white p-4 rounded-full shadow-[0_10px_25px_rgba(91,138,60,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3">
+          <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+          <div className="bg-white text-brand-green font-black rounded-full h-7 w-7 flex items-center justify-center text-sm border-2 border-white">{totalItems}</div>
+        </button>
+      )}
+
+      {isCartOpen && <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 transition-opacity" onClick={() => setIsCartOpen(false)} />}
+
+      <div className={`fixed inset-y-0 right-0 z-50 w-full sm:w-[420px] bg-brand-bg shadow-2xl transform transition-transform duration-300 ease-in-out ${isCartOpen ? 'translate-x-0' : 'translate-x-full'} flex flex-col border-l border-brand-brown/10`}>
+        <div className="p-6 border-b border-brand-brown/10 flex justify-between items-start bg-white">
+          <div>
+            <h2 className="text-2xl font-calistoga text-brand-brown flex items-center gap-3">Orden Actual <span className="bg-brand-green text-white font-sans text-xs py-1 px-3 rounded-full font-bold">{totalItems} items</span></h2>
+            <button onClick={clearCart} className="text-sm leading-none text-red-500 hover:text-red-700 font-bold mt-3 flex items-center gap-1.5 transition-colors"><svg className="w-4 h-4 mt-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>Vaciar carrito</button>
+          </div>
+          <button onClick={() => setIsCartOpen(false)} className="p-2 text-gray-400 hover:text-brand-brown hover:bg-brand-bg rounded-full"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-6 bg-brand-bg">
+          <ul className="space-y-4">
+            {cart.map(item => {
+              const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
+              return (
+                <li key={item.id} className="flex justify-between items-center p-4 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
+                  <div className="flex-1 pl-3 pr-2 min-w-0">
+                    <p className="font-bold text-brand-brown text-sm leading-tight mb-1 truncate">{cartTitle}</p>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {cartSubtitle && <span className={`text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-md shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
+                      <p className="text-xs text-brand-green font-bold">${item.price} c/u</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center w-[90px] sm:w-[100px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-8 overflow-hidden flex-shrink-0">
+                    <button onClick={() => removeFromCart(item.id)} className="w-8 h-full bg-white hover:text-red-500 font-bold">-</button>
+                    <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs sm:text-sm text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
+                    <button onClick={() => addToCart(item)} className="w-8 h-full bg-white hover:text-brand-green font-bold">+</button>
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <div className="p-6 border-t border-brand-brown/10 bg-white">
+          <div className="flex justify-between items-end mb-6">
+            <span className="text-lg font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
+            <span className="text-4xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
+          </div>
+          <button onClick={handleCheckout} disabled={isSubmitting} className={`w-full text-white py-4 rounded-xl font-black text-lg transition-all shadow-lg uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark shadow-brand-green/30 active:scale-[0.98]'}`}>
+            {isSubmitting ? 'Procesando...' : 'Cobrar Orden'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+export default App

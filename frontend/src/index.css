@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Calistoga&family=Satisfy&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Paleta de Colores Nahui Nature */
+  --color-brand-bg: #F8F6EF;
+  --color-brand-green: #5B8A3C;
+  --color-brand-green-dark: #42662C;
+  --color-brand-brown: #7B502B;
+  
+  /* Tipografías */
+  --font-calistoga: "Calistoga", serif;
+  --font-satisfy: "Satisfy", cursive;
+  --font-body: "Body Grotesque", system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-brand-bg);
+}

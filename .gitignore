@@ -1,0 +1,12 @@
+# Variables de entorno
+.env
+
+# Dependencias
+node_modules/
+dist/
+dev-dist/
+
+# Python
+__pycache__/
+venv/
+env/
