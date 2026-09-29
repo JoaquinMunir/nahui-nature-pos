@@ -3,37 +3,42 @@
 A Progressive Web Application (PWA) and Mobile Point of Sale (mPOS) designed for remote route sales operations in environments with limited or no internet connectivity. The system implements a robust Store-and-Forward architecture to ensure seamless logistics, data persistence, and zero-loss order reconciliation regardless of network availability.
 
 ## System Architecture
-This project utilizes a decoupled, modern service architecture:
-- **Frontend / Client:** React.js (Vite) + Tailwind CSS (v4) + Dexie.js (IndexedDB) + Vite PWA (Service Worker)
-- **Backend / API:** Python (FastAPI) for high-performance, asynchronous REST API services
-- **Database:** PostgreSQL (Supabase)
+This project utilizes a decoupled, modern service architecture prepared for cloud deployment (CI/CD):
+- **Frontend / Client:** React.js (Vite) + Tailwind CSS (v4) + Dexie.js (IndexedDB) + Vite PWA (Service Worker). Target Hosting: Vercel / Netlify.
+- **Backend / API:** Python (FastAPI) for high-performance, asynchronous REST API services. Target Hosting: Render / Railway.
+- **Database:** PostgreSQL (Supabase).
 
 ## Core Capabilities
 - **Offline-First B2B Sales:** Full POS operation capability during network dead zones. Order generation, cryptographic ID mapping, and temporal state management are handled exclusively via IndexedDB.
 - **Offline Client Onboarding & GPS Capture:** Sales representatives can register new clients in the field without connectivity. The app uses the native HTML5 Geolocation API to capture precise satellite coordinates (Latitude/Longitude) offline.
 - **Dynamic Route Management:** The system automatically learns and categorizes new delivery routes using a Smart Combobox and backend `ON CONFLICT DO NOTHING` SQL rules, completely eliminating hardcoded route management.
 - **Background Synchronization:** Automated, silent state reconciliation with the central PostgreSQL database upon network restoration, flushing both the offline transaction queue and the offline client registration queue.
-- **Progressive Web App (PWA):** Installable client interface that caches the entire Application Shell (HTML, CSS, JS, graphical assets) to function identically to a native mobile application without requiring server-side rendering.
+- **Progressive Web App (PWA) & Native Mobile Experience:** Installable client interface that caches the entire Application Shell (HTML, CSS, JS, graphical assets) to function identically to a native mobile application without requiring server-side rendering. Implements strict viewport scaling prevention (`user-scalable=no`), portrait orientation locks, and deep OS integration via `manifest.json` and maskable icons.
 
-## Local Development & Deployment Environment
+## Environment Management & Deployment
 
-### Backend Configuration (Python/FastAPI)
+The architecture strictly separates environment variables to isolate local development from production cloud environments.
+
+### 1. Frontend Configuration (React/Vite)
+The frontend utilizes a `.env` file at the root level to dynamically route HTTP requests (Axios) based on the active environment.
+- **Variable:** `VITE_API_URL`
+- **Development:** Points to `http://127.0.0.1:8000` for local testing.
+- **Production:** Injected via Vercel/Netlify CI/CD pipeline to point to the live FastAPI cloud URL.
+
+**Run Modes:**
+- `npm run dev`: Bypasses Service Worker caching to allow immediate Hot Module Replacement visibility during development.
+- `npm run build`: Compiles static assets and generates the final physical Service Worker (`sw.js`).
+- `npm run preview`: Serves the compiled production build locally to test true offline PWA behavior before cloud deployment.
+
+### 2. Backend Configuration (Python/FastAPI)
 1. Navigate to the backend directory: `cd backend`
 2. Activate the virtual environment: `.\venv\Scripts\activate`
 3. Install dependencies: `pip install -r requirements.txt`
 4. Initialize the local development server: `uvicorn main:app --reload`
+- **Variable:** `DATABASE_URL` (Isolated in the backend `.env` to protect the Supabase PostgreSQL connection string from client exposure).
 
-### Frontend Configuration (React/Vite)
-The frontend is a Single Page Application (SPA) built with React and bundled via Vite. It uses Tailwind CSS (v4) for utility-first styling and Axios for HTTP client operations.
-
-- **Development Mode (Live Editing):**
-  1. `cd frontend`
-  2. `npm run dev`
-  *(Note: Bypasses Service Worker caching to allow immediate Hot Module Replacement visibility during development).*
-
-- **Production Simulation (PWA & Offline Testing):**
-  1. `npm run build` (Compiles static assets and generates the Service Worker manifest)
-  2. `npm run preview` (Serves the compiled production build locally)
+### 3. Version Control & CI/CD
+The project is version-controlled via Git, utilizing `.gitignore` policies to exclude `node_modules`, Python environments (`__pycache__`, `venv`), and `.env` files. The `main` branch acts as the single source of truth for automated cloud deployments.
 
 ## UI Branding & Theming Guidelines
 The UI strictly adheres to the "Nahui Nature" corporate brand guidelines, implemented via Tailwind v4 CSS configuration:
@@ -62,6 +67,7 @@ The frontend employs a mobile-first, zero-friction interface engineered specific
 ### UI/UX Rules Engine (POS Catalog)
 - **Category-First Navigation:** The main viewport suppresses individual SKUs, presenting exclusively high-level Category Cover Cards.
 - **Centralized Modal Architecture:** Interacting with a category mounts a centralized, focus-trapping modal pop-up. Inside the modal, the `reduce` algorithm dynamically groups flavor variants by `weight_g` into independent accordions.
+- **Robust Type Coercion Engine:** The categorization logic implements loose equality operators (`==`) to safely map Supabase structural integers (`int4`) to JavaScript string representations, guaranteeing bulletproof UI rendering of product variants across strict typing boundaries.
 - **Dynamic Category Accent Lines:** The system intercepts database product categories to programmatically render a top-border 6px accent line across cards and left-border accents on cart items via corporate hex mapping (Obleas: `#8A6B4E`, Chocohojuelas: `#3B2216`, Chips: `#5B8A3C`, Nubes de Maíz: `#F3D36B`, Lentejas: `#953431`, Platanitos: `#E4B647`, Cecina/Carne: `#2B1010`).
 - **Flavor-Specific Floating Badges:** SKU variants render a single floating badge mapping the flavor name to its physical packaging color matrix (e.g., `#ffce33` for Queso, `#bc584b` for Fuego). Single-variant products automatically suppress this component.
 - **Dynamic Action Controls:** Action buttons dynamically mutate into inline increment/decrement controllers (`[ - | qty | + ]`) based on the SKU's active presence in the cart array, augmented with a direct `<input type="number">` field triggering the native mobile numeric keypad.
