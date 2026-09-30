@@ -135,7 +135,7 @@ function App() {
             setRoutes(localRoutes);
             setIsOfflineMode(true); 
           } else {
-            setError("Sin conexión y sin base local.");
+            setError("Error real: " + err.message + " | Intentando: " + ENDPOINTS.products);
           }
         } catch (localErr) {
           setError("Error en almacenamiento local.");
