@@ -20,7 +20,7 @@ This project utilizes a decoupled, modern service architecture prepared for clou
 The architecture strictly separates environment variables to isolate local development from production cloud environments.
 
 ### 1. Frontend Configuration (React/Vite)
-The frontend utilizes a `.env` file at the root level to dynamically route HTTP requests (Axios) based on the active environment.
+The frontend utilizes a `.env` file at the root level to dynamically route HTTP requests (Axios) based on the active environment. Endpoints are strictly evaluated as variables (without string quotes) to prevent routing errors.
 - **Variable:** `VITE_API_URL`
 - **Development:** Points to `http://127.0.0.1:8000` for local testing.
 - **Production:** Injected via Vercel/Netlify CI/CD pipeline to point to the live FastAPI cloud URL.
@@ -35,9 +35,13 @@ The frontend utilizes a `.env` file at the root level to dynamically route HTTP 
 2. Activate the virtual environment: `.\venv\Scripts\activate`
 3. Install dependencies: `pip install -r requirements.txt`
 4. Initialize the local development server: `uvicorn main:app --reload`
-- **Variable:** `DATABASE_URL` (Isolated in the backend `.env` to protect the Supabase PostgreSQL connection string from client exposure).
+- **Variable:** `DATABASE_URL` (Isolated in the backend `.env` to protect the Supabase connection string from client exposure).
+- **Supabase Cloud Connection:** To ensure compatibility with cloud hosts like Render, the connection utilizes the **Supabase Session Pooler** (IPv4 proxied, port 5432) instead of the default IPv6 Transaction Pooler. Passwords containing special characters are strictly **URL Encoded** to maintain URI string integrity.
 
-### 3. Version Control & CI/CD
+### 3. Server Keep-Alive Strategy (Render Free Tier)
+To prevent the FastAPI service from suspending after 15 minutes of inactivity, the API implements a dedicated Health Check endpoint (`GET /health`). This lightweight route is monitored by an external cron service (e.g., UptimeRobot) every 14 minutes, keeping the server perpetually awake without executing database queries or consuming Supabase connection limits.
+
+### 4. Version Control & CI/CD
 The project is version-controlled via Git, utilizing `.gitignore` policies to exclude `node_modules`, Python environments (`__pycache__`, `venv`), and `.env` files. The `main` branch acts as the single source of truth for automated cloud deployments.
 
 ## UI Branding & Theming Guidelines
@@ -88,6 +92,7 @@ The frontend employs a mobile-first, zero-friction interface engineered specific
 
 The React client interfaces with a decoupled Python RESTful API built on the FastAPI framework.
 
+- **CORS Policies:** Cross-Origin Resource Sharing is strictly enforced via `CORSMiddleware`, granting access exclusively to the local development environment (`http://localhost:5173`) and the Vercel production domain.
 - **Data Fetching (GET):** The client simultaneously consumes `/products`, `/clients`, and `/routes` via `Promise.all` to hydrate the global state and IndexedDB cache.
 - **Transactional Writes (POST):** 
   - `/orders`: Strictly validates cross-origin JSON payloads, safely translating complex nested structures into database operations.
