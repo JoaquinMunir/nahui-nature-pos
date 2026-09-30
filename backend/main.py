@@ -44,6 +44,10 @@ class ClientCreate(BaseModel):
     longitude: Optional[float] = None
     route_name: str
 
+@app.get("/health")
+def health_check():
+    return {"status": "active", "message": "Server connection"}
+
 @app.get("/products")
 def get_products():
     try:
