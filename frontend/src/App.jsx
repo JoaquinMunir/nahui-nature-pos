@@ -2,6 +2,16 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { db } from './db' 
 
+const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
+
+// Diccionario centralizado de rutas
+const ENDPOINTS = {
+  products: `${API_URL}/products`,
+  clients:  `${API_URL}/clients`,
+  routes:   `${API_URL}/routes`,
+  orders:   `${API_URL}/orders`
+};
+
 const CATEGORY_COVERS = {
   "Obleas tradición de amaranto": "https://images.unsplash.com/photo-1600018593466-9b5133af00be?w=800&q=80",
   "Platanitos crujientes": "https://images.unsplash.com/photo-1599859599960-9303531b4028?w=800&q=80",
@@ -76,7 +86,7 @@ function App() {
         const offlineClients = await db.sync_clients_queue.toArray();
         for (const client of offlineClients) {
           try {
-            const res = await axios.post('http://127.0.0.1:8000/clients', client);
+            const res = await axios.post(ENDPOINTS.clients, client);
             if (res.data.status === 'success') await db.sync_clients_queue.delete(client.id);
           } catch (err) { break; }
         }
@@ -86,7 +96,7 @@ function App() {
         const offlineOrders = await db.sync_queue.toArray();
         for (const order of offlineOrders) {
           try {
-            const res = await axios.post('http://127.0.0.1:8000/orders', order);
+            const res = await axios.post(ENDPOINTS.orders, order);
             if (res.data.status === 'success') await db.sync_queue.delete(order.id); 
           } catch (err) { break; }
         }
@@ -96,9 +106,9 @@ function App() {
     const fetchInitialData = async () => {
       try {
         const [resProducts, resClients, resRoutes] = await Promise.all([
-          axios.get('http://127.0.0.1:8000/products'),
-          axios.get('http://127.0.0.1:8000/clients'),
-          axios.get('http://127.0.0.1:8000/routes')
+          axios.get(ENDPOINTS.products),
+          axios.get(ENDPOINTS.clients),
+          axios.get(ENDPOINTS.routes)
         ]);
         
         if (resProducts.data.status === 'success' && resClients.data.status === 'success' && resRoutes.data.status === 'success') {
@@ -125,7 +135,7 @@ function App() {
             setRoutes(localRoutes);
             setIsOfflineMode(true); 
           } else {
-            setError("Sin conexión y sin base local.");
+            setError("Error: " + err.message);
           }
         } catch (localErr) {
           setError("Error en almacenamiento local.");
@@ -183,7 +193,7 @@ function App() {
     };
 
     try {
-      await axios.post('http://127.0.0.1:8000/clients', newClient);
+      await axios.post(ENDPOINTS.clients, newClient);
       await db.clients.add(newClient);
       setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
       alert('Cliente registrado exitosamente.');
@@ -256,7 +266,7 @@ function App() {
       items: cart.map(item => ({ id: crypto.randomUUID(), product_id: item.id, quantity: item.quantity, unit_price: item.price, subtotal: item.price * item.quantity }))
     };
     try {
-      const res = await axios.post('http://127.0.0.1:8000/orders', payload);
+      const res = await axios.post(ENDPOINTS.orders, payload);
       if (res.data.status === 'success') { clearCart(); setActiveClient(null); }
     } catch (error) {
       try {
