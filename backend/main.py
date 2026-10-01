@@ -147,3 +147,44 @@ def create_order(order: OrderCreate):
     except Exception as e:
         print(f"Database error: {e}") 
         raise HTTPException(status_code=500, detail=str(e))
+    
+@app.get("/orders")
+def get_orders():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute("""
+            SELECT 
+                o.id, 
+                o.total_amount, 
+                o.created_at, 
+                c.name AS client_name,
+                c.location AS client_location,
+                c.address AS client_address,
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'quantity', oi.quantity,
+                            'product_name', p.name,
+                            'category', p.category,
+                            'subtotal', oi.subtotal
+                        )
+                    ) FILTER (WHERE oi.id IS NOT NULL), '[]'
+                ) AS items
+            FROM orders o
+            LEFT JOIN clients c ON o.client_id = c.id
+            LEFT JOIN order_items oi ON o.id = oi.order_id
+            LEFT JOIN products p ON oi.product_id = p.id
+            GROUP BY o.id, c.name, c.location, c.address
+            ORDER BY o.created_at DESC
+        """)
+        
+        orders = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return {"status": "success", "data": orders}
+    except Exception as e:
+        print(f"Database error (get orders): {e}") 
+        raise HTTPException(status_code=500, detail=str(e))

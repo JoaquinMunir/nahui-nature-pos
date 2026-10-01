@@ -10,6 +10,10 @@ This project utilizes a decoupled, modern service architecture prepared for clou
 
 ## Core Capabilities
 - **Offline-First B2B Sales:** Full POS operation capability during network dead zones. Order generation, cryptographic ID mapping, and temporal state management are handled exclusively via IndexedDB.
+- **Real-Time Sales Dashboard & Analytics:** Administrative view to track daily revenue and reconcile field transactions. 
+  - **Relational Hydration:** The frontend dynamically consumes cross-referenced logistics data (Client Names, Locations) mapped via an optimized `LEFT JOIN` and nested `json_agg` arrays on the backend, allowing zero-latency expansion of order contents without secondary network requests.
+  - **Dynamic Revenue Filtering:** Implements a dual-engine in-memory filter (Text-based searching & YYYY-MM-DD Date mapping) that dynamically recalculates total accumulated revenue on the fly, providing instant cash-out metrics (e.g., "Total revenue for September 30th in Los Asmoles").
+- **Automated WhatsApp Ticketing:** Instant generation of digital receipts. Upon successful order creation, the system compiles the transaction details (client, itemized list, subtotals) into a formatted text string and triggers a native deep link (`wa.me`) to send the ticket directly to the client's WhatsApp.
 - **Offline Client Onboarding & GPS Capture:** Sales representatives can register new clients in the field without connectivity. The app uses the native HTML5 Geolocation API to capture precise satellite coordinates (Latitude/Longitude) offline.
 - **Dynamic Route Management:** The system automatically learns and categorizes new delivery routes using a Smart Combobox and backend `ON CONFLICT DO NOTHING` SQL rules, completely eliminating hardcoded route management.
 - **Background Synchronization:** Automated, silent state reconciliation with the central PostgreSQL database upon network restoration, flushing both the offline transaction queue and the offline client registration queue.
@@ -78,11 +82,12 @@ The frontend employs a mobile-first, zero-friction interface engineered specific
 - **True Offline Visual Resilience:** Completely eliminates third-party image placeholder dependencies (like placehold.co). Broken offline images dynamically default to CSS-based fallback cards matching the category's corporate hex code with the SKU's initials.
 - **Pixel-Perfect Alignment:** Utilizes Tailwind's `leading-none` and precise micro-margins (`mt-[1px]`) to ensure optical center alignment between typography and SVG iconography.
 
-### UI/UX Rules Engine (Client Logistics)
+### UI/UX Rules Engine (Client Logistics & Administration)
 - **Intelligent Client Directory:** The initial view groups clients strictly by their geographical `location` via `reduce()`, presenting collapsible accordions that prevent cognitive overload.
 - **Native Deep Linking:** Client cards leverage professional SVG iconography natively hooked to mobile protocols (`tel:` and `https://wa.me/`) for instant direct calling and WhatsApp messaging.
 - **Hybrid GPS Form:** The Client Onboarding form features a dual-input geolocation system. Users can tap a button to extract precise satellite GPS coordinates in the field, or manually override the `latitude` and `longitude` fields if inputting data from an administrative desktop.
 - **Smart Combobox (`<datalist>`):** The route assignment field utilizes native HTML5 datalists to provide auto-complete functionality from the downloaded `routes` table, while allowing free-text creation of new routes.
+- **Unified App Routing (State-Based Navigation):** Seamlessly toggles the main viewport between the active Storefront (POS) and the Sales Dashboard (Orders History) without reloading the DOM, ensuring maximum performance on low-end devices.
 
 ### Store-and-Forward Transaction Lifecycle
 - **Adaptive Checkout Routing:** The POS engine utilizes Cryptographic UUIDs (`crypto.randomUUID()`) natively on the client for both orders, order items, and new client IDs. If an Axios `POST` request to FastAPI throws a network exception, the catch block routes the payload to the respective local `sync_queue` table.
