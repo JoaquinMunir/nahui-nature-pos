@@ -721,13 +721,15 @@ const handleCheckout = async () => {
     <div className="min-h-screen relative bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
         
-        {/* 1. ENCABEZADO Y TÍTULO*/}
+        {/* 1. ENCABEZADO Y TÍTULO */}
         <header className="mb-5 md:mb-3 flex items-center justify-between w-full gap-2">
           
           <h1 className="text-3xl sm:text-5xl md:text-6xl tracking-tight flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
-            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-8 h-8 sm:w-12 sm:h-12 md:w-24 md:h-24 object-contain drop-shadow-sm" />
+            {/* 👉 El logo se adapta: más chico en celular (w-10), grande en computadora (md:w-24) */}
+            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-10 h-10 sm:w-14 sm:h-14 md:w-24 md:h-24 object-contain drop-shadow-sm" />
             <span className="font-calistoga text-brand-brown uppercase">Nahui</span>
-            <span className="font-satisfy text-brand-green text-5xl sm:text-6xl md:text-7xl lowercase relative top-2 md:top-1">nature</span>
+            {/* 👉 "nature" se adapta: moderado en celular (text-4xl), grande en computadora (md:text-7xl) */}
+            <span className="font-satisfy text-brand-green text-4xl sm:text-6xl md:text-7xl lowercase relative top-1.5 md:top-1">nature</span>
           </h1>
 
           <div className="text-right flex-shrink flex items-center justify-end">
@@ -737,6 +739,8 @@ const handleCheckout = async () => {
           </div>
           
         </header>
+
+       
 
         {/* 2. BARRA DE NAVEGACIÓN STICKY (Fija en TODAS las pantallas) */}
         <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-3 -mx-4 px-4 lg:-mx-10 lg:px-10 border-b border-brand-brown/10 mb-6 shadow-sm">
