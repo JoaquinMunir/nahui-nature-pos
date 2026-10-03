@@ -1373,7 +1373,6 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
             </div>
            </div>
           </div>
-        </div>
       )}
 
       {/* MODAL DE ALERTA PERSONALIZADA */}
@@ -1395,7 +1394,6 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
             </div>
           </div>
         </div>
-      </div>
       )}
 
       {/* MODAL RÁPIDO DE CARGA INICIAL DE CAMIONETA */}
