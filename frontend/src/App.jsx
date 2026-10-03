@@ -288,7 +288,7 @@ function App() {
     };
 
     // 2. Conectamos los radares al navegador/celular
-    window.addEventListener('offline', handleOffline);
+    window.addEventListener('offline', handleOffline);  
     window.addEventListener('online', handleOnline);
 
     // 3. Revisión de seguridad inicial al abrir la app
@@ -783,24 +783,26 @@ const handleCheckout = async () => {
                 </div>
               )}
 
-              {isOnRoad ? (
-                <>
-                  <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-amber-500 hover:bg-amber-600 text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Gasto Operativo">
-                    <span className="text-lg leading-none md:hidden">💸</span>
-                    <span className="hidden md:inline">💸 Gasto</span>
+                {isOnRoad ? (
+                  <>
+                    <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-[#dd9d5c] hover:bg-[#b78049] text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Gasto Operativo">
+                    <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                    </svg>
+                      <span className="hidden md:inline">Gasto</span>
+                    </button>
+                    <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Terminar Ruta">
+                      <span className="text-lg leading-none md:hidden">🛑</span>
+                      <span className="hidden md:inline">🛑 Terminar Ruta</span>
+                    </button>
+                  </>
+                ) : (
+                  <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                    <span className="text-lg leading-none">🚚</span>
+                    <span className="text-sm md:text-base hidden sm:inline">Iniciar Ruta</span>
+                    <span className="text-sm font-black sm:hidden">Ruta</span>
                   </button>
-                  <button onClick={handleEndRoute} className="bg-red-500 hover:bg-red-600 text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Terminar Ruta">
-                    <span className="text-lg leading-none md:hidden">🛑</span>
-                    <span className="hidden md:inline">🛑 Terminar Ruta</span>
-                  </button>
-                </>
-              ) : (
-                <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
-                  <span className="text-lg leading-none">🚚</span>
-                  <span className="text-sm md:text-base hidden sm:inline">Iniciar Ruta</span>
-                  <span className="text-sm font-black sm:hidden">Ruta</span>
-                </button>
-              )}
+                )}
             </div>
 
           </div>
@@ -953,9 +955,9 @@ const handleCheckout = async () => {
                                 qty: ''
                               });
                             }}
-                            className="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg hover:bg-blue-700 transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
+                            className="bg-[#49839a] text-white font-bold px-3 py-2 rounded-lg hover:bg-[#3a697c] transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
                           >
-                            <span className="text-sm hidden xl:inline">Transpasar</span>
+                            <span className="text-sm hidden xl:inline">Traspasar</span>
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                           </button>
                         </div>

@@ -7,7 +7,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['icon-192.png', 'icon-512.png', 'favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Nahui Nature POS',
         short_name: 'Nahui POS',
