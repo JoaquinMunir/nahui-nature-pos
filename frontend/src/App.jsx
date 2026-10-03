@@ -112,7 +112,12 @@ function App() {
   const [mobileInventory, setMobileInventory] = useState([]);
   const [showRouteLoadModal, setShowRouteLoadModal] = useState(false);
   const [routeLoadCart, setRouteLoadCart] = useState({});
-  const [saleMode, setSaleMode] = useState('mobile');
+  
+  const [saleMode, setSaleMode] = useState(() => {
+  const onRoad = localStorage.getItem('isOnRoad') === 'true';
+  return onRoad ? 'mobile' : 'central';
+});
+;
   const [stockInputs, setStockInputs] = useState({});
   const [transferModal, setTransferModal] = useState({ isOpen: false, product: null, stockCasa: 0, qty: '' });
 
