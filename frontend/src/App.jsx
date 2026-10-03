@@ -114,10 +114,10 @@ function App() {
   const [routeLoadCart, setRouteLoadCart] = useState({});
   
   const [saleMode, setSaleMode] = useState(() => {
-  const onRoad = localStorage.getItem('isOnRoad') === 'true';
-  return onRoad ? 'mobile' : 'central';
-});
-;
+    const onRoad = localStorage.getItem('isOnRoad') === 'true';
+    return onRoad ? 'mobile' : 'central';
+  });
+
   const [stockInputs, setStockInputs] = useState({});
   const [transferModal, setTransferModal] = useState({ isOpen: false, product: null, stockCasa: 0, qty: '' });
 
@@ -279,7 +279,6 @@ function App() {
   };
   
   useEffect(() => {
-    // 1. Funciones que se disparan al cambiar la señal
     const handleOffline = () => {
       setIsOfflineMode(true);
       setAppAlert({ isOpen: true, title: 'Señal Perdida', message: 'Entrando a modo offline. Puedes seguir vendiendo.', type: 'warning' });
@@ -288,20 +287,16 @@ function App() {
     const handleOnline = () => {
       setIsOfflineMode(false);
       setAppAlert({ isOpen: true, title: 'Conexión Recuperada', message: 'Sincronizando datos en segundo plano...', type: 'success' });
-      // Cuando regresa el internet, forzamos una recarga de inventarios silenciosa
       fetchInventories();
     };
 
-    // 2. Conectamos los radares al navegador/celular
     window.addEventListener('offline', handleOffline);  
     window.addEventListener('online', handleOnline);
 
-    // 3. Revisión de seguridad inicial al abrir la app
     if (!navigator.onLine) {
       setIsOfflineMode(true);
     }
 
-    // 4. Limpieza de memoria si se cierra la app
     return () => {
       window.removeEventListener('offline', handleOffline);
       window.removeEventListener('online', handleOnline);
@@ -413,14 +408,12 @@ function App() {
       } catch (err) {}
     };
     
-const fetchInitialData = async () => {
+    const fetchInitialData = async () => {
       try {
-        // 👉 CORRECCIÓN 1: Agregamos resOrders a la lista para evitar el choque (crash)
         const [resProducts, resClients, resRoutes, resOrders] = await Promise.all([
           axios.get(ENDPOINTS.products),
           axios.get(ENDPOINTS.clients),
           axios.get(ENDPOINTS.routes),
-          // 👉 BLINDAJE: Si el historial de ventas falla, devuelve null pero NO rompe el resto de la app
           axios.get(ENDPOINTS.orders).catch(() => null) 
         ]);
         
@@ -429,7 +422,6 @@ const fetchInitialData = async () => {
           setClients(resClients.data.data);
           setRoutes(resRoutes.data.data);
           
-          // 👉 CORRECCIÓN 2: Guardamos ventas de forma segura solo si se descargaron correctamente
           if (resOrders && resOrders.data && resOrders.data.status === 'success') {
             setOrdersHistory(resOrders.data.data);
             localStorage.setItem('offline_orders_history', JSON.stringify(resOrders.data.data));
@@ -449,7 +441,6 @@ const fetchInitialData = async () => {
           let localClients = await db.clients.toArray();
           let localRoutes = await db.routes.toArray();
           
-          // Leemos el historial guardado en la memoria si estamos offline
           const localOrders = JSON.parse(localStorage.getItem('offline_orders_history')) || [];
           setOrdersHistory(localOrders);
           
@@ -633,7 +624,7 @@ const fetchInitialData = async () => {
     window.open(url, '_blank');
   };
 
-const handleCheckout = async () => {
+  const handleCheckout = async () => {
     if (cart.length === 0 || !activeClient) return;
     setIsSubmitting(true);
     const payload = {
@@ -642,13 +633,11 @@ const handleCheckout = async () => {
       items: cart.map(item => ({ id: crypto.randomUUID(), product_id: item.id, quantity: item.quantity, unit_price: item.price, subtotal: item.price * item.quantity }))
     };
 
-    // 👉 1. Preparamos el ticket falso para inyectarlo al historial visual al instante
     const newOrderHistoryItem = {
       id: payload.id, client_name: activeClient.name, client_location: activeClient.location, client_address: activeClient.address, total_amount: payload.total_amount, created_at: payload.created_at,
       items: cart.map(item => ({ product_name: item.name, category: item.category, quantity: item.quantity, subtotal: item.price * item.quantity }))
     };
 
-    // Función para actualizar historial visual sin importar si hay internet
     const updateLocalHistory = () => {
       setOrdersHistory(prev => {
         const updated = [newOrderHistoryItem, ...prev];
@@ -667,7 +656,7 @@ const handleCheckout = async () => {
           localStorage.setItem('shiftSales', (currentSales + totalOrder).toString());
           localStorage.setItem('shiftOrderCount', (currentCount + 1).toString());
         }
-        updateLocalHistory(); // 👉 Se agrega al historial
+        updateLocalHistory(); 
         clearCart(); setActiveClient(null); 
       }
       fetchInventories();
@@ -696,7 +685,7 @@ const handleCheckout = async () => {
           return inv;
         }));
 
-        updateLocalHistory(); // 👉 Se agrega al historial en modo OFFLINE
+        updateLocalHistory(); 
         clearCart(); 
         setActiveClient(null);
       } catch (dbError) { 
@@ -726,38 +715,29 @@ const handleCheckout = async () => {
     <div className="min-h-screen relative bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
         
-      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
-        return (
-    <div className="min-h-screen relative bg-brand-bg">
-      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
-        
         {/* 1. ENCABEZADO Y TÍTULO */}
-        <header className="mb-5 md:mb-3 flex items-center justify-between w-full gap-2">
+        <header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2">
           
-          <div className="flex items-center gap-2.5 sm:gap-4 flex-shrink-0">
-            {/* 👉 Logo grande y proporcionado */}
-            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-14 h-14 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
-            
-            {/* 👉 Contenedor de texto de la marca para que vayan juntos y alineados */}
-            <h1 className="flex items-baseline gap-1.5 sm:gap-2">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
+            <h1 className="flex items-baseline gap-1 sm:gap-2">
               <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight">Nahui</span>
               <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl">nature</span>
             </h1>
           </div>
 
           <div className="text-right flex-shrink flex items-center justify-end">
-            <p className="text-brand-brown/70 font-bold text-[9px] sm:text-xs md:text-sm uppercase tracking-widest leading-tight">
+            <p className="text-brand-brown/70 font-bold text-[8px] sm:text-xs md:text-sm uppercase tracking-widest leading-tight">
               Punto de Venta<br className="sm:hidden" /> Móvil
             </p>
           </div>
           
         </header>
 
-        {/* 2. BARRA DE NAVEGACIÓN STICKY (Fija en TODAS las pantallas) */}
-        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-3 -mx-4 px-4 lg:-mx-10 lg:px-10 border-b border-brand-brown/10 mb-6 shadow-sm">
+        {/* 2. BARRA DE NAVEGACIÓN STICKY */}
+        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-2.5 -mx-4 px-4 lg:-mx-10 lg:px-10 border-b border-brand-brown/10 mb-3 md:mb-6 shadow-sm">
           <div className="flex items-center justify-between gap-3 md:justify-end">
             
-            {/* ZONA DESLIZABLE (Carrusel: Tienda, Ventas, Bodega) */}
             <div className="flex-1 flex overflow-x-auto items-center gap-2 pb-1 md:pb-0 scroll-smooth pr-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               
               <button 
@@ -786,10 +766,8 @@ const handleCheckout = async () => {
 
             </div>
 
-            {/* ZONA FIJA A LA DERECHA (Inamovible) */}
             <div className="flex-shrink-0 flex items-center gap-2 pl-3 border-l border-brand-brown/10 md:border-none">
               
-              {/* BADGE OFFLINE */}
               {isOfflineMode && (
                 <div className="bg-amber-100 text-amber-800 px-2.5 py-2.5 md:px-3 md:py-2.5 rounded-xl font-bold text-[10px] md:text-sm shadow-sm flex items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
                   <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span></span>
@@ -1341,7 +1319,6 @@ const handleCheckout = async () => {
             </div>
             
             <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
-              {/* Ventas */}
               <div className="flex justify-between items-center mb-4 pb-4 border-b border-brand-brown/10">
                 <div>
                   <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Ingresos por Ventas</p>
@@ -1350,7 +1327,6 @@ const handleCheckout = async () => {
                 <span className="text-xl font-black text-brand-green">+ ${shiftStats.totalSales.toFixed(2)}</span>
               </div>
 
-              {/* Gastos */}
               <div className="flex justify-between items-center mb-6 pb-4 border-b border-brand-brown/10">
                 <div>
                   <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Gastos Operativos</p>
@@ -1359,14 +1335,12 @@ const handleCheckout = async () => {
                 <span className="text-xl font-black text-red-500">- ${shiftStats.totalExpenses.toFixed(2)}</span>
               </div>
 
-              {/* Neto a Entregar */}
               <div className="bg-white rounded-2xl p-5 border border-brand-brown/10 mb-6 shadow-sm relative overflow-hidden">
                 <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-green"></div>
                 <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Efectivo Neto a Entregar</p>
                 <p className="text-4xl font-black text-brand-brown">${shiftStats.netCash.toFixed(2)}</p>
               </div>
 
-              {/* Inventario Restante en Camioneta */}
               <div>
                  <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest mb-2 flex items-center gap-1.5">
                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
