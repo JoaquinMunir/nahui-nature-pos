@@ -712,12 +712,12 @@ function App() {
 const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
 
   return (
-<div className="min-h-screen relative bg-brand-bg">
-      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
-        {/* Columna de Contenido Principal (Izquierda en horizontal) */}
-
-{/* 1. ENCABEZADO Y TÍTULO */}
-<header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2"> 
+    <div className="min-h-screen relative bg-brand-bg">
+      <div className="p-3 sm:p-4 lg:p-10 max-w-[1400px] mx-auto pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start">
+        <div className="landscape:col-span-8 w-full">
+          
+         {/* 1. ENCABEZADO Y TÍTULO */}
+         <header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2"> 
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
             <h1 className="flex items-baseline gap-1 sm:gap-2">
@@ -1395,6 +1395,7 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* MODAL RÁPIDO DE CARGA INICIAL DE CAMIONETA */}
