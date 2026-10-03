@@ -9,13 +9,21 @@ const ENDPOINTS = {
   products: `${API_URL}/products`,
   clients:  `${API_URL}/clients`,
   routes:   `${API_URL}/routes`,
-  orders:   `${API_URL}/orders`
+  orders:   `${API_URL}/orders`,
+  inventory: `${API_URL}/inventory/central`,
+  mobileInventory: `${API_URL}/inventory/mobile`,
+  transfer: `${API_URL}/inventory/transfer`,
+  sessions: `${API_URL}/sessions`
 };
 
 const CATEGORY_COVERS = {
-  "Obleas tradición de amaranto": "https://images.unsplash.com/photo-1600018593466-9b5133af00be?w=800&q=80",
-  "Platanitos crujientes": "https://images.unsplash.com/photo-1599859599960-9303531b4028?w=800&q=80",
-  "Cecina": "https://images.unsplash.com/photo-1599859599960-9303531b4028?w=800&q=80",
+  "Cecina": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/dried_beef.jpg",
+  "Chips del huerto": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/veggie_chips.jpg",
+  "Chocohojuelas artesanales": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/chocohojuela.jpg",
+  "Lentejas con limón y chile": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/lenteja_.jpg",
+  "Nubes de maíz": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/maicitos.jpg",
+  "Obleas tradición de amaranto": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/obleas_.jpg",
+  "Platanitos crujientes": "https://drwsqimkucepjqlqsoxd.supabase.co/storage/v1/object/public/covers/platanitos.jpg",
 };
 
 const formatProduct = (product) => {
@@ -41,9 +49,22 @@ const formatProduct = (product) => {
     if (f.includes('jalapeno')) return "bg-[#6e9550] text-[#F8F6EF]";
     if (f.includes('fuego')) return "bg-[#bc584b] text-[#F8F6EF]";
     if (f.includes('ranchero')) return "bg-[#c2774e] text-[#F8F6EF]";
+
     if (f.includes('adobad')) return "bg-[#8b2c15] text-[#F8F6EF]";
     if (f.includes('habanero')) return "bg-[#d97216] text-[#F8F6EF]";
     if (f.includes('limon')) return "bg-[#5B8A3C] text-[#F8F6EF]";
+
+    if (f.includes('arcoiris')) return "bg-[#C48BE0] text-[#F8F6EF]";
+    if (f.includes('cafe')) return "bg-[#A67B5B] text-[#F8F6EF]";
+    if (f.includes('chocolate')) return "bg-[#905B3C] text-[#F8F6EF]";
+    if (f.includes('coco')) return "bg-[#D1BBA1] text-[#F8F6EF]";
+    if (f.includes('frutos rojos')) return "bg-[#F58294] text-[#F8F6EF]";
+    if (f.includes('maracuya')) return "bg-[#E4CF65] text-[#F8F6EF]";
+    if (f.includes('matcha')) return "bg-[#BFBB7E] text-[#F8F6EF]";
+    if (f.includes('mora azul')) return "bg-[#C3BBE5] text-[#F8F6EF]";
+    if (f.includes('nuez')) return "bg-[#D7BEA4] text-[#F8F6EF]";
+    if (f.includes('taro')) return "bg-[#B7A2CD] text-[#F8F6EF]";
+
     return "bg-[#7B502B] text-[#F8F6EF]"; 
   };
 
@@ -56,6 +77,15 @@ const formatProduct = (product) => {
     cartSubtitleColor: getFlavorColor(product.name),
   };
 };
+
+const SUPPLIERS = [
+  { id: 1, name: "Cecina", emoji: "🥩", link: "https://www.proveedordecarne.com/catalogo" },
+  { id: 2, name: "Chips", emoji: "🌿", link: "https://wa.me/523121234567" },
+  { id: 3, name: "Lentejas", emoji: "🌶️", link: "https://m.me/empaquescolima" },
+  { id: 4, name: "Maicitos", emoji: "🌽", link: "https://wa.me/523121234567" },
+  { id: 5, name: "Obleas", emoji: "🌾", link: "https://wa.me/523121234567" },
+  { id: 6, name: "Platanitos", emoji: "🍌", link: "https://wa.me/523121234567" },
+];
 
 function App() {
   const [products, setProducts] = useState([])
@@ -75,6 +105,18 @@ function App() {
   const [expandedOrderId, setExpandedOrderId] = useState(null)
   const [searchOrder, setSearchOrder] = useState('');
   const [filterDate, setFilterDate] = useState('');
+  const [sendWhatsApp, setSendWhatsApp] = useState(() => localStorage.getItem('sendWhatsApp') !== 'false');
+
+  const [searchInv, setSearchInv] = useState('');
+  const [showInventory, setShowInventory] = useState(false);
+  const [centralInventory, setCentralInventory] = useState([]);
+  const [mobileInventory, setMobileInventory] = useState([]);
+  const [saleMode, setSaleMode] = useState('mobile');
+  const [stockInputs, setStockInputs] = useState({});
+  const [transferModal, setTransferModal] = useState({ isOpen: false, product: null, stockCasa: 0, qty: '' });
+
+  const [expandedInvCategories, setExpandedInvCategories] = useState({});
+  const toggleInvCategory = (cat) => setExpandedInvCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
 
   const [selectedCategory, setSelectedCategory] = useState(null)
   const [expandedWeights, setExpandedWeights] = useState({})
@@ -85,6 +127,125 @@ function App() {
   const [clientForm, setClientForm] = useState({
     name: '', contact: '', phone_number: '', address: '', location: '', route_name: '', latitude: '', longitude: ''
   })
+
+  // Estados para el Reabastecimiento de Proveedores
+  const [showRestockModal, setShowRestockModal] = useState(false);
+  const [restockCart, setRestockCart] = useState({}); 
+
+  const handleBulkRestock = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const itemsToUpdate = Object.entries(restockCart).filter(([id, qty]) => qty > 0);
+      if (itemsToUpdate.length === 0) {
+        alert("Agrega al menos una cantidad para reabastecer.");
+        setIsSubmitting(false);
+        return;
+      }
+      const promises = itemsToUpdate.map(([id, qty]) => 
+        axios.post(`${ENDPOINTS.inventory}/add`, { product_id: id, quantity: qty })
+      );
+      await Promise.all(promises);
+      alert("¡Reabastecimiento exitoso! La Bodega Central ha sido actualizada.");
+      setShowRestockModal(false);
+      setRestockCart({});
+      fetchInventories(); 
+    } catch (error) {
+      alert("Error al conectar con la base de datos para el reabastecimiento.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const [showShiftReport, setShowShiftReport] = useState(false);
+  const [shiftStats, setShiftStats] = useState({ totalSales: 0, totalExpenses: 0, orderCount: 0, netCash: 0 });
+
+  const [isOnRoad, setIsOnRoad] = useState(() => localStorage.getItem('isOnRoad') === 'true');
+  const [shiftStartTime, setShiftStartTime] = useState(() => localStorage.getItem('shiftStartTime') || null);
+
+  const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('routeExpenses')) || []);
+  const [expenseModal, setExpenseModal] = useState({ isOpen: false, concept: '', amount: '' });
+  
+  // 👉 REPARACIÓN: INICIO DE TURNO CREA LA CAJA REGISTRADORA
+  const handleStartRoute = () => {
+    setIsOnRoad(true);
+    const startTime = new Date().toISOString();
+    setShiftStartTime(startTime);
+    localStorage.setItem('isOnRoad', 'true');
+    localStorage.setItem('shiftStartTime', startTime);
+    localStorage.setItem('shiftSales', '0');       // Inicializamos dinero
+    localStorage.setItem('shiftOrderCount', '0');  // Inicializamos conteo
+    setSaleMode('mobile'); 
+    setShowInventory(true);
+    setShowOrders(false);
+  };
+
+  // 👉 REPARACIÓN: EL CIERRE AHORA ES BLINDADO Y DIRECTO
+  const handleEndRoute = () => {
+    const totalSales = parseFloat(localStorage.getItem('shiftSales') || '0');
+    const orderCount = parseInt(localStorage.getItem('shiftOrderCount') || '0');
+    const totalExpenses = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
+
+    setShiftStats({
+      totalSales,
+      totalExpenses,
+      orderCount,
+      netCash: totalSales - totalExpenses
+    });
+
+    setShowShiftReport(true);
+  };
+
+  // 👉 REPARACIÓN: CONFIRMACIÓN LIMPIA LA MEMORIA DE LA CAJA
+  const confirmEndRoute = async () => {
+    const sessionPayload = {
+      id: crypto.randomUUID(),
+      start_time: shiftStartTime || new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      total_sales: shiftStats.totalSales,
+      total_expenses: shiftStats.totalExpenses,
+      net_cash: shiftStats.netCash,
+      order_count: shiftStats.orderCount,
+      expenses: expenses.map(e => ({
+        id: e.id,
+        concept: e.concept,
+        amount: e.amount,
+        created_at: e.time
+      }))
+    };
+
+    try {
+      await axios.post(ENDPOINTS.sessions, sessionPayload);
+    } catch (error) {
+      await db.sync_sessions_queue.add(sessionPayload).catch(()=>{});
+      alert("Modo sin conexión: El corte de caja se guardó en el dispositivo y se subirá luego.");
+    }
+
+    setIsOnRoad(false);
+    setShiftStartTime(null);
+    setExpenses([]); 
+    localStorage.removeItem('isOnRoad');
+    localStorage.removeItem('shiftStartTime');
+    localStorage.removeItem('routeExpenses');
+    localStorage.removeItem('shiftSales');
+    localStorage.removeItem('shiftOrderCount');
+    setShowShiftReport(false);
+    
+    alert("¡Turno cerrado exitosamente! La camioneta ha sido auditada.");
+  };
+  
+  const handleAddExpense = (e) => {
+    e.preventDefault();
+    const amount = parseFloat(expenseModal.amount);
+    if (isNaN(amount) || amount <= 0 || !expenseModal.concept) return;
+
+    const newExpense = { id: crypto.randomUUID(), concept: expenseModal.concept, amount: amount, time: new Date().toISOString() };
+    const updatedExpenses = [...expenses, newExpense];
+    
+    setExpenses(updatedExpenses);
+    localStorage.setItem('routeExpenses', JSON.stringify(updatedExpenses));
+    setExpenseModal({ isOpen: false, concept: '', amount: '' });
+  };
 
   const fetchOrdersHistory = async () => {
     setIsLoadingOrders(true);
@@ -100,10 +261,58 @@ function App() {
     }
   };
 
-  // Efecto para cargar las órdenes automáticamente al abrir la vista
   useEffect(() => {
     if (showOrders) fetchOrdersHistory();
   }, [showOrders]);
+
+  const fetchInventories = async () => {
+    try {
+      const [centralRes, mobileRes] = await Promise.all([
+        axios.get(ENDPOINTS.inventory),
+        axios.get(ENDPOINTS.mobileInventory)
+      ]);
+      
+      let cData = [];
+      let mData = [];
+
+      if (centralRes.data.status === 'success') {
+        cData = centralRes.data.data;
+        setCentralInventory(cData);
+      }
+      if (mobileRes.data.status === 'success') {
+        mData = mobileRes.data.data;
+        setMobileInventory(mData);
+      }
+
+      try {
+        if (cData.length > 0) {
+          await db.central_inventory.clear();
+          await db.central_inventory.bulkPut(cData);
+        }
+        if (mData.length > 0) {
+          await db.mobile_inventory.clear();
+          await db.mobile_inventory.bulkPut(mData);
+        }
+      } catch (saveError) {
+        console.error("Dexie bloqueó el guardado:", saveError);
+      }
+    } catch (error) {
+      console.warn("Sin conexión: Cargando inventarios desde la memoria del dispositivo...");
+      try {
+        const localCentral = await db.central_inventory.toArray();
+        const localMobile = await db.mobile_inventory.toArray();
+        
+        if (localCentral.length > 0) setCentralInventory(localCentral);
+        if (localMobile.length > 0) setMobileInventory(localMobile);
+      } catch (dbError) {
+        console.error("Error leyendo memoria local:", dbError);
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchInventories(); 
+  }, []);
 
   useEffect(() => {
     const syncOfflineData = async () => {
@@ -122,12 +331,32 @@ function App() {
         for (const order of offlineOrders) {
           try {
             const res = await axios.post(ENDPOINTS.orders, order);
-            if (res.data.status === 'success') await db.sync_queue.delete(order.id); 
+            if (res.data.status === 'success') {
+              await db.sync_queue.delete(order.id); 
+            }
+          } catch (err) { 
+            if (err.response && err.response.status === 400) {
+              await db.sync_queue.delete(order.id);
+            } else {
+              break; 
+            }
+          }
+        }
+      } catch (err) {}
+
+      try {
+        const offlineSessions = await db.sync_sessions_queue.toArray();
+        for (const session of offlineSessions) {
+          try {
+            const res = await axios.post(ENDPOINTS.sessions, session);
+            if (res.data.status === 'success') {
+              await db.sync_sessions_queue.delete(session.id);
+            }
           } catch (err) { break; }
         }
       } catch (err) {}
     };
-
+    
     const fetchInitialData = async () => {
       try {
         const [resProducts, resClients, resRoutes] = await Promise.all([
@@ -150,11 +379,15 @@ function App() {
         }
       } catch (err) {
         try {
-          const localProducts = await db.products.toArray();
-          const localClients = await db.clients.toArray();
-          const localRoutes = await db.routes.toArray();
+          let localProducts = await db.products.toArray();
+          let localClients = await db.clients.toArray();
+          let localRoutes = await db.routes.toArray();
           
           if (localProducts.length > 0 || localClients.length > 0) {
+            localProducts.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
+            localClients.sort((a, b) => (a.location || '').localeCompare(b.location || '') || a.name.localeCompare(b.name));
+            localRoutes.sort((a, b) => a.name.localeCompare(b.name));
+
             setProducts(localProducts);
             setClients(localClients);
             setRoutes(localRoutes);
@@ -172,7 +405,6 @@ function App() {
 
     fetchInitialData();
   }, [])
-
 
   const captureLocation = () => {
     if (!navigator.geolocation) { alert("Tu dispositivo no soporta GPS."); return; }
@@ -247,7 +479,21 @@ function App() {
 
   const addToCart = (product) => setCart(prevCart => {
     const existing = prevCart.find(item => item.id === product.id);
-    if (existing) return prevCart.map(item => item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item);
+    const requestedQty = existing ? existing.quantity + 1 : 1;
+    
+    let availableStock = 0;
+    if (saleMode === 'mobile') {
+      availableStock = mobileInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
+    } else {
+      availableStock = centralInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
+    }
+
+    if (requestedQty > availableStock) {
+      alert(`❌ ¡Stock agotado! Solo tienes ${availableStock} unidades en ${saleMode === 'mobile' ? 'la Camioneta' : 'el Centro'}.`);
+      return prevCart; 
+    }
+
+    if (existing) return prevCart.map(item => item.id === product.id ? { ...item, quantity: requestedQty } : item);
     return [...prevCart, { ...product, quantity: 1 }];
   });
 
@@ -307,35 +553,63 @@ function App() {
     text += `¡Gracias por tu preferencia! 🌱`;
 
     const encodedText = encodeURIComponent(text);
-    
-    // Detector de dispositivo
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-    
-    // Ruta inteligente: App nativa para celular, Web para PC (evade el bug de Windows)
-    const url = isMobile 
-      ? `https://wa.me/${phone}?text=${encodedText}` 
-      : `https://web.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
-      
+    const url = isMobile ? `https://wa.me/${phone}?text=${encodedText}` : `https://web.whatsapp.com/send?phone=${phone}&text=${encodedText}`;
     window.open(url, '_blank');
   };
 
+  // 👉 REPARACIÓN: REGISTRAMOS EL DINERO EN LA CAJA AL COBRAR
   const handleCheckout = async () => {
     if (cart.length === 0 || !activeClient) return;
     setIsSubmitting(true);
     const payload = {
       id: crypto.randomUUID(), client_id: activeClient.id, total_amount: totalOrder, created_at: new Date().toISOString(),
+      sale_mode: saleMode,
       items: cart.map(item => ({ id: crypto.randomUUID(), product_id: item.id, quantity: item.quantity, unit_price: item.price, subtotal: item.price * item.quantity }))
     };
     try {
       const res = await axios.post(ENDPOINTS.orders, payload);
-      sendWhatsAppTicket(activeClient, cart, totalOrder);
-      if (res.data.status === 'success') { clearCart(); setActiveClient(null); }
+      if (sendWhatsApp) sendWhatsAppTicket(activeClient, cart, totalOrder);      
+      if (res.data.status === 'success') { 
+        if (isOnRoad) {
+          const currentSales = parseFloat(localStorage.getItem('shiftSales') || '0');
+          const currentCount = parseInt(localStorage.getItem('shiftOrderCount') || '0');
+          localStorage.setItem('shiftSales', (currentSales + totalOrder).toString());
+          localStorage.setItem('shiftOrderCount', (currentCount + 1).toString());
+        }
+        clearCart(); setActiveClient(null); 
+      }
+      fetchInventories();
     } catch (error) {
       try {
         await db.sync_queue.add(payload);
-        sendWhatsAppTicket(activeClient, cart, totalOrder);
-        clearCart(); setActiveClient(null);
-      } catch (dbError) { alert('Error de almacenamiento local.'); }
+        if (sendWhatsApp) sendWhatsAppTicket(activeClient, cart, totalOrder);
+        
+        if (isOnRoad) {
+          const currentSales = parseFloat(localStorage.getItem('shiftSales') || '0');
+          const currentCount = parseInt(localStorage.getItem('shiftOrderCount') || '0');
+          localStorage.setItem('shiftSales', (currentSales + totalOrder).toString());
+          localStorage.setItem('shiftOrderCount', (currentCount + 1).toString());
+        }
+
+        const setInventory = saleMode === 'mobile' ? setMobileInventory : setCentralInventory;
+        const localTable = saleMode === 'mobile' ? db.mobile_inventory : db.central_inventory;
+
+        setInventory(prev => prev.map(inv => {
+          const soldItem = payload.items.find(i => String(i.product_id) === String(inv.product_id));
+          if (soldItem) {
+            const newStock = inv.stock_quantity - soldItem.quantity;
+            localTable.update(inv.product_id, { stock_quantity: newStock }).catch(()=>{});
+            return { ...inv, stock_quantity: newStock };
+          }
+          return inv;
+        }));
+
+        clearCart(); 
+        setActiveClient(null);
+      } catch (dbError) { 
+        alert('Error crítico de almacenamiento local.'); 
+      }
     } finally { setIsSubmitting(false); }
   };
 
@@ -356,7 +630,7 @@ function App() {
 
   const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
 
-return (
+  return (
     <div className="min-h-screen relative bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
         <header className="mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
@@ -365,19 +639,58 @@ return (
               <span className="font-calistoga text-brand-brown uppercase">Nahui</span>
               <span className="font-satisfy text-brand-green text-6xl md:text-7xl lowercase relative top-2">Nature</span>
             </h1>
-            <p className="text-brand-brown/70 font-medium mt-3 text-lg uppercase tracking-widest">Punto de Venta Móvil</p>
+            <div className="flex items-center gap-3 mt-3">
+              <p className="text-brand-brown/70 font-medium text-lg uppercase tracking-widest leading-none">Punto de Venta Móvil</p>
+              
+              {isOnRoad && (
+                <span className="bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm animate-in fade-in">
+                  <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>
+                  En Ruta
+                </span>
+              )}
+            </div>
           </div>
           <div className="flex flex-col items-end gap-3">
-            <button 
-              onClick={() => setShowOrders(!showOrders)} 
-              className="bg-white border-2 border-brand-brown text-brand-brown font-bold px-5 py-2 rounded-xl hover:bg-brand-brown hover:text-white transition-all shadow-sm flex items-center gap-2"
-            >
-              {showOrders ? (
-                <><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> Volver a Tienda</>
-              ) : (
-                <><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Ver Ventas</>
+            
+            <div className="flex flex-wrap justify-end gap-2 items-center">
+              
+            {isOnRoad ? (
+                <>
+                  <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95">
+                    💸 Gasto
+                  </button>
+                  <button onClick={handleEndRoute} className="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 mr-2 active:scale-95">
+                    🛑 Terminar Ruta
+                  </button>
+                </>
+              ) : (                <button onClick={handleStartRoute} className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 mr-2 active:scale-95">
+                  🚚 Iniciar Ruta
+                </button>
               )}
-            </button>
+
+              <button 
+                onClick={() => { setShowOrders(false); setShowInventory(false); }} 
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                Tienda
+              </button>
+              <button 
+                onClick={() => { setShowOrders(true); setShowInventory(false); }} 
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                Ventas
+              </button>
+              <button 
+                onClick={() => { setShowInventory(true); setShowOrders(false); }} 
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                Bodega
+              </button>
+            </div>
+
             {isOfflineMode && (
               <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full font-bold text-sm shadow-sm flex items-center gap-2 border border-amber-200 h-fit">
                 <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span></span>
@@ -387,13 +700,175 @@ return (
           </div>
         </header>
 
-{showOrders ? (
+        {showInventory ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-brand-brown/10 pb-4">
+              <div className="flex items-center gap-4">
+                <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Control Logístico</h2>
+                <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider hidden md:inline-block">Gestión de Inventarios</span>
+              </div>
+              <button 
+                onClick={() => setShowRestockModal(true)}
+                className="bg-brand-brown hover:bg-brand-brown/90 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm active:scale-95"
+              >
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                Reabastecer Centro
+              </button>
+            </div>
+
+            <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden mb-6 flex flex-col">
+              
+              {/* Buscador */}
+              <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center">
+                <div className="relative w-full md:w-96">
+                  <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  </span>
+                  <input 
+                    type="text" 
+                    placeholder="Buscar producto o variante..." 
+                    value={searchInv}
+                    onChange={(e) => setSearchInv(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium text-brand-brown"
+                  />
+                </div>
+              </div>
+
+              {/* Cabecera de Tabla (Desktop) */}
+              <div className="hidden lg:grid grid-cols-12 gap-2 p-4 border-b border-gray-100 font-black text-gray-400 text-[10px] xl:text-xs uppercase tracking-widest bg-white items-center">
+                <div className="col-span-4 pl-2">Catálogo</div>
+                <div className="col-span-4 grid grid-cols-3 text-center bg-gray-50 py-2 rounded-lg border border-gray-100 px-1">
+                  <span className="flex items-center justify-center gap-1.5"><span className="text-lg">🏬</span> Central</span>
+                  <span className="flex items-center justify-center gap-1.5 border-l border-r border-gray-200"><span className="text-lg">🚚</span> Movil</span>
+                  <span className="flex items-center justify-center gap-1.5 text-brand-green"><span className="text-lg">📦</span> General</span>
+                </div>
+                <div className="col-span-4 text-right pr-2">Gestión Rápida</div>
+              </div>
+
+              {/* Cuerpo de la Tabla */}
+              <div className="divide-y divide-gray-100 bg-white">
+                {products
+                  .filter(p => {
+                    const term = searchInv.toLowerCase();
+                    return p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
+                  })
+                  .map(product => {
+                    const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
+                    const isSingle = product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+                    
+                    const stockCasa = centralInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
+                    const stockCamioneta = mobileInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
+                    const stockTotal = stockCasa + stockCamioneta;
+                    
+                    const inputValue = stockInputs[product.id] || '';
+                    const weight = product.weight_g ? `${product.weight_g}g` : '';
+
+                    return (
+                      <div key={product.id} className="grid grid-cols-1 lg:grid-cols-12 gap-2 p-4 items-center hover:bg-brand-bg/40 transition-colors">
+                        
+                        <div className="col-span-1 lg:col-span-4 flex items-center gap-3 pl-1">
+                          
+                          <div className="w-11 h-11 rounded-lg relative overflow-hidden flex items-center justify-center text-white flex-shrink-0 shadow-sm" style={{ backgroundColor: catColor }}>
+                            {product.image_url ? (
+                              <img src={product.image_url} alt={cartTitle} className="w-full h-full object-cover text-transparent" />
+                            ) : (
+                              <span className="font-black text-sm opacity-90">{product.category.substring(0,2).toUpperCase()}</span>
+                            )}
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <h4 className="font-bold text-brand-brown text-sm md:text-base leading-tight truncate">{cartTitle}</h4>
+                            <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                              {!isSingle && <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{cartSubtitle}</span>}
+                              {weight && <span className="text-[10px] font-bold text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded">{weight}</span>}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="col-span-1 lg:col-span-4 grid grid-cols-3 gap-1 text-center items-center bg-gray-50 lg:bg-transparent p-2 lg:p-0 rounded-xl border border-gray-100 lg:border-none mt-2 lg:mt-0">
+                          <div className="flex flex-col">
+                            <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🏬 Central</span>
+                            <span className={`text-xl font-black ${stockCasa <= 10 ? 'text-red-500' : 'text-brand-brown'}`}>{stockCasa}</span>
+                          </div>
+                          <div className="flex flex-col border-l border-r border-gray-200">
+                            <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🚚 Movil</span>
+                            <span className="text-xl font-black text-blue-600">{stockCamioneta}</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="lg:hidden text-[9px] text-brand-green uppercase font-bold mb-1">📦 General</span>
+                            <span className="text-xl font-black text-brand-green">{stockTotal}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="col-span-1 lg:col-span-4 flex items-center justify-end gap-2 mt-3 lg:mt-0 pr-1">
+                          
+                          <input 
+                            type="number" 
+                            min="1"
+                            placeholder="Cant."
+                            value={inputValue}
+                            onChange={(e) => setStockInputs(prev => ({...prev, [product.id]: e.target.value}))}
+                            className="w-16 sm:w-20 pl-1 pr-1 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green outline-none font-bold text-brand-brown transition-colors text-sm text-center shadow-sm" 
+                          />
+                          
+                          <button 
+                            title="Ingresar nueva mercancía al Centro"
+                            onClick={async () => {
+                              if(!inputValue || isNaN(inputValue) || Number(inputValue) <= 0) return;
+                              try {
+                                const res = await axios.post(`${ENDPOINTS.inventory}/add`, {
+                                  product_id: product.id, quantity: Number(inputValue)
+                                });
+                                if (res.data.status === 'success') {
+                                  setCentralInventory(prev => {
+                                    const exists = prev.find(i => String(i.product_id) === String(product.id));
+                                    if (exists) return prev.map(i => String(i.product_id) === String(product.id) ? { ...i, stock_quantity: res.data.new_stock } : i);
+                                    return [...prev, { product_id: product.id, stock_quantity: res.data.new_stock }];
+                                  });
+                                  setStockInputs(prev => ({...prev, [product.id]: ''}));
+                                }
+                              } catch (error) { alert("Error al ingresar a bodega."); }
+                            }}
+                            className="bg-brand-green text-white font-bold px-3 py-2 rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
+                          >
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                            <span className="text-sm hidden xl:inline">Ingresar</span>
+                          </button>
+
+                          <button 
+                            title="Mover del Centro al Movil"
+                            onClick={() => {
+                              if (stockCasa === 0) {
+                                alert(`❌ No hay stock en el Centro para traspasar.`);
+                                return;
+                              }
+                              setTransferModal({
+                                isOpen: true,
+                                product: product,
+                                stockCasa: stockCasa,
+                                qty: ''
+                              });
+                            }}
+                            className="bg-blue-600 text-white font-bold px-3 py-2 rounded-lg hover:bg-blue-700 transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
+                          >
+                            <span className="text-sm hidden xl:inline">Transpasar</span>
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                          </button>
+                        </div>
+                        
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+          </div>
+        ) : showOrders ? (
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
             <div className="flex items-center gap-4 mb-6 border-b border-brand-brown/10 pb-4">
               <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Historial de Ventas</h2>
             </div>
 
-            {/* Panel de Filtros y Sumatorio de Caja */}
             <div className="bg-white p-4 rounded-2xl shadow-sm border border-brand-brown/10 mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
               <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                 <div className="relative">
@@ -427,7 +902,6 @@ return (
                     
                     <div className="cursor-pointer group" onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}>
                       <div className="flex justify-between items-start mb-3">
-                        {/* Fecha y Hora Corregidas */}
                         <span className="text-[11px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1.5 rounded-md tracking-wide flex items-center gap-1.5">
                           <svg className="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                           {new Date(order.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })} • {new Date(order.created_at).toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'})}
@@ -637,14 +1111,29 @@ return (
                   </div>
                 ) : (
                   <div className="animate-in fade-in zoom-in-95 duration-300">
-                    <div className="bg-brand-brown text-white p-4 rounded-2xl mb-6 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                      <div>
-                        <p className="text-brand-bg text-sm uppercase tracking-widest font-bold mb-0.5">Vendiendo a:</p>
-                        <h2 className="text-2xl font-calistoga">{activeClient.name}</h2>
-                        <p className="text-sm opacity-90 mt-1.5 flex items-center gap-1.5"><svg className="w-4 h-4 mt-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{activeClient.location} • {activeClient.route_name}</p>
+                  <div className="bg-brand-brown text-white p-4 rounded-2xl mb-6 shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                      <p className="text-brand-bg text-sm uppercase tracking-widest font-bold mb-0.5">Vendiendo a:</p>
+                      <h2 className="text-2xl font-calistoga">{activeClient.name}</h2>
+                      
+                      <div className="flex items-center gap-1.5 mt-3 bg-black/20 p-1.5 rounded-xl border border-white/10 w-fit">
+                        <button 
+                          onClick={() => setSaleMode('mobile')} 
+                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-blue-500 text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                        >
+                          🚚 En Ruta
+                        </button>
+                        <button 
+                          onClick={() => setSaleMode('central')} 
+                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-brand-green text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                        >
+                          🏬 En Centro
+                        </button>
                       </div>
-                      <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Cambiar Cliente</button>
+                      
                     </div>
+                    <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Cambiar Cliente</button>
+                  </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                       {categoryNames.map(categoryName => {
                         const items = groupedProducts[categoryName];
@@ -670,6 +1159,313 @@ return (
           </>
         )}
       </div>
+
+      {/* MODAL DE GASTOS OPERATIVOS */}
+      {expenseModal.isOpen && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setExpenseModal({ ...expenseModal, isOpen: false })}></div>
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div className="bg-amber-500 p-6 text-white text-center relative">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <span className="text-3xl">💸</span>
+              </div>
+              <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Registrar Gasto</h3>
+              <p className="text-amber-100 text-sm font-medium">Gasolina, comidas o insumos</p>
+            </div>
+            
+            <form onSubmit={handleAddExpense} className="p-6">
+              <div className="mb-4">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Concepto / Motivo</label>
+                <input type="text" autoFocus required value={expenseModal.concept} onChange={e => setExpenseModal({...expenseModal, concept: e.target.value})} placeholder="Ej. Gasolina Magna" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors text-brand-brown font-bold" />
+              </div>
+              <div className="mb-8">
+                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-center">Monto a descontar</label>
+                <input type="number" step="any" required value={expenseModal.amount} onChange={e => setExpenseModal({...expenseModal, amount: e.target.value})} placeholder="0.00" className="w-full text-center text-4xl font-black text-brand-brown border-b-2 border-gray-200 focus:border-amber-500 outline-none pb-2 transition-colors bg-transparent" />
+              </div>
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setExpenseModal({ ...expenseModal, isOpen: false })} className="flex-1 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-wider text-sm">Cancelar</button>
+                <button type="submit" className="flex-1 bg-amber-500 text-white font-bold py-3.5 rounded-xl hover:bg-amber-600 transition-colors shadow-md active:scale-95 uppercase tracking-wider text-sm">Guardar Gasto</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: REPORTE DE CORTE DE CAJA (FIN DE TURNO) */}
+      {showShiftReport && (
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowShiftReport(false)}></div>
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            
+            <div className="bg-brand-brown p-6 text-white text-center relative flex-shrink-0">
+              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <span className="text-3xl">📊</span>
+              </div>
+              <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Corte de Ruta</h3>
+              <p className="text-brand-bg/80 text-xs font-bold uppercase tracking-widest">Auditoría del Turno Actual</p>
+            </div>
+            
+            <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
+              {/* Ventas */}
+              <div className="flex justify-between items-center mb-4 pb-4 border-b border-brand-brown/10">
+                <div>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Ingresos por Ventas</p>
+                  <p className="text-sm font-medium text-brand-brown">{shiftStats.orderCount} pedidos completados</p>
+                </div>
+                <span className="text-xl font-black text-brand-green">+ ${shiftStats.totalSales.toFixed(2)}</span>
+              </div>
+
+              {/* Gastos */}
+              <div className="flex justify-between items-center mb-6 pb-4 border-b border-brand-brown/10">
+                <div>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Gastos Operativos</p>
+                  <p className="text-sm font-medium text-brand-brown">{expenses.length} conceptos registrados</p>
+                </div>
+                <span className="text-xl font-black text-red-500">- ${shiftStats.totalExpenses.toFixed(2)}</span>
+              </div>
+
+              {/* Neto a Entregar */}
+              <div className="bg-white rounded-2xl p-5 border border-brand-brown/10 mb-6 shadow-sm relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-green"></div>
+                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Efectivo Neto a Entregar</p>
+                <p className="text-4xl font-black text-brand-brown">${shiftStats.netCash.toFixed(2)}</p>
+              </div>
+
+              {/* Inventario Restante en Camioneta */}
+              <div>
+                 <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                   Mercancía a devolver (Camioneta)
+                 </p>
+                 <div className="max-h-32 overflow-y-auto bg-white rounded-xl p-3 border border-brand-brown/10 shadow-sm">
+                   {mobileInventory.filter(i => i.stock_quantity > 0).length === 0 ? (
+                      <p className="text-xs text-gray-400 text-center font-bold my-2 uppercase tracking-widest">Camioneta vacía</p>
+                   ) : (
+                      mobileInventory.filter(i => i.stock_quantity > 0).map(inv => {
+                        // 👉 REPARACIÓN: Comparación segura de IDs
+                        const prod = products.find(p => String(p.id) === String(inv.product_id));
+                        if(!prod) return null;
+                        const isSingle = prod.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+                        const name = isSingle ? prod.category : `${prod.category} - ${prod.name}`;
+                        return (
+                          <div key={inv.product_id} className="flex justify-between items-center text-sm mb-2 last:mb-0 border-b border-gray-50 pb-1 last:border-0 last:pb-0">
+                             <span className="text-brand-brown font-medium truncate pr-2 text-xs">{name}</span>
+                             <span className="font-black text-brand-green bg-brand-green/10 px-2 py-0.5 rounded shadow-sm text-xs">{inv.stock_quantity} u.</span>
+                          </div>
+                        )
+                      })
+                   )}
+                 </div>
+              </div>
+            </div>
+
+            <div className="p-4 bg-white border-t border-brand-brown/10 flex gap-3 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+              <button type="button" onClick={() => setShowShiftReport(false)} className="flex-1 bg-gray-50 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 uppercase tracking-wider text-xs shadow-sm">Revisar algo</button>
+              <button type="button" onClick={confirmEndRoute} className="flex-1 bg-brand-green text-white font-black py-3.5 rounded-xl hover:bg-brand-green-dark transition-colors shadow-md active:scale-95 uppercase tracking-wider text-xs">Confirmar Cierre</button>
+            </div>
+            
+          </div>
+        </div>
+      )}
+
+      {/* MODAL PERSONALIZADO DE TRASPASO LOGÍSTICO */}
+      {transferModal.isOpen && transferModal.product && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setTransferModal({ ...transferModal, isOpen: false })}></div>
+          
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
+            {/* Cabecera Azul */}
+            <div className="bg-blue-600 p-6 text-white text-center relative">
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+              </div>
+              <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Traspaso a Ruta</h3>
+              <p className="text-blue-100 text-sm font-medium">Carga de vehículo móvil</p>
+            </div>
+            
+            {/* AQUÍ ESTÁ EL FORMULARIO QUE HACE LA CONEXIÓN A FASTAPI */}
+            <form 
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const qty = parseInt(transferModal.qty, 10);
+                if (isNaN(qty) || qty <= 0) return alert("Ingresa un número válido.");
+                if (qty > transferModal.stockCasa) return alert(`❌ No puedes traspasar ${qty}. Solo hay ${transferModal.stockCasa}.`);
+                
+                try {
+                  const res = await axios.post(ENDPOINTS.transfer, {
+                    product_id: transferModal.product.id,
+                    quantity: qty,
+                    route_name: "Ruta 1"
+                  });
+                  
+                  if (res.data.status === 'success') {
+                    // 1. Actualizamos el número de la Casa en pantalla
+                    setCentralInventory(prev => prev.map(i => 
+                      String(i.product_id) === String(transferModal.product.id) 
+                      ? { ...i, stock_quantity: res.data.new_central_stock } : i
+                    ));
+                    
+                    // 2. Actualizamos el número de la Camioneta en pantalla
+                    setMobileInventory(prev => {
+                      const exists = prev.find(i => String(i.product_id) === String(transferModal.product.id));
+                      if (exists) return prev.map(i => String(i.product_id) === String(transferModal.product.id) ? { ...i, stock_quantity: res.data.new_mobile_stock } : i);
+                      return [...prev, { product_id: transferModal.product.id, stock_quantity: res.data.new_mobile_stock }];
+                    });
+                    
+                    // 3. Cerramos el Modal
+                    setTransferModal({ isOpen: false, product: null, stockCasa: 0, qty: '' });
+                  }
+                } catch (error) {
+                  alert(error.response?.data?.detail || "Error de conexión al intentar el traspaso.");
+                }
+              }} 
+              className="p-6"
+            >
+              {/* Info del Producto */}
+              <div className="mb-6 text-center">
+                <p className="font-bold text-brand-brown text-lg leading-tight">
+                  {formatProduct(transferModal.product).cartTitle}
+                </p>
+                {transferModal.product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") !== 'unico' && (
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mt-1">
+                    {transferModal.product.name} {transferModal.product.weight_g ? `(${transferModal.product.weight_g}g)` : ''}
+                  </p>
+                )}
+                <div className="inline-flex items-center gap-1.5 mt-3 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                  <span className="text-[10px] text-gray-500 uppercase font-bold tracking-widest">Disponible en Casa:</span>
+                  <span className="font-black text-brand-green">{transferModal.stockCasa} u.</span>
+                </div>
+              </div>
+              
+              {/* Input Gigante */}
+              <div className="mb-8">
+                <label className="block text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-2 text-center">Cantidad a Traspasar</label>
+                <input 
+                  type="number" 
+                  min="1"
+                  max={transferModal.stockCasa}
+                  autoFocus
+                  value={transferModal.qty}
+                  onChange={(e) => setTransferModal({ ...transferModal, qty: e.target.value })}
+                  className="w-full text-center text-5xl font-black text-brand-brown border-b-2 border-gray-200 focus:border-blue-600 outline-none pb-2 transition-colors bg-transparent"
+                  placeholder="0"
+                />
+              </div>
+              
+              {/* Botones de Acción */}
+              <div className="flex gap-3">
+                <button type="button" onClick={() => setTransferModal({ ...transferModal, isOpen: false })} className="flex-1 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-wider text-sm">
+                  Cancelar
+                </button>
+                <button type="submit" disabled={!transferModal.qty || transferModal.qty <= 0} className="flex-1 bg-blue-600 text-white font-bold py-3.5 rounded-xl hover:bg-blue-700 transition-colors shadow-md active:scale-95 disabled:bg-gray-300 disabled:shadow-none uppercase tracking-wider text-sm flex items-center justify-center gap-2">
+                  Confirmar <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE REABASTECIMIENTO Y PROVEEDORES */}
+      {showRestockModal && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowRestockModal(false)}></div>
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-2xl overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+            
+            <div className="bg-brand-brown p-6 text-white flex justify-between items-center flex-shrink-0">
+              <div>
+                <h3 className="text-2xl font-calistoga tracking-wide flex items-center gap-3">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                  Ingreso de Mercancía
+                </h3>
+                <p className="text-brand-bg/80 text-sm mt-1">Directorio de proveedores y registro de bodega</p>
+              </div>
+              <button onClick={() => setShowRestockModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
+
+              {/* ZONA 1: DIRECTORIO DE PROVEEDORES DINÁMICO */}
+              <div className="mb-8">
+                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2">1. Contactar Proveedores</h4>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                  
+                  {/* React dibujará todos los botones automáticamente leyendo la lista de arriba */}
+                  {SUPPLIERS.map(supplier => (
+                    <a 
+                      key={supplier.id}
+                      href={supplier.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="bg-white border border-emerald-200 p-3 rounded-xl flex flex-col items-center justify-center gap-2 hover:bg-emerald-50 transition-colors shadow-sm group cursor-pointer"
+                    >
+                      <span className="text-2xl group-hover:scale-110 transition-transform">{supplier.emoji}</span>
+                      <span className="text-xs font-bold text-brand-brown text-center leading-tight">Proveedor<br/>{supplier.name}</span>
+                    </a>
+                  ))}
+
+                </div>
+                <p className="text-[10px] text-gray-400 mt-2 text-center">Toca un botón para contactar al proveedor directamente.</p>
+              </div>
+
+              {/* ZONA 2: REGISTRO MASIVO AL INVENTARIO */}
+              <div>
+                <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2">2. Ingresar a Bodega Central</h4>
+                <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
+                  {products.map(product => {
+                    const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
+                    const isSingle = product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+                    const currentStock = centralInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
+                    
+                    return (
+                      <div key={product.id} className="flex justify-between items-center p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                        <div className="flex items-center gap-3 overflow-hidden pr-3">
+                          <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: catColor }}></div>
+                          <div className="truncate">
+                            <p className="text-sm font-bold text-brand-brown truncate">{cartTitle}</p>
+                            {!isSingle && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{cartSubtitle} {product.weight_g ? `(${product.weight_g}g)` : ''}</p>}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4 flex-shrink-0">
+                          <div className="text-right hidden sm:block">
+                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actual</p>
+                            <p className={`text-sm font-black ${currentStock <= 10 ? 'text-red-500' : 'text-brand-brown'}`}>{currentStock}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-brand-green font-black text-lg">+</span>
+                            <input 
+                              type="number" 
+                              min="0"
+                              placeholder="0"
+                              value={restockCart[product.id] || ''}
+                              onChange={(e) => setRestockCart(prev => ({...prev, [product.id]: parseInt(e.target.value) || 0}))}
+                              className="w-16 bg-brand-bg border border-brand-brown/20 rounded-lg px-2 py-1.5 text-center font-bold text-brand-brown focus:border-brand-green outline-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+
+            </div>
+
+            <div className="p-4 bg-white border-t border-brand-brown/10 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+              <button 
+                onClick={handleBulkRestock} 
+                disabled={isSubmitting}
+                className={`w-full text-white font-black py-4 rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-wider text-sm flex items-center justify-center gap-2 ${isSubmitting ? 'bg-gray-400' : 'bg-brand-green hover:bg-brand-green-dark'}`}
+              >
+                {isSubmitting ? 'Guardando Ingreso...' : 'Confirmar Ingreso a Bodega'}
+              </button>
+            </div>
+            
+          </div>
+        </div>
+      )}
 
       {selectedCategory && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
@@ -762,10 +1558,28 @@ return (
           </ul>
         </div>
         <div className="p-6 border-t border-brand-brown/10 bg-white">
-          <div className="flex justify-between items-end mb-6">
+          <div className="flex justify-between items-end mb-4">
             <span className="text-lg font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
             <span className="text-4xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
           </div>
+
+          <label className="flex items-center justify-between mb-4 bg-emerald-50/50 p-3 rounded-xl border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors shadow-sm">
+            <div className="flex items-center gap-2">
+              <svg className="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+              <span className="text-xs font-bold text-emerald-800">Enviar ticket por WhatsApp</span>
+            </div>
+            <input 
+              type="checkbox" 
+              checked={sendWhatsApp} 
+              onChange={() => {
+                const newVal = !sendWhatsApp;
+                setSendWhatsApp(newVal);
+                localStorage.setItem('sendWhatsApp', newVal);
+              }} 
+              className="w-4 h-4 accent-emerald-600 rounded cursor-pointer" 
+            />
+          </label>
+
           <button onClick={handleCheckout} disabled={isSubmitting} className={`w-full text-white py-4 rounded-xl font-black text-lg transition-all shadow-lg uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark shadow-brand-green/30 active:scale-[0.98]'}`}>
             {isSubmitting ? 'Procesando...' : 'Cobrar Orden'}
           </button>
