@@ -11,7 +11,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://nahui-nature-pos.vercel.app"
+        "https://nahuinature-pos.vercel.app"
     ],
     allow_credentials=True,
     allow_methods=["*"],
