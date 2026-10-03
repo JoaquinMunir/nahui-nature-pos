@@ -1371,7 +1371,7 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
               <button type="button" onClick={() => setShowShiftReport(false)} className="flex-1 bg-gray-50 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 uppercase tracking-wider text-xs shadow-sm">Revisar algo</button>
               <button type="button" onClick={confirmEndRoute} className="flex-1 bg-brand-green text-white font-black py-3.5 rounded-xl hover:bg-brand-green-dark transition-colors shadow-md active:scale-95 uppercase tracking-wider text-xs">Confirmar Cierre</button>
             </div>
-            
+           </div>
           </div>
         </div>
       )}
