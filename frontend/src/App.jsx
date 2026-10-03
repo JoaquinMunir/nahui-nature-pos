@@ -711,9 +711,15 @@ function App() {
 
   const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
 
-  return (
+    return (
     <div className="min-h-screen relative bg-brand-bg">
-      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
+      {/* Contenedor principal que se divide en grid dual si está en horizontal */}
+      <div className="p-3 sm:p-4 lg:p-10 max-w-[1400px] mx-auto pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start">
+        
+        {/* Columna de Contenido Principal (Izquierda en horizontal) */}
+        <div className="landscape:col-span-8 w-full">
+          {/* Aquí irá tu header, navegación y catálogos que ya tienes */}
+
         
         {/* 1. ENCABEZADO Y TÍTULO */}
         <header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2">
