@@ -726,7 +726,6 @@ const handleCheckout = async () => {
     <div className="min-h-screen relative bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
         
- bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
         
         {/* 1. ENCABEZADO Y TÍTULO */}
