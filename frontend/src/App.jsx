@@ -713,9 +713,7 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
 
   return (
     <div className="min-h-screen relative bg-brand-bg">
-      <div className="p-3 sm:p-4 lg:p-10 max-w-[1400px] mx-auto pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start">
-        <div className="landscape:col-span-8 w-full">
-          
+      <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">          
          {/* 1. ENCABEZADO Y TÍTULO */}
          <header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2"> 
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
@@ -1770,7 +1768,6 @@ const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(
           </button>
         </div>
       </div>
-    </div>
   )
 }
 
