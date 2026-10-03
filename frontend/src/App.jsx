@@ -1286,19 +1286,17 @@ const handleCheckout = async () => {
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setExpenseModal({ ...expenseModal, isOpen: false })}></div>
           <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-            <div className="bg-amber-500 p-6 text-white text-center relative">
+             className="bg-amber-500 p-6 text-white text-center relative">
+                          <div className="bg-amber-500 p-6 text-white text-center relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                 <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-                /svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                </svg> {/* 👉 Agregado el "<" que faltaba */}
               </div>
               <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Registrar Gasto</h3>
               <p className="text-amber-100 text-sm font-medium">Gasolina, comidas o insumos</p>
             </div>
-            
-            <form onSubmit={handleAddExpense} className="p-6">
-              <div className="mb-4">
-                <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Concepto / Motivo</label>
+            Motivo</label>
                 <input type="text" autoFocus required value={expenseModal.concept} onChange={e => setExpenseModal({...expenseModal, concept: e.target.value})} placeholder="Ej. Gasolina Magna" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors text-brand-brown font-bold" />
               </div>
               <div className="mb-8">
