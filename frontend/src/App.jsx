@@ -4,7 +4,6 @@ import { db } from './db'
 
 const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
 
-// Diccionario centralizado de rutas
 const ENDPOINTS = {
   products: `${API_URL}/products`,
   clients:  `${API_URL}/clients`,
@@ -49,11 +48,9 @@ const formatProduct = (product) => {
     if (f.includes('jalapeno')) return "bg-[#6e9550] text-[#F8F6EF]";
     if (f.includes('fuego')) return "bg-[#bc584b] text-[#F8F6EF]";
     if (f.includes('ranchero')) return "bg-[#c2774e] text-[#F8F6EF]";
-
     if (f.includes('adobad')) return "bg-[#8b2c15] text-[#F8F6EF]";
     if (f.includes('habanero')) return "bg-[#d97216] text-[#F8F6EF]";
     if (f.includes('limon')) return "bg-[#5B8A3C] text-[#F8F6EF]";
-
     if (f.includes('arcoiris')) return "bg-[#C48BE0] text-[#F8F6EF]";
     if (f.includes('cafe')) return "bg-[#A67B5B] text-[#F8F6EF]";
     if (f.includes('chocolate')) return "bg-[#905B3C] text-[#F8F6EF]";
@@ -81,7 +78,7 @@ const formatProduct = (product) => {
 const SUPPLIERS = [
   { id: 1, name: "Cecina", emoji: "🥩", link: "https://www.proveedordecarne.com/catalogo" },
   { id: 2, name: "Chips", emoji: "🌿", link: "https://wa.me/523121234567" },
-  { id: 3, name: "Lentejas", emoji: "🌶️", link: "https://m.me/empaquescolima" },
+  { id: 3, name: "Lentejas", emoji: "🌶", link: "https://m.me/empaquescolima" },
   { id: 4, name: "Maicitos", emoji: "🌽", link: "https://wa.me/523121234567" },
   { id: 5, name: "Obleas", emoji: "🌾", link: "https://wa.me/523121234567" },
   { id: 6, name: "Platanitos", emoji: "🍌", link: "https://wa.me/523121234567" },
@@ -94,6 +91,8 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   
+  const [appAlert, setAppAlert] = useState({ isOpen: false, title: '', message: '', type: 'error' });
+
   const [activeClient, setActiveClient] = useState(null)
   const [cart, setCart] = useState([])
   const [isCartOpen, setIsCartOpen] = useState(false)
@@ -111,6 +110,8 @@ function App() {
   const [showInventory, setShowInventory] = useState(false);
   const [centralInventory, setCentralInventory] = useState([]);
   const [mobileInventory, setMobileInventory] = useState([]);
+  const [showRouteLoadModal, setShowRouteLoadModal] = useState(false);
+  const [routeLoadCart, setRouteLoadCart] = useState({});
   const [saleMode, setSaleMode] = useState('mobile');
   const [stockInputs, setStockInputs] = useState({});
   const [transferModal, setTransferModal] = useState({ isOpen: false, product: null, stockCasa: 0, qty: '' });
@@ -128,7 +129,6 @@ function App() {
     name: '', contact: '', phone_number: '', address: '', location: '', route_name: '', latitude: '', longitude: ''
   })
 
-  // Estados para el Reabastecimiento de Proveedores
   const [showRestockModal, setShowRestockModal] = useState(false);
   const [restockCart, setRestockCart] = useState({}); 
 
@@ -138,7 +138,7 @@ function App() {
     try {
       const itemsToUpdate = Object.entries(restockCart).filter(([id, qty]) => qty > 0);
       if (itemsToUpdate.length === 0) {
-        alert("Agrega al menos una cantidad para reabastecer.");
+        setAppAlert({ isOpen: true, title: 'Atención', message: 'Agrega al menos una cantidad para reabastecer.', type: 'warning' });
         setIsSubmitting(false);
         return;
       }
@@ -146,12 +146,12 @@ function App() {
         axios.post(`${ENDPOINTS.inventory}/add`, { product_id: id, quantity: qty })
       );
       await Promise.all(promises);
-      alert("¡Reabastecimiento exitoso! La Bodega Central ha sido actualizada.");
       setShowRestockModal(false);
       setRestockCart({});
       fetchInventories(); 
+      setAppAlert({ isOpen: true, title: 'Éxito', message: '¡Reabastecimiento exitoso! La Bodega Central ha sido actualizada.', type: 'success' });
     } catch (error) {
-      alert("Error al conectar con la base de datos para el reabastecimiento.");
+      setAppAlert({ isOpen: true, title: 'Error', message: 'Error al conectar con la base de datos para el reabastecimiento.', type: 'error' });
     } finally {
       setIsSubmitting(false);
     }
@@ -166,21 +166,57 @@ function App() {
   const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('routeExpenses')) || []);
   const [expenseModal, setExpenseModal] = useState({ isOpen: false, concept: '', amount: '' });
   
-  // 👉 REPARACIÓN: INICIO DE TURNO CREA LA CAJA REGISTRADORA
   const handleStartRoute = () => {
     setIsOnRoad(true);
     const startTime = new Date().toISOString();
     setShiftStartTime(startTime);
     localStorage.setItem('isOnRoad', 'true');
     localStorage.setItem('shiftStartTime', startTime);
-    localStorage.setItem('shiftSales', '0');       // Inicializamos dinero
-    localStorage.setItem('shiftOrderCount', '0');  // Inicializamos conteo
+    localStorage.setItem('shiftSales', '0');       
+    localStorage.setItem('shiftOrderCount', '0');  
     setSaleMode('mobile'); 
-    setShowInventory(true);
+    
+    setShowRouteLoadModal(true);
+    setShowInventory(false);
     setShowOrders(false);
   };
 
-  // 👉 REPARACIÓN: EL CIERRE AHORA ES BLINDADO Y DIRECTO
+  const handleBulkRouteLoad = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      const itemsToTransfer = Object.entries(routeLoadCart).filter(([id, qty]) => qty > 0);
+      if (itemsToTransfer.length === 0) {
+        setShowRouteLoadModal(false); 
+        return;
+      }
+
+      for (const [id, qty] of itemsToTransfer) {
+        const stockCasa = centralInventory.find(i => String(i.product_id) === String(id))?.stock_quantity || 0;
+        if (qty > stockCasa) {
+          setAppAlert({ isOpen: true, title: 'Stock Insuficiente', message: `Estás intentando cargar más mercancía de la que existe en Central.`, type: 'error' });
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
+      const promises = itemsToTransfer.map(([id, qty]) => 
+        axios.post(ENDPOINTS.transfer, { product_id: id, quantity: qty, route_name: "Ruta 1" })
+      );
+
+      await Promise.all(promises);
+      await fetchInventories();
+
+      setShowRouteLoadModal(false);
+      setRouteLoadCart({});
+      setAppAlert({ isOpen: true, title: '¡Camioneta Lista!', message: 'Mercancía cargada a la unidad exitosamente. ¡Buen viaje!', type: 'success' });
+    } catch (error) {
+      setAppAlert({ isOpen: true, title: 'Error', message: 'Hubo un problema al cargar la camioneta.', type: 'error' });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleEndRoute = () => {
     const totalSales = parseFloat(localStorage.getItem('shiftSales') || '0');
     const orderCount = parseInt(localStorage.getItem('shiftOrderCount') || '0');
@@ -196,7 +232,6 @@ function App() {
     setShowShiftReport(true);
   };
 
-  // 👉 REPARACIÓN: CONFIRMACIÓN LIMPIA LA MEMORIA DE LA CAJA
   const confirmEndRoute = async () => {
     const sessionPayload = {
       id: crypto.randomUUID(),
@@ -218,7 +253,12 @@ function App() {
       await axios.post(ENDPOINTS.sessions, sessionPayload);
     } catch (error) {
       await db.sync_sessions_queue.add(sessionPayload).catch(()=>{});
-      alert("Modo sin conexión: El corte de caja se guardó en el dispositivo y se subirá luego.");
+      setAppAlert({ 
+        isOpen: true, 
+        title: 'Guardado Local', 
+        message: 'Modo sin conexión: El corte se guardó en tu dispositivo y se subirá en cuanto regrese el internet.', 
+        type: 'warning' 
+      });
     }
 
     setIsOnRoad(false);
@@ -229,11 +269,40 @@ function App() {
     localStorage.removeItem('routeExpenses');
     localStorage.removeItem('shiftSales');
     localStorage.removeItem('shiftOrderCount');
-    setShowShiftReport(false);
     
-    alert("¡Turno cerrado exitosamente! La camioneta ha sido auditada.");
+    setShowShiftReport(false);
   };
   
+  useEffect(() => {
+    // 1. Funciones que se disparan al cambiar la señal
+    const handleOffline = () => {
+      setIsOfflineMode(true);
+      setAppAlert({ isOpen: true, title: 'Señal Perdida', message: 'Entrando a modo offline. Puedes seguir vendiendo.', type: 'warning' });
+    };
+    
+    const handleOnline = () => {
+      setIsOfflineMode(false);
+      setAppAlert({ isOpen: true, title: 'Conexión Recuperada', message: 'Sincronizando datos en segundo plano...', type: 'success' });
+      // Cuando regresa el internet, forzamos una recarga de inventarios silenciosa
+      fetchInventories();
+    };
+
+    // 2. Conectamos los radares al navegador/celular
+    window.addEventListener('offline', handleOffline);
+    window.addEventListener('online', handleOnline);
+
+    // 3. Revisión de seguridad inicial al abrir la app
+    if (!navigator.onLine) {
+      setIsOfflineMode(true);
+    }
+
+    // 4. Limpieza de memoria si se cierra la app
+    return () => {
+      window.removeEventListener('offline', handleOffline);
+      window.removeEventListener('online', handleOnline);
+    };
+  }, []);
+
   const handleAddExpense = (e) => {
     e.preventDefault();
     const amount = parseFloat(expenseModal.amount);
@@ -246,24 +315,6 @@ function App() {
     localStorage.setItem('routeExpenses', JSON.stringify(updatedExpenses));
     setExpenseModal({ isOpen: false, concept: '', amount: '' });
   };
-
-  const fetchOrdersHistory = async () => {
-    setIsLoadingOrders(true);
-    try {
-      const res = await axios.get(ENDPOINTS.orders);
-      if (res.data.status === 'success') {
-        setOrdersHistory(res.data.data);
-      }
-    } catch (error) {
-      alert("Error al cargar el historial de ventas. Revisa tu conexión.");
-    } finally {
-      setIsLoadingOrders(false);
-    }
-  };
-
-  useEffect(() => {
-    if (showOrders) fetchOrdersHistory();
-  }, [showOrders]);
 
   const fetchInventories = async () => {
     try {
@@ -357,18 +408,27 @@ function App() {
       } catch (err) {}
     };
     
-    const fetchInitialData = async () => {
+const fetchInitialData = async () => {
       try {
-        const [resProducts, resClients, resRoutes] = await Promise.all([
+        // 👉 CORRECCIÓN 1: Agregamos resOrders a la lista para evitar el choque (crash)
+        const [resProducts, resClients, resRoutes, resOrders] = await Promise.all([
           axios.get(ENDPOINTS.products),
           axios.get(ENDPOINTS.clients),
-          axios.get(ENDPOINTS.routes)
+          axios.get(ENDPOINTS.routes),
+          // 👉 BLINDAJE: Si el historial de ventas falla, devuelve null pero NO rompe el resto de la app
+          axios.get(ENDPOINTS.orders).catch(() => null) 
         ]);
         
         if (resProducts.data.status === 'success' && resClients.data.status === 'success' && resRoutes.data.status === 'success') {
           setProducts(resProducts.data.data);
           setClients(resClients.data.data);
           setRoutes(resRoutes.data.data);
+          
+          // 👉 CORRECCIÓN 2: Guardamos ventas de forma segura solo si se descargaron correctamente
+          if (resOrders && resOrders.data && resOrders.data.status === 'success') {
+            setOrdersHistory(resOrders.data.data);
+            localStorage.setItem('offline_orders_history', JSON.stringify(resOrders.data.data));
+          }
           
           await db.products.clear(); await db.products.bulkPut(resProducts.data.data);
           await db.clients.clear(); await db.clients.bulkPut(resClients.data.data);
@@ -378,10 +438,15 @@ function App() {
           syncOfflineData(); 
         }
       } catch (err) {
+        console.error("Error en conexión inicial:", err);
         try {
           let localProducts = await db.products.toArray();
           let localClients = await db.clients.toArray();
           let localRoutes = await db.routes.toArray();
+          
+          // Leemos el historial guardado en la memoria si estamos offline
+          const localOrders = JSON.parse(localStorage.getItem('offline_orders_history')) || [];
+          setOrdersHistory(localOrders);
           
           if (localProducts.length > 0 || localClients.length > 0) {
             localProducts.sort((a, b) => a.category.localeCompare(b.category) || a.name.localeCompare(b.name));
@@ -393,21 +458,21 @@ function App() {
             setRoutes(localRoutes);
             setIsOfflineMode(true); 
           } else {
-            setError("Error: " + err.message);
+            setError("Error: El servidor no responde y no hay datos guardados localmente.");
           }
         } catch (localErr) {
-          setError("Error en almacenamiento local.");
+          setError("Error de almacenamiento local.");
         }
       } finally {
         setLoading(false);
       }
     };
-
+    
     fetchInitialData();
   }, [])
 
   const captureLocation = () => {
-    if (!navigator.geolocation) { alert("Tu dispositivo no soporta GPS."); return; }
+    if (!navigator.geolocation) { setAppAlert({ isOpen: true, title: 'GPS Inactivo', message: 'Tu dispositivo no soporta GPS.', type: 'error' }); return; }
     setIsLocating(true);
     navigator.geolocation.getCurrentPosition(
       (position) => {
@@ -419,7 +484,7 @@ function App() {
         setIsLocating(false);
       },
       (error) => {
-        alert("No se pudo obtener la ubicación. Verifica los permisos de GPS.");
+        setAppAlert({ isOpen: true, title: 'Permiso Denegado', message: 'No se pudo obtener la ubicación. Verifica los permisos de GPS.', type: 'error' });
         setIsLocating(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -454,15 +519,15 @@ function App() {
       await axios.post(ENDPOINTS.clients, newClient);
       await db.clients.add(newClient);
       setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
-      alert('Cliente registrado exitosamente.');
+      setAppAlert({ isOpen: true, title: '¡Éxito!', message: 'Cliente registrado exitosamente.', type: 'success' });
     } catch (error) {
       try {
         await db.clients.add(newClient);
         await db.sync_clients_queue.add(newClient);
         setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
-        alert('Modo sin conexión: El cliente fue guardado en el dispositivo y se sincronizará luego.');
+        setAppAlert({ isOpen: true, title: 'Guardado Local', message: 'Modo sin conexión: El cliente se guardó en tu dispositivo.', type: 'warning' });
       } catch (dbError) {
-        alert('Error crítico de almacenamiento local.');
+        setAppAlert({ isOpen: true, title: 'Error Crítico', message: 'Error de almacenamiento local.', type: 'error' });
       }
     } finally {
       setIsSubmitting(false);
@@ -489,7 +554,12 @@ function App() {
     }
 
     if (requestedQty > availableStock) {
-      alert(`❌ ¡Stock agotado! Solo tienes ${availableStock} unidades en ${saleMode === 'mobile' ? 'la Camioneta' : 'el Centro'}.`);
+      setAppAlert({
+        isOpen: true,
+        title: 'Stock Agotado',
+        message: `Solo tienes ${availableStock} unidades en ${saleMode === 'mobile' ? 'la Camioneta' : 'el Centro'}.`,
+        type: 'error'
+      });
       return prevCart; 
     }
 
@@ -558,8 +628,7 @@ function App() {
     window.open(url, '_blank');
   };
 
-  // 👉 REPARACIÓN: REGISTRAMOS EL DINERO EN LA CAJA AL COBRAR
-  const handleCheckout = async () => {
+const handleCheckout = async () => {
     if (cart.length === 0 || !activeClient) return;
     setIsSubmitting(true);
     const payload = {
@@ -567,6 +636,22 @@ function App() {
       sale_mode: saleMode,
       items: cart.map(item => ({ id: crypto.randomUUID(), product_id: item.id, quantity: item.quantity, unit_price: item.price, subtotal: item.price * item.quantity }))
     };
+
+    // 👉 1. Preparamos el ticket falso para inyectarlo al historial visual al instante
+    const newOrderHistoryItem = {
+      id: payload.id, client_name: activeClient.name, client_location: activeClient.location, client_address: activeClient.address, total_amount: payload.total_amount, created_at: payload.created_at,
+      items: cart.map(item => ({ product_name: item.name, category: item.category, quantity: item.quantity, subtotal: item.price * item.quantity }))
+    };
+
+    // Función para actualizar historial visual sin importar si hay internet
+    const updateLocalHistory = () => {
+      setOrdersHistory(prev => {
+        const updated = [newOrderHistoryItem, ...prev];
+        localStorage.setItem('offline_orders_history', JSON.stringify(updated));
+        return updated;
+      });
+    };
+
     try {
       const res = await axios.post(ENDPOINTS.orders, payload);
       if (sendWhatsApp) sendWhatsAppTicket(activeClient, cart, totalOrder);      
@@ -577,6 +662,7 @@ function App() {
           localStorage.setItem('shiftSales', (currentSales + totalOrder).toString());
           localStorage.setItem('shiftOrderCount', (currentCount + 1).toString());
         }
+        updateLocalHistory(); // 👉 Se agrega al historial
         clearCart(); setActiveClient(null); 
       }
       fetchInventories();
@@ -605,10 +691,11 @@ function App() {
           return inv;
         }));
 
+        updateLocalHistory(); // 👉 Se agrega al historial en modo OFFLINE
         clearCart(); 
         setActiveClient(null);
       } catch (dbError) { 
-        alert('Error crítico de almacenamiento local.'); 
+        setAppAlert({ isOpen: true, title: 'Error Crítico', message: 'Error de almacenamiento local al procesar la orden.', type: 'error' });
       }
     } finally { setIsSubmitting(false); }
   };
@@ -633,72 +720,91 @@ function App() {
   return (
     <div className="min-h-screen relative bg-brand-bg">
       <div className="p-4 lg:p-10 max-w-6xl mx-auto pb-32">
-        <header className="mb-8 flex flex-col md:flex-row md:justify-between md:items-start gap-4">
-          <div>
-            <h1 className="text-5xl md:text-6xl tracking-tight mb-2 flex items-baseline gap-3">
-              <span className="font-calistoga text-brand-brown uppercase">Nahui</span>
-              <span className="font-satisfy text-brand-green text-6xl md:text-7xl lowercase relative top-2">Nature</span>
-            </h1>
-            <div className="flex items-center gap-3 mt-3">
-              <p className="text-brand-brown/70 font-medium text-lg uppercase tracking-widest leading-none">Punto de Venta Móvil</p>
-              
-              {isOnRoad && (
-                <span className="bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm animate-in fade-in">
-                  <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span></span>
-                  En Ruta
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="flex flex-col items-end gap-3">
-            
-            <div className="flex flex-wrap justify-end gap-2 items-center">
-              
-            {isOnRoad ? (
-                <>
-                  <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-amber-500 hover:bg-amber-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95">
-                    💸 Gasto
-                  </button>
-                  <button onClick={handleEndRoute} className="bg-red-500 hover:bg-red-600 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 mr-2 active:scale-95">
-                    🛑 Terminar Ruta
-                  </button>
-                </>
-              ) : (                <button onClick={handleStartRoute} className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-4 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 mr-2 active:scale-95">
-                  🚚 Iniciar Ruta
-                </button>
-              )}
+        
+        {/* 1. ENCABEZADO Y TÍTULO*/}
+        <header className="mb-5 md:mb-3 flex items-center justify-between w-full gap-2">
+          
+          <h1 className="text-3xl sm:text-5xl md:text-6xl tracking-tight flex items-center gap-1.5 sm:gap-3 flex-shrink-0">
+            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-8 h-8 sm:w-12 sm:h-12 md:w-24 md:h-24 object-contain drop-shadow-sm" />
+            <span className="font-calistoga text-brand-brown uppercase">Nahui</span>
+            <span className="font-satisfy text-brand-green text-5xl sm:text-6xl md:text-7xl lowercase relative top-2 md:top-1">nature</span>
+          </h1>
 
+          <div className="text-right flex-shrink flex items-center justify-end">
+            <p className="text-brand-brown/70 font-bold text-[9px] sm:text-xs md:text-sm uppercase tracking-widest leading-tight">
+              Punto de Venta<br className="sm:hidden" /> Móvil
+            </p>
+          </div>
+          
+        </header>
+
+        {/* 2. BARRA DE NAVEGACIÓN STICKY (Fija en TODAS las pantallas) */}
+        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-3 -mx-4 px-4 lg:-mx-10 lg:px-10 border-b border-brand-brown/10 mb-6 shadow-sm">
+          <div className="flex items-center justify-between gap-3 md:justify-end">
+            
+            {/* ZONA DESLIZABLE (Carrusel: Tienda, Ventas, Bodega) */}
+            <div className="flex-1 flex overflow-x-auto items-center gap-2 pb-1 md:pb-0 scroll-smooth pr-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+              
               <button 
                 onClick={() => { setShowOrders(false); setShowInventory(false); }} 
-                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
                 Tienda
               </button>
+              
               <button 
                 onClick={() => { setShowOrders(true); setShowInventory(false); }} 
-                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                 Ventas
               </button>
+              
               <button 
                 onClick={() => { setShowInventory(true); setShowOrders(false); }} 
-                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+                className={`border-2 font-bold px-4 py-2 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                 Bodega
               </button>
+
             </div>
 
-            {isOfflineMode && (
-              <div className="bg-amber-100 text-amber-800 px-4 py-2 rounded-full font-bold text-sm shadow-sm flex items-center gap-2 border border-amber-200 h-fit">
-                <span className="relative flex h-3 w-3"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span></span>
-                Modo sin conexión
-              </div>
-            )}
+            {/* ZONA FIJA A LA DERECHA (Inamovible) */}
+            <div className="flex-shrink-0 flex items-center gap-2 pl-3 border-l border-brand-brown/10 md:border-none">
+              
+              {/* BADGE OFFLINE */}
+              {isOfflineMode && (
+                <div className="bg-amber-100 text-amber-800 px-2.5 py-2.5 md:px-3 md:py-2.5 rounded-xl font-bold text-[10px] md:text-sm shadow-sm flex items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
+                  <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span></span>
+                  <span className="hidden sm:inline">Sin conexión</span>
+                  <span className="sm:hidden">Offline</span>
+                </div>
+              )}
+
+              {isOnRoad ? (
+                <>
+                  <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-amber-500 hover:bg-amber-600 text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Gasto Operativo">
+                    <span className="text-lg leading-none md:hidden">💸</span>
+                    <span className="hidden md:inline">💸 Gasto</span>
+                  </button>
+                  <button onClick={handleEndRoute} className="bg-red-500 hover:bg-red-600 text-white font-bold p-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-2 active:scale-95" title="Terminar Ruta">
+                    <span className="text-lg leading-none md:hidden">🛑</span>
+                    <span className="hidden md:inline">🛑 Terminar Ruta</span>
+                  </button>
+                </>
+              ) : (
+                <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
+                  <span className="text-lg leading-none">🚚</span>
+                  <span className="text-sm md:text-base hidden sm:inline">Iniciar Ruta</span>
+                  <span className="text-sm font-black sm:hidden">Ruta</span>
+                </button>
+              )}
+            </div>
+
           </div>
-        </header>
+        </div>
 
         {showInventory ? (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -718,7 +824,6 @@ function App() {
 
             <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden mb-6 flex flex-col">
               
-              {/* Buscador */}
               <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center">
                 <div className="relative w-full md:w-96">
                   <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
@@ -734,7 +839,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Cabecera de Tabla (Desktop) */}
               <div className="hidden lg:grid grid-cols-12 gap-2 p-4 border-b border-gray-100 font-black text-gray-400 text-[10px] xl:text-xs uppercase tracking-widest bg-white items-center">
                 <div className="col-span-4 pl-2">Catálogo</div>
                 <div className="col-span-4 grid grid-cols-3 text-center bg-gray-50 py-2 rounded-lg border border-gray-100 px-1">
@@ -745,7 +849,6 @@ function App() {
                 <div className="col-span-4 text-right pr-2">Gestión Rápida</div>
               </div>
 
-              {/* Cuerpo de la Tabla */}
               <div className="divide-y divide-gray-100 bg-white">
                 {products
                   .filter(p => {
@@ -826,8 +929,9 @@ function App() {
                                     return [...prev, { product_id: product.id, stock_quantity: res.data.new_stock }];
                                   });
                                   setStockInputs(prev => ({...prev, [product.id]: ''}));
+                                  setAppAlert({ isOpen: true, title: 'Inventario Actualizado', message: 'La mercancía fue ingresada a la bodega central.', type: 'success' });
                                 }
-                              } catch (error) { alert("Error al ingresar a bodega."); }
+                              } catch (error) { setAppAlert({ isOpen: true, title: 'Error', message: 'No se pudo ingresar a bodega.', type: 'error' }); }
                             }}
                             className="bg-brand-green text-white font-bold px-3 py-2 rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
                           >
@@ -839,7 +943,7 @@ function App() {
                             title="Mover del Centro al Movil"
                             onClick={() => {
                               if (stockCasa === 0) {
-                                alert(`❌ No hay stock en el Centro para traspasar.`);
+                                setAppAlert({ isOpen: true, title: 'Stock Insuficiente', message: 'No hay stock en el Centro para traspasar.', type: 'error' });
                                 return;
                               }
                               setTransferModal({
@@ -1147,7 +1251,7 @@ function App() {
                               {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
                               {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
                             </div>
-                            <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variantes disponibles</p></div>
+                            <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
                           </div>
                         )
                       })}
@@ -1242,7 +1346,6 @@ function App() {
                       <p className="text-xs text-gray-400 text-center font-bold my-2 uppercase tracking-widest">Camioneta vacía</p>
                    ) : (
                       mobileInventory.filter(i => i.stock_quantity > 0).map(inv => {
-                        // 👉 REPARACIÓN: Comparación segura de IDs
                         const prod = products.find(p => String(p.id) === String(inv.product_id));
                         if(!prod) return null;
                         const isSingle = prod.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
@@ -1268,13 +1371,108 @@ function App() {
         </div>
       )}
 
+      {/* MODAL DE ALERTA PERSONALIZADA */}
+      {appAlert.isOpen && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onClick={() => setAppAlert({ ...appAlert, isOpen: false })}></div>
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className={`p-6 text-white text-center ${appAlert.type === 'error' ? 'bg-red-500' : appAlert.type === 'success' ? 'bg-brand-green' : 'bg-amber-500'}`}>
+              <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
+                <span className="text-3xl">{appAlert.type === 'error' ? '❌' : appAlert.type === 'success' ? '✅' : '⚠️'}</span>
+              </div>
+              <h3 className="text-2xl font-calistoga mb-1">{appAlert.title}</h3>
+            </div>
+            <div className="p-6 text-center">
+              <p className="text-brand-brown font-medium mb-6">{appAlert.message}</p>
+              <button onClick={() => setAppAlert({ ...appAlert, isOpen: false })} className={`w-full font-black py-3.5 rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-wider text-sm text-white ${appAlert.type === 'error' ? 'bg-red-500 hover:bg-red-600' : appAlert.type === 'success' ? 'bg-brand-green hover:bg-brand-green-dark' : 'bg-amber-500 hover:bg-amber-600'}`}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL RÁPIDO DE CARGA INICIAL DE CAMIONETA */}
+      {showRouteLoadModal && (
+        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowRouteLoadModal(false)}></div>
+          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
+
+            <div className="bg-blue-600 p-6 text-white flex justify-between items-center flex-shrink-0">
+              <div>
+                <h3 className="text-2xl font-calistoga tracking-wide flex items-center gap-3">
+                  <span className="text-3xl">🚚</span> Carga de Vehículo
+                </h3>
+                <p className="text-blue-100 text-xs uppercase tracking-widest mt-1 font-bold">Traspaso Rápido (Central ➔ Móvil)</p>
+              </div>
+              <button onClick={() => setShowRouteLoadModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
+              <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
+                {products.map(product => {
+                  const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
+                  const stockCasa = centralInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
+
+                  if (stockCasa === 0) return null;
+
+                  return (
+                    <div key={product.id} className="flex justify-between items-center p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50">
+                      <div className="flex items-center gap-3 overflow-hidden pr-3">
+                        <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: catColor }}></div>
+                        <div className="truncate">
+                          <p className="text-sm font-bold text-brand-brown truncate">{cartTitle}</p>
+                          {cartSubtitle && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{cartSubtitle}</p>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 flex-shrink-0">
+                        <div className="text-right hidden sm:block">
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">En Bodega</p>
+                          <p className="text-sm font-black text-brand-brown">{stockCasa}</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="number"
+                            min="0"
+                            max={stockCasa}
+                            placeholder="0"
+                            value={routeLoadCart[product.id] || ''}
+                            onChange={(e) => setRouteLoadCart(prev => ({...prev, [product.id]: parseInt(e.target.value) || 0}))}
+                            className="w-16 bg-brand-bg border border-brand-brown/20 rounded-lg px-2 py-1.5 text-center font-bold text-blue-600 focus:border-blue-600 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )
+                })}
+                {products.filter(p => (centralInventory.find(i => String(i.product_id) === String(p.id))?.stock_quantity || 0) > 0).length === 0 && (
+                  <div className="p-8 text-center text-gray-500 font-bold text-sm">Bodega Central vacía.<br/>No hay mercancía para traspasar.</div>
+                )}
+              </div>
+            </div>
+
+            <div className="p-4 bg-white border-t border-brand-brown/10 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
+              <button
+                onClick={handleBulkRouteLoad}
+                disabled={isSubmitting}
+                className={`w-full text-white font-black py-4 rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-wider text-sm flex items-center justify-center gap-2 ${isSubmitting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
+              >
+                {isSubmitting ? 'Transfiriendo...' : 'Confirmar Carga y Salir'}
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
       {/* MODAL PERSONALIZADO DE TRASPASO LOGÍSTICO */}
       {transferModal.isOpen && transferModal.product && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setTransferModal({ ...transferModal, isOpen: false })}></div>
           
           <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
-            {/* Cabecera Azul */}
             <div className="bg-blue-600 p-6 text-white text-center relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
                 <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
@@ -1283,7 +1481,6 @@ function App() {
               <p className="text-blue-100 text-sm font-medium">Carga de vehículo móvil</p>
             </div>
             
-            {/* AQUÍ ESTÁ EL FORMULARIO QUE HACE LA CONEXIÓN A FASTAPI */}
             <form 
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -1299,29 +1496,23 @@ function App() {
                   });
                   
                   if (res.data.status === 'success') {
-                    // 1. Actualizamos el número de la Casa en pantalla
                     setCentralInventory(prev => prev.map(i => 
                       String(i.product_id) === String(transferModal.product.id) 
                       ? { ...i, stock_quantity: res.data.new_central_stock } : i
                     ));
-                    
-                    // 2. Actualizamos el número de la Camioneta en pantalla
                     setMobileInventory(prev => {
                       const exists = prev.find(i => String(i.product_id) === String(transferModal.product.id));
                       if (exists) return prev.map(i => String(i.product_id) === String(transferModal.product.id) ? { ...i, stock_quantity: res.data.new_mobile_stock } : i);
                       return [...prev, { product_id: transferModal.product.id, stock_quantity: res.data.new_mobile_stock }];
                     });
-                    
-                    // 3. Cerramos el Modal
                     setTransferModal({ isOpen: false, product: null, stockCasa: 0, qty: '' });
                   }
                 } catch (error) {
-                  alert(error.response?.data?.detail || "Error de conexión al intentar el traspaso.");
+                  setAppAlert({ isOpen: true, title: 'Error', message: 'Error de conexión al intentar el traspaso.', type: 'error' });
                 }
               }} 
               className="p-6"
             >
-              {/* Info del Producto */}
               <div className="mb-6 text-center">
                 <p className="font-bold text-brand-brown text-lg leading-tight">
                   {formatProduct(transferModal.product).cartTitle}
@@ -1337,7 +1528,6 @@ function App() {
                 </div>
               </div>
               
-              {/* Input Gigante */}
               <div className="mb-8">
                 <label className="block text-[10px] font-bold text-blue-500 uppercase tracking-widest mb-2 text-center">Cantidad a Traspasar</label>
                 <input 
@@ -1352,7 +1542,6 @@ function App() {
                 />
               </div>
               
-              {/* Botones de Acción */}
               <div className="flex gap-3">
                 <button type="button" onClick={() => setTransferModal({ ...transferModal, isOpen: false })} className="flex-1 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-wider text-sm">
                   Cancelar
@@ -1386,13 +1575,9 @@ function App() {
             </div>
 
             <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
-
-              {/* ZONA 1: DIRECTORIO DE PROVEEDORES DINÁMICO */}
               <div className="mb-8">
                 <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2">1. Contactar Proveedores</h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                  
-                  {/* React dibujará todos los botones automáticamente leyendo la lista de arriba */}
                   {SUPPLIERS.map(supplier => (
                     <a 
                       key={supplier.id}
@@ -1405,12 +1590,10 @@ function App() {
                       <span className="text-xs font-bold text-brand-brown text-center leading-tight">Proveedor<br/>{supplier.name}</span>
                     </a>
                   ))}
-
                 </div>
                 <p className="text-[10px] text-gray-400 mt-2 text-center">Toca un botón para contactar al proveedor directamente.</p>
               </div>
 
-              {/* ZONA 2: REGISTRO MASIVO AL INVENTARIO */}
               <div>
                 <h4 className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3 border-b border-gray-200 pb-2">2. Ingresar a Bodega Central</h4>
                 <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
@@ -1450,7 +1633,6 @@ function App() {
                   })}
                 </div>
               </div>
-
             </div>
 
             <div className="p-4 bg-white border-t border-brand-brown/10 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
@@ -1462,7 +1644,6 @@ function App() {
                 {isSubmitting ? 'Guardando Ingreso...' : 'Confirmar Ingreso a Bodega'}
               </button>
             </div>
-            
           </div>
         </div>
       )}
