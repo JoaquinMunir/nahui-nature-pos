@@ -798,7 +798,10 @@ const handleCheckout = async () => {
                   </>
                 ) : (
                   <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-3 py-2.5 md:px-4 md:py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 whitespace-nowrap">
-                    <span className="text-lg leading-none">🚚</span>
+                    <svg className="w-4 h-4 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>  
                     <span className="text-sm md:text-base hidden sm:inline">Iniciar Ruta</span>
                     <span className="text-sm font-black sm:hidden">Ruta</span>
                   </button>
@@ -1225,15 +1228,22 @@ const handleCheckout = async () => {
                       <div className="flex items-center gap-1.5 mt-3 bg-black/20 p-1.5 rounded-xl border border-white/10 w-fit">
                         <button 
                           onClick={() => setSaleMode('mobile')} 
-                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-blue-500 text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
                         >
-                          🚚 En Ruta
+                        <svg className="w-4 h-4 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                        </svg>
+                        En Ruta
                         </button>
                         <button 
                           onClick={() => setSaleMode('central')} 
-                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-brand-green text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                          className={`px-3 py-1.5 rounded-lg text-sm font-bold flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
                         >
-                          🏬 En Centro
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                          </svg>
+                          En Centro
                         </button>
                       </div>
                       
