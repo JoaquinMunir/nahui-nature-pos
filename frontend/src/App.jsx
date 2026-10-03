@@ -1288,7 +1288,9 @@ const handleCheckout = async () => {
           <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="bg-amber-500 p-6 text-white text-center relative">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                <span className="text-3xl">💸</span>
+                <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                /svg>
               </div>
               <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Registrar Gasto</h3>
               <p className="text-amber-100 text-sm font-medium">Gasolina, comidas o insumos</p>
