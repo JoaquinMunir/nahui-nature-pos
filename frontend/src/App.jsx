@@ -959,9 +959,8 @@ function App() {
               <div className="flex items-center gap-4 mb-6 border-b border-brand-brown/10 pb-4">
                 <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Historial de Ventas</h2>
               </div>
-
-              <div className="bg-white p-4 rounded-2xl shadow-sm border border-brand-brown/10 mb-6 flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
-                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+              <div className="bg-white p-4 max-lg:landscape:p-2 rounded-2xl shadow-sm border border-brand-brown/10 mb-6 max-lg:landscape:mb-3 flex flex-col md:flex-row max-lg:landscape:flex-row gap-4 max-lg:landscape:gap-2 justify-between items-start md:items-center max-lg:landscape:items-center">
+                <div className="flex flex-col sm:flex-row max-lg:landscape:flex-row gap-3 max-lg:landscape:gap-2 w-full md:w-auto">
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
@@ -1047,11 +1046,12 @@ function App() {
               {!loading && !error && (
                 <>
                   {isAddingClient && !activeClient ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                      <div className="flex items-center gap-4 mb-6">
-                        <button onClick={() => setIsAddingClient(false)} className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-brown hover:bg-gray-50 transition-colors">
-                          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        </button>
+                      <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
+                        <div className="flex items-center gap-3">
+                          <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
+                          <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
+                        </div>
+                        <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
                         <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Alta de Cliente</h2>
                       </div>
 
@@ -1338,14 +1338,16 @@ function App() {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setExpenseModal({ ...expenseModal, isOpen: false })}></div>
           <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-sm overflow-hidden animate-in fade-in zoom-in duration-200">
             <form onSubmit={handleAddExpense}>
-              <div className="bg-amber-500 p-6 text-white text-center relative">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <svg className="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <div className="bg-amber-500 p-6 max-lg:landscape:p-3 text-white text-center relative max-lg:landscape:flex max-lg:landscape:items-center max-lg:landscape:justify-center max-lg:landscape:gap-4">
+                <div className="w-16 h-16 max-lg:landscape:w-10 max-lg:landscape:h-10 bg-white/20 rounded-full flex items-center justify-center mx-auto max-lg:landscape:mx-0 mb-3 max-lg:landscape:mb-0">
+                  <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
                   </svg>
                 </div>
-                <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Registrar Gasto</h3>
-                <p className="text-amber-100 text-sm font-medium">Gasolina, comidas o insumos</p>
+                <div className="max-lg:landscape:text-left">
+                  <h3 className="text-2xl max-lg:landscape:text-lg font-calistoga mb-1 max-lg:landscape:mb-0 tracking-wide">Registrar Gasto</h3>
+                  <p className="text-amber-100 text-sm max-lg:landscape:text-[10px] font-medium">Gasolina, comidas o insumos</p>
+                </div>
               </div>
               
               <div className="p-6">
@@ -1353,9 +1355,9 @@ function App() {
                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Motivo</label>
                   <input type="text" autoFocus required value={expenseModal.concept} onChange={e => setExpenseModal({...expenseModal, concept: e.target.value})} placeholder="Ej. Gasolina Magna" className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-amber-500 transition-colors text-brand-brown font-bold" />
                 </div>
-                <div className="mb-8">
+                <div className="mb-8 max-lg:landscape:mb-3">
                   <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 text-center">Monto a descontar</label>
-                  <input type="number" step="any" required value={expenseModal.amount} onChange={e => setExpenseModal({...expenseModal, amount: e.target.value})} placeholder="0.00" className="w-full text-center text-4xl font-black text-brand-brown border-b-2 border-gray-200 focus:border-amber-500 outline-none pb-2 transition-colors bg-transparent" />
+                  <input type="number" step="any" required value={expenseModal.amount} onChange={e => setExpenseModal({...expenseModal, amount: e.target.value})} placeholder="0.00" className="w-full text-center text-4xl max-lg:landscape:text-2xl font-black text-brand-brown border-b-2 border-gray-200 focus:border-amber-500 outline-none pb-2 max-lg:landscape:pb-1 transition-colors bg-transparent" />
                 </div>
                 <div className="flex gap-3">
                   <button type="button" onClick={() => setExpenseModal({ ...expenseModal, isOpen: false })} className="flex-1 bg-gray-100 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-200 transition-colors uppercase tracking-wider text-sm">Cancelar</button>
@@ -1465,12 +1467,12 @@ function App() {
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowRouteLoadModal(false)}></div>
           <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
 
-            <div className="bg-blue-600 p-6 text-white flex justify-between items-center flex-shrink-0">
+            <div className="bg-blue-600 p-6 max-lg:landscape:p-3 text-white flex justify-between items-center flex-shrink-0">
               <div>
-                <h3 className="text-2xl font-calistoga tracking-wide flex items-center gap-3">
-                  <span className="text-3xl">🚚</span> Carga de Vehículo
+                <h3 className="text-2xl max-lg:landscape:text-lg font-calistoga tracking-wide flex items-center gap-3 max-lg:landscape:gap-2">
+                  <span className="text-3xl max-lg:landscape:text-xl">🚚</span> Carga de Vehículo
                 </h3>
-                <p className="text-blue-100 text-xs uppercase tracking-widest mt-1 font-bold">Traspaso Rápido (Central ➔ Móvil)</p>
+                <p className="text-blue-100 text-xs max-lg:landscape:text-[9px] uppercase tracking-widest mt-1 max-lg:landscape:mt-0 font-bold">Traspaso Rápido (Central ➔ Móvil)</p>
               </div>
               <button onClick={() => setShowRouteLoadModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
                 <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
