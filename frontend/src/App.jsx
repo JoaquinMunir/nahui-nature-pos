@@ -782,7 +782,7 @@ function App() {
                 </button>
                 <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold p-2.5 max-lg:landscape:px-4 max-lg:landscape:py-2 md:px-4 md:py-2.5 rounded-xl max-lg:landscape:rounded-lg transition-all shadow-md flex items-center gap-2 active:scale-95 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider" title="Terminar Ruta">
                   <span className="text-lg max-lg:landscape:text-sm leading-none md:hidden">🛑</span>
-                  <span className="hidden md:inline max-lg:landscape:inline">🛑 Terminar</span>
+                  <span className="hidden md:inline max-lg:landscape:inline">Terminar</span>
                 </button>
               </>
             ) : (
