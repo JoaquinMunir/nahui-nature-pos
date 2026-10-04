@@ -1046,15 +1046,13 @@ function App() {
               {!loading && !error && (
                 <>
                   {isAddingClient && !activeClient ? (
-                      <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
-                        <div className="flex items-center gap-3">
-                          <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
-                          <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
-                        </div>
-                        <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
-                        <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Alta de Cliente</h2>
+                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                      <div className="flex items-center gap-4 max-lg:landscape:gap-2 mb-6 max-lg:landscape:mb-3">
+                        <button onClick={() => setIsAddingClient(false)} className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-brown hover:bg-gray-50 transition-colors">
+                          <svg className="w-6 h-6 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        </button>
+                        <h2 className="text-2xl md:text-3xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Alta de Cliente</h2>
                       </div>
-
                       <form onSubmit={handleCreateClient} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 p-5 md:p-8 space-y-6">
                         <div>
                           <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4">1. Identidad del Negocio</h3>
@@ -1143,13 +1141,13 @@ function App() {
 
                   ) : !activeClient ? (
                     <div className="animate-in fade-in duration-300">
-                      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
                         <div className="flex items-center gap-3">
-                          <h2 className="text-2xl font-calistoga text-brand-brown">Directorio</h2>
-                          <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">{clients.length} tiendas</span>
+                          <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
+                          <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
                         </div>
-                        <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 rounded-xl hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2">
-                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                        <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
+                          <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
                           Nuevo Cliente
                         </button>
                       </div>
