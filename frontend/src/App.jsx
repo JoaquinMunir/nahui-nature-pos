@@ -736,8 +736,8 @@ function App() {
           </header>
         </div>
 
-        {/* 2. BARRA DE NAVEGACIÓN STICKY (Ocupa 100% de la pantalla) */}
-        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-2.5 max-lg:landscape:py-2 border-b border-brand-brown/10 shadow-sm w-full">
+        {/* 2. BARRA DE NAVEGACIÓN FIJA */}
+        <div className="fixed top-0 left-0 z-50 bg-brand-bg/95 backdrop-blur-md py-2.5 max-lg:landscape:py-2 border-b border-brand-brown/10 shadow-sm w-full">
           <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-10 flex items-center justify-between gap-3 md:justify-end">
             
             <div className="flex-1 flex overflow-x-auto items-center gap-2 pb-1 md:pb-0 scroll-smooth pr-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -804,7 +804,7 @@ function App() {
       </div>
 
       {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
-      <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
+      <div className="p-3 sm:p-4 lg:p-10 pt-20 sm:pt-24 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
         
         <div className={`w-full space-y-4 ${isStoreView ? 'landscape:col-span-8' : 'landscape:col-span-12'}`}>
           {showInventory ? (
@@ -1228,9 +1228,42 @@ function App() {
                         </div>
                       </div>
 
-                      <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-sm max-lg:landscape:text-[10px] max-lg:landscape:uppercase max-lg:landscape:tracking-widest font-bold py-2 px-4 max-lg:landscape:py-1.5 max-lg:landscape:px-3 rounded-xl max-lg:landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0">
-                        Cambiar <span className="hidden sm:inline max-lg:landscape:hidden">Cliente</span>
+                ) : (
+                  <div className="animate-in fade-in zoom-in-95 duration-300">
+                    <div className="bg-brand-brown text-white p-4 max-lg:landscape:p-3 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-sm flex flex-col landscape:flex-row justify-between items-stretch landscape:items-center gap-3">
+                      
+                      {/* Izquierda: Nombre y Selector de Ruta */}
+                      <div className="flex flex-col landscape:flex-row landscape:items-center gap-2 landscape:gap-4 flex-1 min-w-0">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xl leading-none opacity-80 flex-shrink-0">👤</span>
+                          <h2 className="text-xl sm:text-2xl landscape:text-lg font-black font-calistoga truncate leading-tight tracking-wide">{activeClient.name}</h2>
+                        </div>
+                        
+                        {/* Mini Toggle Modalidad */}
+                        <div className="flex items-center bg-black/20 p-1 rounded-xl landscape:rounded-lg border border-white/10 w-fit flex-shrink-0">
+                          <button 
+                            onClick={() => setSaleMode('mobile')} 
+                            className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
+                          >
+                            <svg className="w-3.5 h-3.5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>
+                            <span>En Ruta</span>
+                          </button>
+                          <button 
+                            onClick={() => setSaleMode('central')} 
+                            className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                            <span>En Centro</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Derecha: Botón Cambiar */}
+                      <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs uppercase tracking-wider font-bold py-2.5 px-4 landscape:py-2 landscape:px-4 rounded-xl landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0 text-center">
+                        Cambiar Cliente
                       </button>
+                    </div>
+
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
