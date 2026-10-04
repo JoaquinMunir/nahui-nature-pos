@@ -7,7 +7,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'favicon.ico', 'apple-touch-icon.png'],
+      // Agregamos los nuevos nombres a los assets
+      includeAssets: ['icon-192.png', 'app-icon-192.png', 'app-icon-512.png', 'favicon.ico', 'apple-touch-icon.png'],
       manifest: {
         name: 'Nahui Nature POS',
         short_name: 'Nahui POS',
@@ -18,12 +19,14 @@ export default defineConfig({
         orientation: 'any',
         icons: [
           {
-            src: '/icon-192.png', 
+            // Esta es la imagen que se instalará en el celular
+            src: '/app-icon-192.png', 
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png', 
+            // Esta es la imagen que se instalará en el celular (tamaño grande)
+            src: '/app-icon-512.png', 
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
