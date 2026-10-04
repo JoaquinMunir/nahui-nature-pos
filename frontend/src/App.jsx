@@ -1187,176 +1187,147 @@ function App() {
                                               <div className="flex items-center gap-2">
                                                 <a href={`tel:${cleanPhone}`} className="flex items-center gap-1.5 text-xs font-bold text-brand-green hover:bg-brand-green hover:text-white transition-colors bg-brand-green/10 px-2.5 py-1.5 rounded-lg"><svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>Llamar</a>
                                                 <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs font-bold text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 rounded-lg shadow-sm"><svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>WhatsApp</a>
-                                            </div>
-                                          );
-                                        })()}
+                                              </div>
+                                            );
+                                          })()}
+                                        </div>
                                       </div>
+                                      <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 rounded-xl hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm">Iniciar Venta</button>
                                     </div>
-                                    <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 rounded-xl hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm">Iniciar Venta</button>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : (
-                  <div className="animate-in fade-in zoom-in-95 duration-300">
-                    <div className="bg-brand-brown text-white p-4 max-lg:landscape:px-4 max-lg:landscape:py-2 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-sm flex flex-col sm:flex-row max-lg:landscape:flex-row justify-between items-start sm:items-center max-lg:landscape:items-center gap-4 max-lg:landscape:gap-3">
-                      <div className="flex items-center gap-2 max-lg:landscape:gap-3 flex-1 w-full overflow-hidden">
-                        <span className="hidden max-lg:landscape:inline text-xl leading-none opacity-80">👤</span>
-                        <h2 className="text-2xl sm:text-3xl max-lg:landscape:text-base font-black font-calistoga truncate max-w-[200px] lg:max-w-[400px] leading-none tracking-wide">{activeClient.name}</h2>
-                        
-                        {/* Mini Toggle Modalidad */}
-                        <div className="flex items-center bg-black/20 p-1.5 max-lg:landscape:p-0.5 rounded-xl max-lg:landscape:rounded-lg border border-white/10 ml-auto max-lg:landscape:ml-2 flex-shrink-0">
-                          <button 
-                            onClick={() => setSaleMode('mobile')} 
-                            className={`px-3 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-sm max-lg:landscape:text-[9px] max-lg:landscape:uppercase max-lg:landscape:tracking-widest font-bold flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
-                          >
-                            <svg className="w-4 h-4 max-lg:landscape:w-3 max-lg:landscape:h-3 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>
-                            <span className="max-lg:landscape:hidden sm:inline">En Ruta</span>
-                          </button>
-                          <button 
-                            onClick={() => setSaleMode('central')} 
-                            className={`px-3 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-sm max-lg:landscape:text-[9px] max-lg:landscape:uppercase max-lg:landscape:tracking-widest font-bold flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
-                          >
-                            <svg className="w-4 h-4 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                            <span className="max-lg:landscape:hidden sm:inline">En Centro</span>
-                          </button>
-                        </div>
-                      </div>
-
-                ) : (
-                  <div className="animate-in fade-in zoom-in-95 duration-300">
-                    <div className="bg-brand-brown text-white p-4 max-lg:landscape:p-3 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-sm flex flex-col landscape:flex-row justify-between items-stretch landscape:items-center gap-3">
-                      
-                      {/* Izquierda: Nombre y Selector de Ruta */}
-                      <div className="flex flex-col landscape:flex-row landscape:items-center gap-2 landscape:gap-4 flex-1 min-w-0">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xl leading-none opacity-80 flex-shrink-0">👤</span>
-                          <h2 className="text-xl sm:text-2xl landscape:text-lg font-black font-calistoga truncate leading-tight tracking-wide">{activeClient.name}</h2>
-                        </div>
-                        
-                        {/* Mini Toggle Modalidad */}
-                        <div className="flex items-center bg-black/20 p-1 rounded-xl landscape:rounded-lg border border-white/10 w-fit flex-shrink-0">
-                          <button 
-                            onClick={() => setSaleMode('mobile')} 
-                            className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
-                          >
-                            <svg className="w-3.5 h-3.5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>
-                            <span>En Ruta</span>
-                          </button>
-                          <button 
-                            onClick={() => setSaleMode('central')} 
-                            className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
-                          >
-                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
-                            <span>En Centro</span>
-                          </button>
-                        </div>
-                      </div>
-
-                      {/* Derecha: Botón Cambiar */}
-                      <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs uppercase tracking-wider font-bold py-2.5 px-4 landscape:py-2 landscape:px-4 rounded-xl landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0 text-center">
-                        Cambiar Cliente
-                      </button>
-                    </div>
-
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                      {categoryNames.map(categoryName => {
-                        const items = groupedProducts[categoryName];
-                        const { catColor } = formatProduct(items[0]);
-                        const coverImage = CATEGORY_COVERS[categoryName];
-                        const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
-                        return (
-                          <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
-                            <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
-                            <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
-                              {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
-                              {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
+                                  ))}
+                                </div>
+                              )}
                             </div>
-                            <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
-                          </div>
-                        )
-                      })}
+                          )
+                        })}
+                      </div>
                     </div>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )}
-      </div>
+                  ) : (
+                    <div className="animate-in fade-in zoom-in-95 duration-300">
+                      <div className="bg-brand-brown text-white p-4 max-lg:landscape:p-3 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-sm flex flex-col landscape:flex-row justify-between items-stretch landscape:items-center gap-3">
+                        
+                        {/* Izquierda: Nombre y Selector de Ruta */}
+                        <div className="flex flex-col landscape:flex-row landscape:items-center gap-2 landscape:gap-4 flex-1 min-w-0">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-xl leading-none opacity-80 flex-shrink-0">👤</span>
+                            <h2 className="text-xl sm:text-2xl landscape:text-lg font-black font-calistoga truncate leading-tight tracking-wide">{activeClient.name}</h2>
+                          </div>
+                          
+                          {/* Mini Toggle Modalidad */}
+                          <div className="flex items-center bg-black/20 p-1 rounded-xl landscape:rounded-lg border border-white/10 w-fit flex-shrink-0">
+                            <button 
+                              onClick={() => setSaleMode('mobile')} 
+                              className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
+                            >
+                              <svg className="w-3.5 h-3.5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" /></svg>
+                              <span>En Ruta</span>
+                            </button>
+                            <button 
+                              onClick={() => setSaleMode('central')} 
+                              className={`px-3 py-1.5 landscape:px-2.5 landscape:py-1 rounded-lg landscape:rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-sm' : 'text-white/50 hover:text-white'}`}
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                              <span>En Centro</span>
+                            </button>
+                          </div>
+                        </div>
 
-      {/* === PANEL DERECHO (CARRITO FIJO EN HORIZONTAL) === */}
-      {isStoreView && (
-        <div className="hidden landscape:flex landscape:col-span-4 sticky top-20 flex-col bg-white rounded-3xl shadow-sm border border-brand-brown/10 h-[calc(100vh-6rem)] overflow-hidden">
-          <div className="p-4 border-b border-brand-brown/10 bg-brand-bg flex justify-between items-center flex-shrink-0">
-            <h2 className="text-xl font-calistoga text-brand-brown">Orden</h2>
-            <div className="flex items-center gap-2">
-              <span className="bg-brand-green text-white font-sans text-xs py-1 px-3 rounded-full font-bold">{totalItems} items</span>
-              <button onClick={clearCart} className="text-red-500 hover:text-red-700 p-1" title="Vaciar">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        {/* Derecha: Botón Cambiar */}
+                        <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs uppercase tracking-wider font-bold py-2.5 px-4 landscape:py-2 landscape:px-4 rounded-xl landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0 text-center">
+                          Cambiar Cliente
+                        </button>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        {categoryNames.map(categoryName => {
+                          const items = groupedProducts[categoryName];
+                          const { catColor } = formatProduct(items[0]);
+                          const coverImage = CATEGORY_COVERS[categoryName];
+                          const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
+                          return (
+                            <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
+                              <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
+                              <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
+                                {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
+                                {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
+                              </div>
+                              <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* === PANEL DERECHO (CARRITO FIJO EN HORIZONTAL) === */}
+        {isStoreView && (
+          <div className="hidden landscape:flex landscape:col-span-4 sticky top-20 flex-col bg-white rounded-3xl shadow-sm border border-brand-brown/10 h-[calc(100vh-6rem)] overflow-hidden">
+            <div className="p-4 border-b border-brand-brown/10 bg-brand-bg flex justify-between items-center flex-shrink-0">
+              <h2 className="text-xl font-calistoga text-brand-brown">Orden</h2>
+              <div className="flex items-center gap-2">
+                <span className="bg-brand-green text-white font-sans text-xs py-1 px-3 rounded-full font-bold">{totalItems} items</span>
+                <button onClick={clearCart} className="text-red-500 hover:text-red-700 p-1" title="Vaciar">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 bg-brand-bg/30">
+              {cart.length === 0 ? (
+                <div className="h-full flex flex-col items-center justify-center opacity-50">
+                  <span className="text-4xl mb-2">🛒</span>
+                  <p className="text-sm font-bold text-brand-brown text-center">El carrito está vacío</p>
+                </div>
+              ) : (
+                <ul className="space-y-3">
+                  {cart.map(item => {
+                    const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
+                    return (
+                      <li key={item.id} className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
+                        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
+                        <div className="flex-1 pl-3 pr-2 min-w-0">
+                          <p className="font-bold text-brand-brown text-xs leading-tight mb-1 truncate">{cartTitle}</p>
+                          <div className="flex items-center gap-1 flex-wrap">
+                            {cartSubtitle && <span className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
+                            <p className="text-[10px] text-brand-green font-bold">${item.price}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center w-[75px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-7 overflow-hidden flex-shrink-0">
+                          <button onClick={() => removeFromCart(item.id)} className="w-6 h-full bg-white hover:text-red-500 font-bold text-sm">-</button>
+                          <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
+                          <button onClick={() => addToCart(item)} className="w-6 h-full bg-white hover:text-brand-green font-bold text-sm">+</button>
+                        </div>
+                      </li>
+                    )
+                  })}
+                </ul>
+              )}
+            </div>
+            
+            <div className="p-4 border-t border-brand-brown/10 bg-white flex-shrink-0">
+              <div className="flex justify-between items-end mb-3">
+                <span className="text-sm font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
+                <span className="text-2xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
+              </div>
+              <label className="flex items-center justify-between mb-3 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors">
+                <div className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                  <span className="text-[10px] font-bold text-emerald-800">WhatsApp</span>
+                </div>
+                <input type="checkbox" checked={sendWhatsApp} onChange={() => { const newVal = !sendWhatsApp; setSendWhatsApp(newVal); localStorage.setItem('sendWhatsApp', newVal); }} className="w-3 h-3 accent-emerald-600 rounded cursor-pointer" />
+              </label>
+              <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-3 rounded-xl font-black text-sm transition-all shadow-md uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting || cart.length === 0 || !activeClient ? 'bg-gray-300 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark active:scale-[0.98]'}`}>
+                {isSubmitting ? '...' : cart.length === 0 ? 'Carrito Vacío' : 'Cobrar Orden'}
               </button>
             </div>
           </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 bg-brand-bg/30">
-            {cart.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center opacity-50">
-                <span className="text-4xl mb-2">🛒</span>
-                <p className="text-sm font-bold text-brand-brown text-center">El carrito está vacío</p>
-              </div>
-            ) : (
-              <ul className="space-y-3">
-                {cart.map(item => {
-                  const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
-                  return (
-                    <li key={item.id} className="flex justify-between items-center p-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
-                      <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
-                      <div className="flex-1 pl-3 pr-2 min-w-0">
-                        <p className="font-bold text-brand-brown text-xs leading-tight mb-1 truncate">{cartTitle}</p>
-                        <div className="flex items-center gap-1 flex-wrap">
-                          {cartSubtitle && <span className={`text-[8px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
-                          <p className="text-[10px] text-brand-green font-bold">${item.price}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center w-[75px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-7 overflow-hidden flex-shrink-0">
-                        <button onClick={() => removeFromCart(item.id)} className="w-6 h-full bg-white hover:text-red-500 font-bold text-sm">-</button>
-                        <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
-                        <button onClick={() => addToCart(item)} className="w-6 h-full bg-white hover:text-brand-green font-bold text-sm">+</button>
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-            )}
-          </div>
-          
-          <div className="p-4 border-t border-brand-brown/10 bg-white flex-shrink-0">
-            <div className="flex justify-between items-end mb-3">
-              <span className="text-sm font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
-              <span className="text-2xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
-            </div>
-            <label className="flex items-center justify-between mb-3 bg-emerald-50/50 p-2 rounded-lg border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors">
-              <div className="flex items-center gap-1.5">
-                <svg className="w-4 h-4 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                <span className="text-[10px] font-bold text-emerald-800">WhatsApp</span>
-              </div>
-              <input type="checkbox" checked={sendWhatsApp} onChange={() => { const newVal = !sendWhatsApp; setSendWhatsApp(newVal); localStorage.setItem('sendWhatsApp', newVal); }} className="w-3 h-3 accent-emerald-600 rounded cursor-pointer" />
-            </label>
-            <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-3 rounded-xl font-black text-sm transition-all shadow-md uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting || cart.length === 0 || !activeClient ? 'bg-gray-300 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark active:scale-[0.98]'}`}>
-              {isSubmitting ? '...' : cart.length === 0 ? 'Carrito Vacío' : 'Cobrar Orden'}
-            </button>
-          </div>
-        </div>
-      )}
+        )}
       
-      {/* FINAL DEL GRID MAESTRO */}
       </div>
 
       {/* MODAL DE GASTOS OPERATIVOS */}
