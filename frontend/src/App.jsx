@@ -713,94 +713,198 @@ function App() {
   const isStoreView = !showInventory && !showOrders && activeClient;
 
   return (
-    <div className="min-h-screen relative bg-brand-bg flex flex-col">
+    <div className="min-h-screen relative bg-brand-bg flex flex-col max-lg:landscape:flex-row">
       
-      {/* 1. ENCABEZADO Y TÍTULO (Visible en vertical, oculto en landscape móvil) */}
-      <div className={`w-full bg-brand-bg relative z-30 max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-10 pt-3 sm:pt-4 lg:pt-10 ${isStoreView ? 'max-lg:landscape:hidden' : ''}`}>
-        <header className="mb-2 md:mb-3 flex items-center justify-between w-full gap-2"> 
+      {/* 1. HEADER & SIDEBAR (Arriba en vertical/PC, Izquierda en horizontal móvil) */}
+      <div className={`bg-brand-bg/95 backdrop-blur-md border-b max-lg:landscape:border-b-0 max-lg:landscape:border-r border-brand-brown/10 shadow-sm z-50 w-full max-lg:landscape:w-48 max-lg:landscape:h-screen max-lg:landscape:sticky max-lg:landscape:top-0 flex flex-col flex-shrink-0 transition-all ${isStoreView ? 'max-lg:landscape:hidden' : ''}`}>
+        
+        {/* LOGO, MARCA Y SUBTÍTULO EN UNA SOLA LÍNEA LIMPIA */}
+        <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto max-lg:landscape:px-3 max-lg:landscape:py-3 max-lg:landscape:flex-col max-lg:landscape:items-start max-lg:landscape:gap-6">
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
+            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm max-lg:landscape:w-10 max-lg:landscape:h-10" />
             <h1 className="flex items-baseline gap-1 sm:gap-2">
-              <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight">Nahui</span>
-              <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl">nature</span>
+              <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight max-lg:landscape:text-xl">Nahui</span>
+              <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl max-lg:landscape:text-2xl">nature</span>
             </h1>
           </div>
-          <div className="text-right flex-shrink flex items-center justify-end">
-            <p className="text-brand-brown/70 font-bold text-[8px] sm:text-xs md:text-sm uppercase tracking-widest leading-tight">
-              Punto de Venta<br className="sm:hidden" /> Móvil
+          
+          {/* Subtítulo ajustado en una sola línea fija para PC y vertical */}
+          <div className="flex-shrink flex items-center justify-end max-lg:landscape:hidden">
+            <p className="text-brand-brown/70 font-bold text-xs md:text-sm uppercase tracking-widest whitespace-nowrap">
+              Punto de Venta Móvil
             </p>
           </div>
-        </header>
+        </div>
+
+        {/* NAVEGACIÓN PRINCIPAL (Horizontal en PC/vertical, Apilada en landscape móvil) */}
+        <div className="px-3 pb-3 sm:px-4 sm:pb-4 md:px-10 max-w-[1400px] mx-auto w-full max-lg:landscape:px-3 max-lg:landscape:py-0 max-lg:landscape:mt-2 flex overflow-x-auto max-lg:landscape:flex-col max-lg:landscape:overflow-visible gap-2 max-lg:landscape:gap-3 flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <button 
+            onClick={() => { setShowOrders(false); setShowInventory(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            <span className="max-lg:landscape:text-sm">Tienda</span>
+          </button>
+          
+          <button 
+            onClick={() => { setShowOrders(true); setShowInventory(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <span className="max-lg:landscape:text-sm">Ventas</span>
+          </button>
+          
+          <button 
+            onClick={() => { setShowInventory(true); setShowOrders(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+            <span className="max-lg:landscape:text-sm">Bodega</span>
+          </button>
+        </div>
       </div>
 
-      {/* 2. BARRA DE NAVEGACIÓN STICKY REAL 100% ANCHO */}
-      <div className="sticky top-0 z-50 bg-brand-bg/95 backdrop-blur-md py-2.5 max-lg:landscape:py-2 border-b border-brand-brown/10 shadow-sm w-full">
-        <div className="max-w-[1400px] mx-auto px-3 sm:px-4 lg:px-10 flex items-center justify-between gap-3 md:justify-end">
-          
-          <div className="flex-1 flex overflow-x-auto items-center gap-2 pb-1 md:pb-0 scroll-smooth pr-3 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            <button 
-              onClick={() => { setShowOrders(false); setShowInventory(false); }} 
-              className={`border-2 font-bold px-4 py-2 max-lg:landscape:px-4 max-lg:landscape:py-1.5 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider rounded-xl max-lg:landscape:rounded-lg transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-            >
-              <svg className="w-4 h-4 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-              Tienda
-            </button>
-            
-            <button 
-              onClick={() => { setShowOrders(true); setShowInventory(false); }} 
-              className={`border-2 font-bold px-4 py-2 max-lg:landscape:px-4 max-lg:landscape:py-1.5 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider rounded-xl max-lg:landscape:rounded-lg transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-            >
-              <svg className="w-4 h-4 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-              Ventas
-            </button>
-            
-            <button 
-              onClick={() => { setShowInventory(true); setShowOrders(false); }} 
-              className={`border-2 font-bold px-4 py-2 max-lg:landscape:px-4 max-lg:landscape:py-1.5 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider rounded-xl max-lg:landscape:rounded-lg transition-all shadow-sm flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-            >
-              <svg className="w-4 h-4 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-              Bodega
-            </button>
-          </div>
+      {/* 2. ÁREA DE CONTENIDO */}
+      <div className="flex-1 flex flex-col min-w-0 relative">
 
-          <div className="flex-shrink-0 flex items-center gap-2 pl-3 border-l border-brand-brown/10 md:border-none">
+        {/* BARRA DE ACCIONES RÁPIDAS (Estado Operativo) */}
+        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-2.5 px-3 sm:px-4 lg:px-10 border-b border-brand-brown/10 shadow-sm w-full flex items-center justify-between gap-3 max-w-[1400px] mx-auto">
+          
+          {/* Indicador Offline */}
+          <div className="flex-1">
             {isOfflineMode && (
-              <div className="bg-amber-100 text-amber-800 px-2.5 py-2.5 md:px-3 md:py-2.5 rounded-xl font-bold text-[10px] md:text-sm shadow-sm flex items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
-                <span className="relative flex h-2.5 w-2.5"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span></span>
-                <span className="hidden sm:inline">Sin conexión</span>
-                <span className="sm:hidden">Offline</span>
+              <div className="inline-flex bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs shadow-sm items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
+                <span>Sin conexión</span>
               </div>
             )}
+          </div>
 
+          {/* Botones de Estado */}
+          <div className="flex items-center gap-2 flex-shrink-0">
             {isOnRoad ? (
               <>
-                <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-[#dd9d5c] hover:bg-[#b78049] text-white font-bold p-2.5 max-lg:landscape:px-4 max-lg:landscape:py-2 md:px-4 md:py-2.5 rounded-xl max-lg:landscape:rounded-lg transition-all shadow-md flex items-center gap-2 active:scale-95 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider" title="Gasto Operativo">
-                  <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-[#dd9d5c] hover:bg-[#b78049] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
                   </svg>
-                  <span className="hidden md:inline max-lg:landscape:inline">Gasto</span>
+                  <span>Gasto</span>
                 </button>
-                <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold p-2.5 max-lg:landscape:px-4 max-lg:landscape:py-2 md:px-4 md:py-2.5 rounded-xl max-lg:landscape:rounded-lg transition-all shadow-md flex items-center gap-2 active:scale-95 max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider" title="Terminar Ruta">
-                  <span className="text-lg max-lg:landscape:text-sm leading-none md:hidden">🛑</span>
-                  <span className="hidden md:inline max-lg:landscape:inline">Terminar</span>
+                <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                  <span className="text-sm sm:text-base leading-none">🛑</span>
+                  <span>Terminar</span>
                 </button>
               </>
             ) : (
-              <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-3 py-2.5 max-lg:landscape:px-4 max-lg:landscape:py-2 md:px-4 md:py-2.5 rounded-xl max-lg:landscape:rounded-lg transition-all shadow-md flex items-center gap-1.5 active:scale-95 whitespace-nowrap max-lg:landscape:text-xs max-lg:landscape:uppercase max-lg:landscape:tracking-wider">
-                <svg className="w-4 h-4 max-lg:landscape:w-4 max-lg:landscape:h-4 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                 </svg>  
-                <span className="text-sm md:text-base hidden sm:inline max-lg:landscape:inline max-lg:landscape:text-xs">Iniciar Ruta</span>
-                <span className="text-sm font-black sm:hidden max-lg:landscape:hidden">Ruta</span>
+                <span>Iniciar Ruta</span>
               </button>
             )}
           </div>
         </div>
+
+        {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
+  return (
+    <div className="min-h-screen relative bg-brand-bg flex flex-col max-lg:landscape:flex-row">
+      
+      {/* 1. HEADER & SIDEBAR (Arriba en vertical/PC, Izquierda en horizontal móvil) */}
+      <div className={`bg-brand-bg/95 backdrop-blur-md border-b max-lg:landscape:border-b-0 max-lg:landscape:border-r border-brand-brown/10 shadow-sm z-50 w-full max-lg:landscape:w-48 max-lg:landscape:h-screen max-lg:landscape:sticky max-lg:landscape:top-0 flex flex-col flex-shrink-0 transition-all ${isStoreView ? 'max-lg:landscape:hidden' : ''}`}>
+        
+        {/* LOGO, MARCA Y SUBTÍTULO EN UNA SOLA LÍNEA LIMPIA */}
+        <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto max-lg:landscape:px-3 max-lg:landscape:py-3 max-lg:landscape:flex-col max-lg:landscape:items-start max-lg:landscape:gap-6">
+          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
+            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm max-lg:landscape:w-10 max-lg:landscape:h-10" />
+            <h1 className="flex items-baseline gap-1 sm:gap-2">
+              <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight max-lg:landscape:text-xl">Nahui</span>
+              <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl max-lg:landscape:text-2xl">nature</span>
+            </h1>
+          </div>
+          
+          {/* Subtítulo ajustado en una sola línea fija para PC y vertical */}
+          <div className="flex-shrink flex items-center justify-end max-lg:landscape:hidden">
+            <p className="text-brand-brown/70 font-bold text-xs md:text-sm uppercase tracking-widest whitespace-nowrap">
+              Punto de Venta Móvil
+            </p>
+          </div>
+        </div>
+
+        {/* NAVEGACIÓN PRINCIPAL (Horizontal en PC/vertical, Apilada en landscape móvil) */}
+        <div className="px-3 pb-3 sm:px-4 sm:pb-4 md:px-10 max-w-[1400px] mx-auto w-full max-lg:landscape:px-3 max-lg:landscape:py-0 max-lg:landscape:mt-2 flex overflow-x-auto max-lg:landscape:flex-col max-lg:landscape:overflow-visible gap-2 max-lg:landscape:gap-3 flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+          <button 
+            onClick={() => { setShowOrders(false); setShowInventory(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+            <span className="max-lg:landscape:text-sm">Tienda</span>
+          </button>
+          
+          <button 
+            onClick={() => { setShowOrders(true); setShowInventory(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            <span className="max-lg:landscape:text-sm">Ventas</span>
+          </button>
+          
+          <button 
+            onClick={() => { setShowInventory(true); setShowOrders(false); }} 
+            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
+          >
+            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+            <span className="max-lg:landscape:text-sm">Bodega</span>
+          </button>
+        </div>
       </div>
 
-      {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
-      <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
+      {/* 2. ÁREA DE CONTENIDO */}
+      <div className="flex-1 flex flex-col min-w-0 relative">
+
+        {/* BARRA DE ACCIONES RÁPIDAS (Estado Operativo) */}
+        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-2.5 px-3 sm:px-4 lg:px-10 border-b border-brand-brown/10 shadow-sm w-full flex items-center justify-between gap-3 max-w-[1400px] mx-auto">
+          
+          {/* Indicador Offline */}
+          <div className="flex-1">
+            {isOfflineMode && (
+              <div className="inline-flex bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs shadow-sm items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
+                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
+                <span>Sin conexión</span>
+              </div>
+            )}
+          </div>
+
+          {/* Botones de Estado */}
+          <div className="flex items-center gap-2 flex-shrink-0">
+            {isOnRoad ? (
+              <>
+                <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-[#dd9d5c] hover:bg-[#b78049] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                  </svg>
+                  <span>Gasto</span>
+                </button>
+                <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                  <span className="text-sm sm:text-base leading-none">🛑</span>
+                  <span>Terminar</span>
+                </button>
+              </>
+            ) : (
+              <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
+                <svg className="w-4 h-4 sm:w-5 sm:h-5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                </svg>  
+                <span>Iniciar Ruta</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
+    <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
         
         <div className={`w-full space-y-4 ${isStoreView ? 'landscape:col-span-8' : 'landscape:col-span-12'}`}>
           {showInventory ? (
