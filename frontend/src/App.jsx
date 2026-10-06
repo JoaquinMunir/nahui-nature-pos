@@ -605,7 +605,7 @@ function App() {
     let text = `*🌿 NAHUI NATURE - COMPROBANTE DE VENTA 🌿*\n\n`;
     text += `👤 *Cliente:* ${client.name}\n`;
     text += `📅 *Fecha:* ${new Date().toLocaleDateString()}\n\n`;
-    text += `*🛍️ DETALLE DEL PEDIDO:*\n`;
+    text += `*🛍️️ DETALLE DEL PEDIDO:*\n`;
     
     cart.forEach(item => {
       const { cartTitle, cartSubtitle } = formatProduct(item);
@@ -808,630 +808,534 @@ function App() {
         </div>
 
         {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
-  return (
-    <div className="min-h-screen relative bg-brand-bg flex flex-col max-lg:landscape:flex-row">
-      
-      {/* 1. HEADER & SIDEBAR (Arriba en vertical/PC, Izquierda en horizontal móvil) */}
-      <div className={`bg-brand-bg/95 backdrop-blur-md border-b max-lg:landscape:border-b-0 max-lg:landscape:border-r border-brand-brown/10 shadow-sm z-50 w-full max-lg:landscape:w-48 max-lg:landscape:h-screen max-lg:landscape:sticky max-lg:landscape:top-0 flex flex-col flex-shrink-0 transition-all ${isStoreView ? 'max-lg:landscape:hidden' : ''}`}>
-        
-        {/* LOGO, MARCA Y SUBTÍTULO EN UNA SOLA LÍNEA LIMPIA */}
-        <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto max-lg:landscape:px-3 max-lg:landscape:py-3 max-lg:landscape:flex-col max-lg:landscape:items-start max-lg:landscape:gap-6">
-          <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-            <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm max-lg:landscape:w-10 max-lg:landscape:h-10" />
-            <h1 className="flex items-baseline gap-1 sm:gap-2">
-              <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight max-lg:landscape:text-xl">Nahui</span>
-              <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl max-lg:landscape:text-2xl">nature</span>
-            </h1>
-          </div>
-          
-          {/* Subtítulo ajustado en una sola línea fija para PC y vertical */}
-          <div className="flex-shrink flex items-center justify-end max-lg:landscape:hidden">
-            <p className="text-brand-brown/70 font-bold text-xs md:text-sm uppercase tracking-widest whitespace-nowrap">
-              Punto de Venta Móvil
-            </p>
-          </div>
-        </div>
-
-        {/* NAVEGACIÓN PRINCIPAL (Horizontal en PC/vertical, Apilada en landscape móvil) */}
-        <div className="px-3 pb-3 sm:px-4 sm:pb-4 md:px-10 max-w-[1400px] mx-auto w-full max-lg:landscape:px-3 max-lg:landscape:py-0 max-lg:landscape:mt-2 flex overflow-x-auto max-lg:landscape:flex-col max-lg:landscape:overflow-visible gap-2 max-lg:landscape:gap-3 flex-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          <button 
-            onClick={() => { setShowOrders(false); setShowInventory(false); }} 
-            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-          >
-            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-            <span className="max-lg:landscape:text-sm">Tienda</span>
-          </button>
-          
-          <button 
-            onClick={() => { setShowOrders(true); setShowInventory(false); }} 
-            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-          >
-            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-            <span className="max-lg:landscape:text-sm">Ventas</span>
-          </button>
-          
-          <button 
-            onClick={() => { setShowInventory(true); setShowOrders(false); }} 
-            className={`border-2 font-bold px-4 py-2 max-lg:landscape:py-3 rounded-xl transition-all shadow-sm flex items-center gap-2 whitespace-nowrap flex-shrink-0 max-lg:landscape:justify-start ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-          >
-            <svg className="w-4 h-4 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-            <span className="max-lg:landscape:text-sm">Bodega</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. ÁREA DE CONTENIDO */}
-      <div className="flex-1 flex flex-col min-w-0 relative">
-
-        {/* BARRA DE ACCIONES RÁPIDAS (Estado Operativo) */}
-        <div className="sticky top-0 z-40 bg-brand-bg/95 backdrop-blur-md py-2.5 px-3 sm:px-4 lg:px-10 border-b border-brand-brown/10 shadow-sm w-full flex items-center justify-between gap-3 max-w-[1400px] mx-auto">
-          
-          {/* Indicador Offline */}
-          <div className="flex-1">
-            {isOfflineMode && (
-              <div className="inline-flex bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs shadow-sm items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
-                <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
-                <span>Sin conexión</span>
-              </div>
-            )}
-          </div>
-
-          {/* Botones de Estado */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            {isOnRoad ? (
-              <>
-                <button onClick={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })} className="bg-[#dd9d5c] hover:bg-[#b78049] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
-                  </svg>
-                  <span>Gasto</span>
-                </button>
-                <button onClick={handleEndRoute} className="bg-[#d24343] hover:bg-[#bb2929] text-white font-bold px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
-                  <span className="text-sm sm:text-base leading-none">🛑</span>
-                  <span>Terminar</span>
-                </button>
-              </>
-            ) : (
-              <button onClick={handleStartRoute} className="bg-brand-green hover:bg-brand-green-dark text-white font-bold px-4 py-1.5 sm:px-5 sm:py-2 rounded-xl transition-all shadow-md flex items-center gap-1.5 active:scale-95 text-xs sm:text-sm uppercase tracking-wider">
-                <svg className="w-4 h-4 sm:w-5 sm:h-5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                </svg>  
-                <span>Iniciar Ruta</span>
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
-    <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
-        
-        <div className={`w-full space-y-4 ${isStoreView ? 'landscape:col-span-8' : 'landscape:col-span-12'}`}>
-          {showInventory ? (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-brand-brown/10 pb-4">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Control Logístico</h2>
-                  <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider hidden md:inline-block">Gestión de Inventarios</span>
-                </div>
-                <button 
-                  onClick={() => setShowRestockModal(true)}
-                  className="bg-brand-brown hover:bg-brand-brown/90 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm active:scale-95"
-                >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-                  Reabastecer Centro
-                </button>
-              </div>
-
-              <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden mb-6 flex flex-col">
-                <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center">
-                  <div className="relative w-full md:w-96">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                    </span>
-                    <input 
-                      type="text" 
-                      placeholder="Buscar producto o variante..." 
-                      value={searchInv}
-                      onChange={(e) => setSearchInv(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium text-brand-brown"
-                    />
-                  </div>
-                </div>
-
-                <div className="hidden lg:grid grid-cols-12 gap-2 p-4 border-b border-gray-100 font-black text-gray-400 text-[10px] xl:text-xs uppercase tracking-widest bg-white items-center">
-                  <div className="col-span-4 pl-2">Catálogo</div>
-                  <div className="col-span-4 grid grid-cols-3 text-center bg-gray-50 py-2 rounded-lg border border-gray-100 px-1">
-                    <span className="flex items-center justify-center gap-1.5"><span className="text-lg">🏬</span> Central</span>
-                    <span className="flex items-center justify-center gap-1.5 border-l border-r border-gray-200"><span className="text-lg">🚚</span> Movil</span>
-                    <span className="flex items-center justify-center gap-1.5 text-brand-green"><span className="text-lg">📦</span> General</span>
-                  </div>
-                  <div className="col-span-4 text-right pr-2">Gestión Rápida</div>
-                </div>
-
-                <div className="divide-y divide-gray-100 bg-white">
-                  {products
-                    .filter(p => {
-                      const term = searchInv.toLowerCase();
-                      return p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
-                    })
-                    .map(product => {
-                      const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
-                      const isSingle = product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
-                      const stockCasa = centralInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
-                      const stockCamioneta = mobileInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
-                      const stockTotal = stockCasa + stockCamioneta;
-                      const inputValue = stockInputs[product.id] || '';
-                      const weight = product.weight_g ? `${product.weight_g}g` : '';
-
-                      return (
-                        <div key={product.id} className="grid grid-cols-1 lg:grid-cols-12 gap-2 p-4 items-center hover:bg-brand-bg/40 transition-colors">
-                          <div className="col-span-1 lg:col-span-4 flex items-center gap-3 pl-1">
-                            <div className="w-11 h-11 rounded-lg relative overflow-hidden flex items-center justify-center text-white flex-shrink-0 shadow-sm" style={{ backgroundColor: catColor }}>
-                              {product.image_url ? (
-                                <img src={product.image_url} alt={cartTitle} className="w-full h-full object-cover text-transparent" />
-                              ) : (
-                                <span className="font-black text-sm opacity-90">{product.category.substring(0,2).toUpperCase()}</span>
-                              )}
-                            </div>
-                            <div className="min-w-0 flex-1">
-                              <h4 className="font-bold text-brand-brown text-sm md:text-base leading-tight truncate">{cartTitle}</h4>
-                              <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                                {!isSingle && <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{cartSubtitle}</span>}
-                                {weight && <span className="text-[10px] font-bold text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded">{weight}</span>}
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div className="col-span-1 lg:col-span-4 grid grid-cols-3 gap-1 text-center items-center bg-gray-50 lg:bg-transparent p-2 lg:p-0 rounded-xl border border-gray-100 lg:border-none mt-2 lg:mt-0">
-                            <div className="flex flex-col">
-                              <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🏬 Central</span>
-                              <span className={`text-xl font-black ${stockCasa <= 10 ? 'text-red-500' : 'text-brand-brown'}`}>{stockCasa}</span>
-                            </div>
-                            <div className="flex flex-col border-l border-r border-gray-200">
-                              <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🚚 Movil</span>
-                              <span className="text-xl font-black text-blue-600">{stockCamioneta}</span>
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="lg:hidden text-[9px] text-brand-green uppercase font-bold mb-1">📦 General</span>
-                              <span className="text-xl font-black text-brand-green">{stockTotal}</span>
-                            </div>
-                          </div>
-                          
-                          <div className="col-span-1 lg:col-span-4 flex items-center justify-end gap-2 mt-3 lg:mt-0 pr-1">
-                            <input 
-                              type="number" 
-                              min="1"
-                              placeholder="Cant."
-                              value={inputValue}
-                              onChange={(e) => setStockInputs(prev => ({...prev, [product.id]: e.target.value}))}
-                              className="w-16 sm:w-20 pl-1 pr-1 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green outline-none font-bold text-brand-brown transition-colors text-sm text-center shadow-sm" 
-                            />
-                            <button 
-                              title="Ingresar nueva mercancía al Centro"
-                              onClick={async () => {
-                                if(!inputValue || isNaN(inputValue) || Number(inputValue) <= 0) return;
-                                try {
-                                  const res = await axios.post(`${ENDPOINTS.inventory}/add`, {
-                                    product_id: product.id, quantity: Number(inputValue)
-                                  });
-                                  if (res.data.status === 'success') {
-                                    setCentralInventory(prev => {
-                                      const exists = prev.find(i => String(i.product_id) === String(product.id));
-                                      if (exists) return prev.map(i => String(i.product_id) === String(product.id) ? { ...i, stock_quantity: res.data.new_stock } : i);
-                                      return [...prev, { product_id: product.id, stock_quantity: res.data.new_stock }];
-                                    });
-                                    setStockInputs(prev => ({...prev, [product.id]: ''}));
-                                    setAppAlert({ isOpen: true, title: 'Inventario Actualizado', message: 'La mercancía fue ingresada a la bodega central.', type: 'success' });
-                                  }
-                                } catch (error) { setAppAlert({ isOpen: true, title: 'Error', message: 'No se pudo ingresar a bodega.', type: 'error' }); }
-                              }}
-                              className="bg-brand-green text-white font-bold px-3 py-2 rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
-                            >
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
-                              <span className="text-sm hidden xl:inline">Ingresar</span>
-                            </button>
-                            <button 
-                              title="Mover del Centro al Movil"
-                              onClick={() => {
-                                if (stockCasa === 0) {
-                                  setAppAlert({ isOpen: true, title: 'Stock Insuficiente', message: 'No hay stock en el Centro para traspasar.', type: 'error' });
-                                  return;
-                                }
-                                setTransferModal({
-                                  isOpen: true,
-                                  product: product,
-                                  stockCasa: stockCasa,
-                                  qty: ''
-                                });
-                              }}
-                              className="bg-[#49839a] text-white font-bold px-3 py-2 rounded-lg hover:bg-[#3a697c] transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
-                            >
-                              <span className="text-sm hidden xl:inline">Traspasar</span>
-                              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                            </button>
-                          </div>
-                        </div>
-                      )
-                    })
-                  }
-                </div>
-              </div>
-            </div>
-          ) : showOrders ? (
-            <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-              <div className="flex items-center gap-4 mb-6 border-b border-brand-brown/10 pb-4">
-                <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Historial de Ventas</h2>
-              </div>
-              <div className="bg-white p-4 max-lg:landscape:p-2 rounded-2xl shadow-sm border border-brand-brown/10 mb-6 max-lg:landscape:mb-3 flex flex-col md:flex-row max-lg:landscape:flex-row gap-4 max-lg:landscape:gap-2 justify-between items-start md:items-center max-lg:landscape:items-center">
-                <div className="flex flex-col sm:flex-row max-lg:landscape:flex-row gap-3 max-lg:landscape:gap-2 w-full md:w-auto">
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
+            
+            <div className={`w-full space-y-4 ${isStoreView ? 'landscape:col-span-8' : 'landscape:col-span-12'}`}>
+              {showInventory ? (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-brand-brown/10 pb-4">
+                    <div className="flex items-center gap-4">
+                      <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Control Logístico</h2>
+                      <span className="bg-brand-green/10 text-brand-green px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider hidden md:inline-block">Gestión de Inventarios</span>
                     </div>
-                    <input type="text" value={searchOrder} onChange={(e) => setSearchOrder(e.target.value)} placeholder="Buscar cliente o zona..." className="pl-10 pr-4 py-2 w-full sm:w-64 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium" />
+                    <button 
+                      onClick={() => setShowRestockModal(true)}
+                      className="bg-brand-brown hover:bg-brand-brown/90 text-white font-bold px-5 py-2.5 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2 text-sm active:scale-95"
+                    >
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                      Reabastecer Centro
+                    </button>
                   </div>
-                  <div className="flex gap-2">
-                    <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium text-brand-brown" />
-                    {filterDate && <button onClick={() => setFilterDate('')} className="px-3 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-sm font-bold transition-colors">X</button>}
-                  </div>
-                </div>
-                
-                <div className="bg-brand-green/10 px-5 py-2.5 rounded-xl border border-brand-green/20 w-full md:w-auto flex justify-between md:flex-col md:items-end md:justify-center">
-                  <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest leading-none mb-1">Total Filtrado ({filteredOrders.length})</p>
-                  <p className="text-2xl font-black text-brand-green leading-none">${totalFilteredRevenue.toFixed(2)}</p>
-                </div>
-              </div>
 
-              {isLoadingOrders ? (
-                <p className="text-brand-green font-bold text-lg animate-pulse">Consultando base de datos...</p>
-              ) : filteredOrders.length === 0 ? (
-                <div className="bg-white p-8 rounded-2xl border border-brand-brown/10 text-center shadow-sm">
-                  <p className="text-gray-500 font-bold">No se encontraron ventas con estos filtros.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredOrders.map(order => (
-                    <div key={order.id} className="bg-white p-5 rounded-2xl border border-brand-green/20 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
-                      <div className="cursor-pointer group" onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}>
-                        <div className="flex justify-between items-start mb-3">
-                          <span className="text-[11px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1.5 rounded-md tracking-wide flex items-center gap-1.5">
-                            <svg className="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            {new Date(order.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })} • {new Date(order.created_at).toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'})}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <svg className={`w-5 h-5 text-gray-400 transition-transform duration-300 group-hover:text-brand-green ${expandedOrderId === order.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                          </div>
-                        </div>
-                        <h3 className="text-xl font-black text-brand-brown leading-tight mb-2">{order.client_name || "Cliente Desconocido"}</h3>
-                        <div className="flex items-start gap-1.5">
-                          <svg className="w-4 h-4 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                          <div>
-                            <p className="text-sm font-bold text-gray-600 leading-none">{order.client_location || "Sin ubicación"}</p>
-                            <p className="text-xs text-gray-500 font-medium mt-1 leading-tight pr-2">{order.client_address || "Sin dirección registrada"}</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      {expandedOrderId === order.id && (
-                        <div className="mt-4 pt-4 border-t border-dashed border-gray-200 animate-in fade-in slide-in-from-top-2">
-                          <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest mb-3">Contenido del Pedido</p>
-                          <ul className="space-y-2.5">
-                            {order.items && order.items.map((item, idx) => {
-                              const isSingle = item.product_name && item.product_name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
-                              return (
-                                <li key={idx} className="flex justify-between items-start text-sm">
-                                  <span className="text-brand-brown font-medium leading-tight flex-1 pr-4">
-                                    <span className="font-black text-brand-green mr-1.5">{item.quantity}x</span> 
-                                    {isSingle ? item.category : `${item.category} - ${item.product_name}`}
-                                  </span>
-                                  <span className="text-brand-brown font-bold tracking-tight">${Number(item.subtotal).toFixed(2)}</span>
-                                </li>
-                              );
-                            })}
-                          </ul>
-                        </div>
-                      )}
-
-                      <div className="mt-5 pt-4 border-t border-gray-100 flex justify-between items-end">
-                        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Cobrado</span>
-                        <span className="text-2xl font-black text-brand-green">${Number(order.total_amount).toFixed(2)}</span>
+                  <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden mb-6 flex flex-col">
+                    <div className="p-4 border-b border-gray-100 bg-gray-50 flex items-center">
+                      <div className="relative w-full md:w-96">
+                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </span>
+                        <input 
+                          type="text" 
+                          placeholder="Buscar producto o variante..." 
+                          value={searchInv}
+                          onChange={(e) => setSearchInv(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium text-brand-brown"
+                        />
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : (
-            <>
-              {loading && <p className="text-brand-green font-bold text-lg animate-pulse">Cargando base de datos...</p>}
-              {error && <p className="text-red-500 font-bold text-lg">{error}</p>}
 
-              {!loading && !error && (
-                <>
-                  {isAddingClient && !activeClient ? (
-                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                      <div className="flex items-center gap-4 max-lg:landscape:gap-2 mb-6 max-lg:landscape:mb-3">
-                        <button onClick={() => setIsAddingClient(false)} className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-brown hover:bg-gray-50 transition-colors">
-                          <svg className="w-6 h-6 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                        </button>
-                        <h2 className="text-2xl md:text-3xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Alta de Cliente</h2>
+                    <div className="hidden lg:grid grid-cols-12 gap-2 p-4 border-b border-gray-100 font-black text-gray-400 text-[10px] xl:text-xs uppercase tracking-widest bg-white items-center">
+                      <div className="col-span-4 pl-2">Catálogo</div>
+                      <div className="col-span-4 grid grid-cols-3 text-center bg-gray-50 py-2 rounded-lg border border-gray-100 px-1">
+                        <span className="flex items-center justify-center gap-1.5"><span className="text-lg">🏬</span> Central</span>
+                        <span className="flex items-center justify-center gap-1.5 border-l border-r border-gray-200"><span className="text-lg">🚚</span> Movil</span>
+                        <span className="flex items-center justify-center gap-1.5 text-brand-green"><span className="text-lg">📦</span> General</span>
                       </div>
-                      <form onSubmit={handleCreateClient} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 p-5 md:p-8 space-y-6">
-                        <div>
-                          <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4">1. Identidad del Negocio</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Nombre Comercial *</label>
-                              <input required type="text" value={clientForm.name} onChange={e => setClientForm({...clientForm, name: e.target.value})} placeholder="Ej. Abarrotes Doña Mary" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Nombre del Contacto</label>
-                              <input type="text" value={clientForm.contact} onChange={e => setClientForm({...clientForm, contact: e.target.value})} placeholder="Ej. María López" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
-                            </div>
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Teléfono (WhatsApp)</label>
-                              <input type="tel" value={clientForm.phone_number} onChange={e => setClientForm({...clientForm, phone_number: e.target.value})} placeholder="Ej. 312 123 4567" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">2. Logística y Ruteo</h3>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Comunidad / Colonia (Agrupador) *</label>
-                              <input required type="text" value={clientForm.location} onChange={e => setClientForm({...clientForm, location: e.target.value})} placeholder="Ej. Los Asmoles, Centro..." className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Ruta Asignada *</label>
-                              <input 
-                                required 
-                                type="text" 
-                                list="rutas-registradas"
-                                value={clientForm.route_name} 
-                                onChange={e => setClientForm({...clientForm, route_name: e.target.value})} 
-                                placeholder="Escribe o selecciona una ruta..." 
-                                className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors text-brand-brown"
-                              />
-                              <datalist id="rutas-registradas">
-                                {(routes || []).map(ruta => (
-                                  <option key={ruta.id} value={ruta.name} />
-                                ))}
-                              </datalist>
-                              <p className="text-[10px] text-gray-400 mt-1.5 ml-1">Selecciona una existente o teclea una nueva.</p>
-                            </div>
-                            <div className="md:col-span-2">
-                              <label className="block text-sm font-bold text-brand-brown mb-1">Dirección (Calle, Número o Referencia) *</label>
-                              <textarea required value={clientForm.address} onChange={e => setClientForm({...clientForm, address: e.target.value})} rows="2" placeholder="Ej. Av. Niños Héroes #123, o Referencia" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors resize-none"></textarea>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div>
-                          <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">3. Coordenadas Exactas</h3>
-                          <div className="flex flex-col items-start gap-4">
-                            <button type="button" onClick={captureLocation} disabled={isLocating} className={`flex items-center justify-center w-full md:w-auto gap-2 px-6 py-3.5 rounded-xl font-bold transition-all shadow-sm ${clientForm.latitude !== '' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-white border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white'}`}>
-                              {isLocating ? (
-                                 <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-                              ) : clientForm.latitude !== '' ? (
-                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                              ) : (
-                                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                              )}
-                              {isLocating ? 'Obteniendo satélites...' : clientForm.latitude !== '' ? 'Ubicación Capturada (Puedes editarla abajo)' : 'Capturar Ubicación (En la calle)'}
-                            </button>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full bg-gray-50 p-4 rounded-xl border border-gray-100">
-                              <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Latitud (Manual / Google Maps)</label>
-                                <input type="number" step="any" value={clientForm.latitude} onChange={e => setClientForm({...clientForm, latitude: e.target.value})} placeholder="Ej. 19.2433" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
-                              </div>
-                              <div>
-                                <label className="block text-xs font-bold text-gray-500 mb-1">Longitud (Manual / Google Maps)</label>
-                                <input type="number" step="any" value={clientForm.longitude} onChange={e => setClientForm({...clientForm, longitude: e.target.value})} placeholder="Ej. -103.7251" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="pt-6 border-t border-brand-brown/10">
-                          <button type="submit" disabled={isSubmitting} className="w-full bg-brand-green text-white font-black text-lg py-4 rounded-xl hover:bg-brand-green-dark transition-colors shadow-lg active:scale-[0.99] uppercase tracking-wider">
-                            {isSubmitting ? 'Guardando...' : 'Guardar Cliente'}
-                          </button>
-                        </div>
-                      </form>
+                      <div className="col-span-4 text-right pr-2">Gestión Rápida</div>
                     </div>
 
-                  ) : !activeClient ? (
-                    <div className="animate-in fade-in duration-300">
-                      <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
-                        <div className="flex items-center gap-3">
-                          <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
-                          <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
-                        </div>
-                        <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
-                          <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                          Nuevo Cliente
-                        </button>
-                      </div>
-                      
-                      <div className="space-y-4 max-lg:landscape:space-y-0 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-3">
-                        {locationNames.map(locationName => {
-                          const localClients = groupedClients[locationName];
-                          const isExpanded = expandedLocations[locationName];
+                    <div className="divide-y divide-gray-100 bg-white">
+                      {products
+                        .filter(p => {
+                          const term = searchInv.toLowerCase();
+                          return p.name.toLowerCase().includes(term) || p.category.toLowerCase().includes(term);
+                        })
+                        .map(product => {
+                          const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
+                          const isSingle = product.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+                          const stockCasa = centralInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
+                          const stockCamioneta = mobileInventory.find(inv => String(inv.product_id) === String(product.id))?.stock_quantity || 0;
+                          const stockTotal = stockCasa + stockCamioneta;
+                          const inputValue = stockInputs[product.id] || '';
+                          const weight = product.weight_g ? `${product.weight_g}g` : '';
+
                           return (
-                            <div key={locationName} className={`bg-white rounded-2xl max-lg:landscape:rounded-xl shadow-sm border border-brand-green/10 overflow-hidden transition-all ${isExpanded ? 'max-lg:landscape:col-span-2' : ''}`}>
-                              <button onClick={() => toggleLocation(locationName)} className="w-full p-5 max-lg:landscape:p-3 flex justify-between items-center hover:bg-brand-bg transition-colors">
-                                <div className="flex items-center gap-3 max-lg:landscape:gap-2">
-                                  <div className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green"><svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
-                                  <div className="text-left"><h3 className="text-xl max-lg:landscape:text-base font-bold text-brand-brown leading-tight">{locationName}</h3><p className="text-sm max-lg:landscape:text-[10px] text-gray-500 font-medium">{localClients.length} tiendas</p></div>
+                            <div key={product.id} className="grid grid-cols-1 lg:grid-cols-12 gap-2 p-4 items-center hover:bg-brand-bg/40 transition-colors">
+                              <div className="col-span-1 lg:col-span-4 flex items-center gap-3 pl-1">
+                                <div className="w-11 h-11 rounded-lg relative overflow-hidden flex items-center justify-center text-white flex-shrink-0 shadow-sm" style={{ backgroundColor: catColor }}>
+                                  {product.image_url ? (
+                                    <img src={product.image_url} alt={cartTitle} className="w-full h-full object-cover text-transparent" />
+                                  ) : (
+                                    <span className="font-black text-sm opacity-90">{product.category.substring(0,2).toUpperCase()}</span>
+                                  )}
                                 </div>
-                                <svg className={`w-6 h-6 max-lg:landscape:w-5 max-lg:landscape:h-5 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-                              </button>
-                              {isExpanded && (
-                                <div className="border-t border-gray-100 bg-brand-bg/30 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-2 max-lg:landscape:p-2">
-                                  {localClients.map(client => (
-                                    <div key={client.id} className="p-4 max-lg:landscape:p-3 border-b max-lg:landscape:border border-gray-100 max-lg:landscape:rounded-xl max-lg:landscape:bg-white last:border-0 max-lg:landscape:last:border flex flex-col sm:flex-row sm:items-center max-lg:landscape:flex-col max-lg:landscape:items-stretch justify-between gap-4 max-lg:landscape:gap-3 hover:bg-white transition-colors shadow-sm max-lg:landscape:shadow-none">
-                                      <div>
-                                        <h4 className="text-lg max-lg:landscape:text-sm font-black text-brand-green leading-tight">{client.name}</h4>
-                                        <p className="text-sm max-lg:landscape:text-[10px] text-brand-brown font-medium mt-0.5 flex items-start gap-1.5"><svg className="w-4 h-4 max-lg:landscape:w-3 max-lg:landscape:h-3 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{client.address || "Sin referencia"}</p>
-                                        <div className="flex flex-col max-lg:landscape:flex-row max-lg:landscape:flex-wrap gap-2 mt-2 max-lg:landscape:mt-1.5">
-                                          {client.contact && <p className="text-xs max-lg:landscape:text-[9px] text-gray-500 flex items-center gap-1.5 font-medium"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>{client.contact}</p>}
-                                          {client.phone_number && (() => {
-                                            const cleanPhone = client.phone_number.replace(/\D/g, '');
-                                            const waLink = cleanPhone.length === 10 ? `https://wa.me/52${cleanPhone}` : `https://wa.me/${cleanPhone}`;
-                                            return (
-                                              <div className="flex items-center gap-2">
-                                                <a href={`tel:${cleanPhone}`} className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-brand-green hover:bg-brand-green hover:text-white transition-colors bg-brand-green/10 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>Llamar</a>
-                                                <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md shadow-sm"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>WhatsApp</a>
-                                              </div>
-                                            );
-                                          })()}
-                                        </div>
-                                      </div>
-                                      <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-2 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm max-lg:landscape:text-xs">Iniciar Venta</button>
-                                    </div>
-                                  ))}
+                                <div className="min-w-0 flex-1">
+                                  <h4 className="font-bold text-brand-brown text-sm md:text-base leading-tight truncate">{cartTitle}</h4>
+                                  <div className="flex items-center gap-2 mt-0.5 flex-wrap">
+                                    {!isSingle && <span className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">{cartSubtitle}</span>}
+                                    {weight && <span className="text-[10px] font-bold text-brand-green bg-brand-green/10 px-1.5 py-0.5 rounded">{weight}</span>}
+                                  </div>
                                 </div>
-                              )}
+                              </div>
+                              
+                              <div className="col-span-1 lg:col-span-4 grid grid-cols-3 gap-1 text-center items-center bg-gray-50 lg:bg-transparent p-2 lg:p-0 rounded-xl border border-gray-100 lg:border-none mt-2 lg:mt-0">
+                                <div className="flex flex-col">
+                                  <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🏬 Central</span>
+                                  <span className={`text-xl font-black ${stockCasa <= 10 ? 'text-red-500' : 'text-brand-brown'}`}>{stockCasa}</span>
+                                </div>
+                                <div className="flex flex-col border-l border-r border-gray-200">
+                                  <span className="lg:hidden text-[9px] text-gray-400 uppercase font-bold mb-1">🚚 Movil</span>
+                                  <span className="text-xl font-black text-blue-600">{stockCamioneta}</span>
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="lg:hidden text-[9px] text-brand-green uppercase font-bold mb-1">📦 General</span>
+                                  <span className="text-xl font-black text-brand-green">{stockTotal}</span>
+                                </div>
+                              </div>
+                              
+                              <div className="col-span-1 lg:col-span-4 flex items-center justify-end gap-2 mt-3 lg:mt-0 pr-1">
+                                <input 
+                                  type="number" 
+                                  min="1"
+                                  placeholder="Cant."
+                                  value={inputValue}
+                                  onChange={(e) => setStockInputs(prev => ({...prev, [product.id]: e.target.value}))}
+                                  className="w-16 sm:w-20 pl-1 pr-1 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:border-brand-green outline-none font-bold text-brand-brown transition-colors text-sm text-center shadow-sm" 
+                                />
+                                <button 
+                                  title="Ingresar nueva mercancía al Centro"
+                                  onClick={async () => {
+                                    if(!inputValue || isNaN(inputValue) || Number(inputValue) <= 0) return;
+                                    try {
+                                      const res = await axios.post(`${ENDPOINTS.inventory}/add`, {
+                                        product_id: product.id, quantity: Number(inputValue)
+                                      });
+                                      if (res.data.status === 'success') {
+                                        setCentralInventory(prev => {
+                                          const exists = prev.find(i => String(i.product_id) === String(product.id));
+                                          if (exists) return prev.map(i => String(i.product_id) === String(product.id) ? { ...i, stock_quantity: res.data.new_stock } : i);
+                                          return [...prev, { product_id: product.id, stock_quantity: res.data.new_stock }];
+                                        });
+                                        setStockInputs(prev => ({...prev, [product.id]: ''}));
+                                        setAppAlert({ isOpen: true, title: 'Inventario Actualizado', message: 'La mercancía fue ingresada a la bodega central.', type: 'success' });
+                                      }
+                                    } catch (error) { setAppAlert({ isOpen: true, title: 'Error', message: 'No se pudo ingresar a bodega.', type: 'error' }); }
+                                  }}
+                                  className="bg-brand-green text-white font-bold px-3 py-2 rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
+                                >
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>
+                                  <span className="text-sm hidden xl:inline">Ingresar</span>
+                                </button>
+                                <button 
+                                  title="Mover del Centro al Movil"
+                                  onClick={() => {
+                                    if (stockCasa === 0) {
+                                      setAppAlert({ isOpen: true, title: 'Stock Insuficiente', message: 'No hay stock en el Centro para traspasar.', type: 'error' });
+                                      return;
+                                    }
+                                    setTransferModal({
+                                      isOpen: true,
+                                      product: product,
+                                      stockCasa: stockCasa,
+                                      qty: ''
+                                    });
+                                  }}
+                                  className="bg-[#49839a] text-white font-bold px-3 py-2 rounded-lg hover:bg-[#3a697c] transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
+                                >
+                                  <span className="text-sm hidden xl:inline">Traspasar</span>
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                                </button>
+                              </div>
                             </div>
                           )
-                        })}
+                        })
+                      }
+                    </div>
+                  </div>
+                </div>
+              ) : showOrders ? (
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                  <div className="flex items-center gap-4 mb-6 border-b border-brand-brown/10 pb-4">
+                    <h2 className="text-2xl md:text-3xl font-calistoga text-brand-brown">Historial de Ventas</h2>
+                  </div>
+                  <div className="bg-white p-4 max-lg:landscape:p-2 rounded-2xl shadow-sm border border-brand-brown/10 mb-6 max-lg:landscape:mb-3 flex flex-col md:flex-row max-lg:landscape:flex-row gap-4 max-lg:landscape:gap-2 justify-between items-start md:items-center max-lg:landscape:items-center">
+                    <div className="flex flex-col sm:flex-row max-lg:landscape:flex-row gap-3 max-lg:landscape:gap-2 w-full md:w-auto">
+                      <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                          <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <input type="text" value={searchOrder} onChange={(e) => setSearchOrder(e.target.value)} placeholder="Buscar cliente o zona..." className="pl-10 pr-4 py-2 w-full sm:w-64 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium" />
                       </div>
+                      <div className="flex gap-2">
+                        <input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl focus:border-brand-green outline-none transition-colors text-sm font-medium text-brand-brown" />
+                        {filterDate && <button onClick={() => setFilterDate('')} className="px-3 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-xl text-sm font-bold transition-colors">X</button>}
+                      </div>
+                    </div>
+                    
+                    <div className="bg-brand-green/10 px-5 py-2.5 rounded-xl border border-brand-green/20 w-full md:w-auto flex justify-between md:flex-col md:items-end md:justify-center">
+                      <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest leading-none mb-1">Total Filtrado ({filteredOrders.length})</p>
+                      <p className="text-2xl font-black text-brand-green leading-none">${totalFilteredRevenue.toFixed(2)}</p>
+                    </div>
+                  </div>
+
+                  {isLoadingOrders ? (
+                    <p className="text-brand-green font-bold text-lg animate-pulse">Consultando base de datos...</p>
+                  ) : filteredOrders.length === 0 ? (
+                    <div className="bg-white p-8 rounded-2xl border border-brand-brown/10 text-center shadow-sm">
+                      <p className="text-gray-500 font-bold">No se encontraron ventas con estos filtros.</p>
                     </div>
                   ) : (
-                    <div className="animate-in fade-in zoom-in-95 duration-300">
-                      
-                      {/* TARJETA DEL CLIENTE CORREGIDA (RESPETA TAMAÑO DE ESCRITORIO) */}
-                      <div className="bg-brand-brown text-white p-4 lg:p-6 max-lg:landscape:p-3 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-md flex flex-col lg:flex-row max-lg:landscape:flex-row justify-between items-start lg:items-center max-lg:landscape:items-center gap-4 max-lg:landscape:gap-3">
-                        
-                        <div className="flex flex-col lg:flex-row max-lg:landscape:flex-row lg:items-center max-lg:landscape:items-center gap-2 lg:gap-4 max-lg:landscape:gap-4 flex-1 min-w-0 pr-2">
-                          <div className="flex items-center gap-2 min-w-0">
-                            <span className="hidden lg:inline max-lg:landscape:inline text-xl leading-none opacity-80 flex-shrink-0">👤</span>
-                            <p className="lg:hidden max-lg:landscape:hidden text-brand-bg text-xs uppercase tracking-widest font-bold mb-1">Vendiendo a:</p>
-                            <h2 className="text-xl sm:text-2xl lg:text-3xl max-lg:landscape:text-lg font-black font-calistoga truncate leading-tight tracking-wide">{activeClient.name}</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {filteredOrders.map(order => (
+                        <div key={order.id} className="bg-white p-5 rounded-2xl border border-brand-green/20 shadow-sm flex flex-col justify-between hover:shadow-md transition-all">
+                          <div className="cursor-pointer group" onClick={() => setExpandedOrderId(expandedOrderId === order.id ? null : order.id)}>
+                            <div className="flex justify-between items-start mb-3">
+                              <span className="text-[11px] font-bold text-gray-500 bg-gray-100 px-2.5 py-1.5 rounded-md tracking-wide flex items-center gap-1.5">
+                                <svg className="w-3.5 h-3.5 opacity-70" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                {new Date(order.created_at).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric' })} • {new Date(order.created_at).toLocaleTimeString('es-MX', {hour: '2-digit', minute:'2-digit'})}
+                              </span>
+                              <div className="flex items-center gap-2">
+                                <svg className={`w-5 h-5 text-gray-400 transition-transform duration-300 group-hover:text-brand-green ${expandedOrderId === order.id ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                              </div>
+                            </div>
+                            <h3 className="text-xl font-black text-brand-brown leading-tight mb-2">{order.client_name || "Cliente Desconocido"}</h3>
+                            <div className="flex items-start gap-1.5">
+                              <svg className="w-4 h-4 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                              <div>
+                                <p className="text-sm font-bold text-gray-600 leading-none">{order.client_location || "Sin ubicación"}</p>
+                                <p className="text-xs text-gray-500 font-medium mt-1 leading-tight pr-2">{order.client_address || "Sin dirección registrada"}</p>
+                              </div>
+                            </div>
                           </div>
-                          
-                          {/* Mini Toggle Modalidad */}
-                          <div className="flex items-center bg-black/20 p-1.5 max-lg:landscape:p-1 rounded-xl max-lg:landscape:rounded-lg border border-white/10 w-fit flex-shrink-0">
-                            <button 
-                              onClick={() => setSaleMode('mobile')} 
-                              className={`px-3 py-1.5 max-lg:landscape:px-2.5 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-xs lg:text-sm max-lg:landscape:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
-                            >
-                              <svg className="w-4 h-4 max-lg:landscape:w-3.5 max-lg:landscape:h-3.5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                              </svg>
-                              <span>En Ruta</span>
-                            </button>
-                            <button 
-                              onClick={() => setSaleMode('central')} 
-                              className={`px-3 py-1.5 max-lg:landscape:px-2.5 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-xs lg:text-sm max-lg:landscape:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
-                            >
-                              <svg className="w-4 h-4 max-lg:landscape:w-3.5 max-lg:landscape:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                              </svg>
-                              <span>En Centro</span>
-                            </button>
+
+                          {expandedOrderId === order.id && (
+                            <div className="mt-4 pt-4 border-t border-dashed border-gray-200 animate-in fade-in slide-in-from-top-2">
+                              <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest mb-3">Contenido del Pedido</p>
+                              <ul className="space-y-2.5">
+                                {order.items && order.items.map((item, idx) => {
+                                  const isSingle = item.product_name && item.product_name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
+                                  return (
+                                    <li key={idx} className="flex justify-between items-start text-sm">
+                                      <span className="text-brand-brown font-medium leading-tight flex-1 pr-4">
+                                        <span className="font-black text-brand-green mr-1.5">{item.quantity}x</span> 
+                                        {isSingle ? item.category : `${item.category} - ${item.product_name}`}
+                                      </span>
+                                      <span className="text-brand-brown font-bold tracking-tight">${Number(item.subtotal).toFixed(2)}</span>
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </div>
+                          )}
+
+                          <div className="mt-5 pt-4 border-t border-gray-100 flex justify-between items-end">
+                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Cobrado</span>
+                            <span className="text-2xl font-black text-brand-green">${Number(order.total_amount).toFixed(2)}</span>
                           </div>
                         </div>
-
-                        {/* Derecha: Botón Cambiar */}
-                        <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs lg:text-sm max-lg:landscape:text-[10px] uppercase tracking-wider font-bold py-2.5 px-4 lg:py-2 lg:px-4 max-lg:landscape:py-1.5 max-lg:landscape:px-3 rounded-xl max-lg:landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0 text-center self-start lg:self-center max-lg:landscape:self-center">
-                          Cambiar Cliente
-                        </button>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {categoryNames.map(categoryName => {
-                          const items = groupedProducts[categoryName];
-                          const { catColor } = formatProduct(items[0]);
-                          const coverImage = CATEGORY_COVERS[categoryName];
-                          const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
-                          return (
-                            <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
-                              <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
-                              <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
-                                {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
-                                {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
-                              </div>
-                              <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
-                            </div>
-                          )
-                        })}
-                      </div>
+                      ))}
                     </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  {loading && <p className="text-brand-green font-bold text-lg animate-pulse">Cargando base de datos...</p>}
+                  {error && <p className="text-red-500 font-bold text-lg">{error}</p>}
+
+                  {!loading && !error && (
+                    <>
+                      {isAddingClient && !activeClient ? (
+                        <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
+                          <div className="flex items-center gap-4 max-lg:landscape:gap-2 mb-6 max-lg:landscape:mb-3">
+                            <button onClick={() => setIsAddingClient(false)} className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-white shadow-sm flex items-center justify-center text-brand-brown hover:bg-gray-50 transition-colors">
+                              <svg className="w-6 h-6 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                            </button>
+                            <h2 className="text-2xl md:text-3xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Alta de Cliente</h2>
+                          </div>
+                          <form onSubmit={handleCreateClient} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 p-5 md:p-8 space-y-6">
+                            <div>
+                              <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4">1. Identidad del Negocio</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Nombre Comercial *</label>
+                                  <input required type="text" value={clientForm.name} onChange={e => setClientForm({...clientForm, name: e.target.value})} placeholder="Ej. Abarrotes Doña Mary" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Nombre del Contacto</label>
+                                  <input type="text" value={clientForm.contact} onChange={e => setClientForm({...clientForm, contact: e.target.value})} placeholder="Ej. María López" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                                </div>
+                                <div className="md:col-span-2">
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Teléfono (WhatsApp)</label>
+                                  <input type="tel" value={clientForm.phone_number} onChange={e => setClientForm({...clientForm, phone_number: e.target.value})} placeholder="Ej. 312 123 4567" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">2. Logística y Ruteo</h3>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Comunidad / Colonia (Agrupador) *</label>
+                                  <input required type="text" value={clientForm.location} onChange={e => setClientForm({...clientForm, location: e.target.value})} placeholder="Ej. Los Asmoles, Centro..." className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+                                </div>
+                                <div>
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Ruta Asignada *</label>
+                                  <input 
+                                    required 
+                                    type="text" 
+                                    list="rutas-registradas"
+                                    value={clientForm.route_name} 
+                                    onChange={e => setClientForm({...clientForm, route_name: e.target.value})} 
+                                    placeholder="Escribe o selecciona una ruta..." 
+                                    className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors text-brand-brown"
+                                  />
+                                  <datalist id="rutas-registradas">
+                                    {(routes || []).map(ruta => (
+                                      <option key={ruta.id} value={ruta.name} />
+                                    ))}
+                                  </datalist>
+                                  <p className="text-[10px] text-gray-400 mt-1.5 ml-1">Selecciona una existente o teclea una nueva.</p>
+                                </div>
+                                <div className="md:col-span-2">
+                                  <label className="block text-sm font-bold text-brand-brown mb-1">Dirección (Calle, Número o Referencia) *</label>
+                                  <textarea required value={clientForm.address} onChange={e => setClientForm({...clientForm, address: e.target.value})} rows="2" placeholder="Ej. Av. Niños Héroes #123, o Referencia" className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors resize-none"></textarea>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div>
+                              <h3 className="text-sm font-bold text-brand-green uppercase tracking-widest border-b border-gray-100 pb-2 mb-4 mt-8">3. Coordenadas Exactas</h3>
+                              <div className="flex flex-col items-start gap-4">
+                                <button type="button" onClick={captureLocation} disabled={isLocating} className={`flex items-center justify-center w-full md:w-auto gap-2 px-6 py-3.5 rounded-xl font-bold transition-all shadow-sm ${clientForm.latitude !== '' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-white border-2 border-brand-green text-brand-green hover:bg-brand-green hover:text-white'}`}>
+                                  {isLocating ? (
+                                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                                  ) : clientForm.latitude !== '' ? (
+                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                                  ) : (
+                                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                  )}
+                                  {isLocating ? 'Obteniendo satélites...' : clientForm.latitude !== '' ? 'Ubicación Capturada (Puedes editarla abajo)' : 'Capturar Ubicación (En la calle)'}
+                                </button>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full bg-gray-50 p-4 rounded-xl border border-gray-100">
+                                  <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Latitud (Manual / Google Maps)</label>
+                                    <input type="number" step="any" value={clientForm.latitude} onChange={e => setClientForm({...clientForm, latitude: e.target.value})} placeholder="Ej. 19.2433" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-xs font-bold text-gray-500 mb-1">Longitud (Manual / Google Maps)</label>
+                                    <input type="number" step="any" value={clientForm.longitude} onChange={e => setClientForm({...clientForm, longitude: e.target.value})} placeholder="Ej. -103.7251" className="w-full bg-white rounded-lg border border-gray-200 p-2 text-sm outline-none focus:border-brand-green font-mono" />
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            <div className="pt-6 border-t border-brand-brown/10">
+                              <button type="submit" disabled={isSubmitting} className="w-full bg-brand-green text-white font-black text-lg py-4 rounded-xl hover:bg-brand-green-dark transition-colors shadow-lg active:scale-[0.99] uppercase tracking-wider">
+                                {isSubmitting ? 'Guardando...' : 'Guardar Cliente'}
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+
+                      ) : !activeClient ? (
+                        <div className="animate-in fade-in duration-300">
+                          <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
+                            <div className="flex items-center gap-3">
+                              <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
+                              <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
+                            </div>
+                            <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
+                              <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                              Nuevo Cliente
+                            </button>
+                          </div>
+                          
+                          <div className="space-y-4 max-lg:landscape:space-y-0 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-3">
+                            {locationNames.map(locationName => {
+                              const localClients = groupedClients[locationName];
+                              const isExpanded = expandedLocations[locationName];
+                              return (
+                                <div key={locationName} className={`bg-white rounded-2xl max-lg:landscape:rounded-xl shadow-sm border border-brand-green/10 overflow-hidden transition-all ${isExpanded ? 'max-lg:landscape:col-span-2' : ''}`}>
+                                  <button onClick={() => toggleLocation(locationName)} className="w-full p-5 max-lg:landscape:p-3 flex justify-between items-center hover:bg-brand-bg transition-colors">
+                                    <div className="flex items-center gap-3 max-lg:landscape:gap-2">
+                                      <div className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green"><svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
+                                      <div className="text-left"><h3 className="text-xl max-lg:landscape:text-base font-bold text-brand-brown leading-tight">{locationName}</h3><p className="text-sm max-lg:landscape:text-[10px] text-gray-500 font-medium">{localClients.length} tiendas</p></div>
+                                    </div>
+                                    <svg className={`w-6 h-6 max-lg:landscape:w-5 max-lg:landscape:h-5 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
+                                  </button>
+                                  {isExpanded && (
+                                    <div className="border-t border-gray-100 bg-brand-bg/30 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-2 max-lg:landscape:p-2">
+                                      {localClients.map(client => (
+                                        <div key={client.id} className="p-4 max-lg:landscape:p-3 border-b max-lg:landscape:border border-gray-100 max-lg:landscape:rounded-xl max-lg:landscape:bg-white last:border-0 max-lg:landscape:last:border flex flex-col sm:flex-row sm:items-center max-lg:landscape:flex-col max-lg:landscape:items-stretch justify-between gap-4 max-lg:landscape:gap-3 hover:bg-white transition-colors shadow-sm max-lg:landscape:shadow-none">
+                                          <div>
+                                            <h4 className="text-lg max-lg:landscape:text-sm font-black text-brand-green leading-tight">{client.name}</h4>
+                                            <p className="text-sm max-lg:landscape:text-[10px] text-brand-brown font-medium mt-0.5 flex items-start gap-1.5"><svg className="w-4 h-4 max-lg:landscape:w-3 max-lg:landscape:h-3 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{client.address || "Sin referencia"}</p>
+                                            <div className="flex flex-col max-lg:landscape:flex-row max-lg:landscape:flex-wrap gap-2 mt-2 max-lg:landscape:mt-1.5">
+                                              {client.contact && <p className="text-xs max-lg:landscape:text-[9px] text-gray-500 flex items-center gap-1.5 font-medium"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>{client.contact}</p>}
+                                              {client.phone_number && (() => {
+                                                const cleanPhone = client.phone_number.replace(/\D/g, '');
+                                                const waLink = cleanPhone.length === 10 ? `https://wa.me/52${cleanPhone}` : `https://wa.me/${cleanPhone}`;
+                                                return (
+                                                  <div className="flex items-center gap-2">
+                                                    <a href={`tel:${cleanPhone}`} className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-brand-green hover:bg-brand-green hover:text-white transition-colors bg-brand-green/10 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>Llamar</a>
+                                                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md shadow-sm"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>WhatsApp</a>
+                                                  </div>
+                                                );
+                                              })()}
+                                            </div>
+                                          </div>
+                                          <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-2 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm max-lg:landscape:text-xs">Iniciar Venta</button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="animate-in fade-in zoom-in-95 duration-300">
+                          
+                          {/* TARJETA DEL CLIENTE CORREGIDA (RESPETA TAMAÑO DE ESCRITORIO) */}
+                          <div className="bg-brand-brown text-white p-4 lg:p-6 max-lg:landscape:p-3 rounded-2xl max-lg:landscape:rounded-xl mb-6 max-lg:landscape:mb-3 shadow-md flex flex-col lg:flex-row max-lg:landscape:flex-row justify-between items-start lg:items-center max-lg:landscape:items-center gap-4 max-lg:landscape:gap-3">
+                            
+                            <div className="flex flex-col lg:flex-row max-lg:landscape:flex-row lg:items-center max-lg:landscape:items-center gap-2 lg:gap-4 max-lg:landscape:gap-4 flex-1 min-w-0 pr-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="hidden lg:inline max-lg:landscape:inline text-xl leading-none opacity-80 flex-shrink-0">👤</span>
+                                <p className="lg:hidden max-lg:landscape:hidden text-brand-bg text-xs uppercase tracking-widest font-bold mb-1">Vendiendo a:</p>
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl max-lg:landscape:text-lg font-black font-calistoga truncate leading-tight tracking-wide">{activeClient.name}</h2>
+                              </div>
+                              
+                              {/* Mini Toggle Modalidad */}
+                              <div className="flex items-center bg-black/20 p-1.5 max-lg:landscape:p-1 rounded-xl max-lg:landscape:rounded-lg border border-white/10 w-fit flex-shrink-0">
+                                <button 
+                                  onClick={() => setSaleMode('mobile')} 
+                                  className={`px-3 py-1.5 max-lg:landscape:px-2.5 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-xs lg:text-sm max-lg:landscape:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'mobile' ? 'bg-[#49839a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                                >
+                                  <svg className="w-4 h-4 max-lg:landscape:w-3.5 max-lg:landscape:h-3.5 scale-x-[-1] translate-y-[1px]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                                  </svg>
+                                  <span>En Ruta</span>
+                                </button>
+                                <button 
+                                  onClick={() => setSaleMode('central')} 
+                                  className={`px-3 py-1.5 max-lg:landscape:px-2.5 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md text-xs lg:text-sm max-lg:landscape:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 transition-all ${saleMode === 'central' ? 'bg-[#67924a] text-white shadow-md' : 'text-white/50 hover:text-white'}`}
+                                >
+                                  <svg className="w-4 h-4 max-lg:landscape:w-3.5 max-lg:landscape:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                                  </svg>
+                                  <span>En Centro</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Derecha: Botón Cambiar */}
+                            <button onClick={() => { if(cart.length > 0) { if(confirm("Tienes productos en el carrito. ¿Deseas descartarlos y cambiar de cliente?")) { clearCart(); setActiveClient(null); } } else { setActiveClient(null); } }} className="bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs lg:text-sm max-lg:landscape:text-[10px] uppercase tracking-wider font-bold py-2.5 px-4 lg:py-2 lg:px-4 max-lg:landscape:py-1.5 max-lg:landscape:px-3 rounded-xl max-lg:landscape:rounded-lg transition-all whitespace-nowrap flex-shrink-0 text-center self-start lg:self-center max-lg:landscape:self-center">
+                              Cambiar Cliente
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                            {categoryNames.map(categoryName => {
+                              const items = groupedProducts[categoryName];
+                              const { catColor } = formatProduct(items[0]);
+                              const coverImage = CATEGORY_COVERS[categoryName];
+                              const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
+                              return (
+                                <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
+                                  <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
+                                  <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
+                                    {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
+                                    {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
+                                  </div>
+                                  <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}
-            </>
-          )}
-        </div>
+            </div>
 
-        {/* === PANEL DERECHO (CARRITO FIJO EN HORIZONTAL) === */}
-        {isStoreView && (
-          <div className="hidden landscape:flex landscape:col-span-4 sticky top-16 lg:top-24 flex-col bg-white rounded-3xl shadow-sm border border-brand-brown/10 h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-7rem)] overflow-hidden">
-            <div className="p-2.5 px-4 lg:p-4 border-b border-brand-brown/10 bg-brand-bg flex justify-between items-center flex-shrink-0">
-              <h2 className="text-lg lg:text-xl font-calistoga text-brand-brown">Orden</h2>
-              <div className="flex items-center gap-2">
-                <span className="bg-brand-green text-white font-sans text-[10px] lg:text-xs py-0.5 px-2.5 lg:py-1 lg:px-3 rounded-full font-bold">{totalItems} items</span>
-                <button onClick={clearCart} className="text-red-500 hover:text-red-700 p-1" title="Vaciar">
-                  <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                </button>
-              </div>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-2.5 lg:p-4 bg-brand-bg/30 flex flex-col justify-start lg:justify-start">
-              {cart.length === 0 ? (
-                <div className="flex flex-col items-center justify-center opacity-70 h-full min-h-[120px] lg:min-h-[200px]">
-                  <span className="text-3xl lg:text-4xl mb-1 lg:mb-2">🛒</span>
-                  <p className="text-xs lg:text-sm font-bold text-brand-brown text-center">El carrito está vacío</p>
+            {/* === PANEL DERECHO (CARRITO FIJO EN HORIZONTAL) === */}
+            {isStoreView && (
+              <div className="hidden landscape:flex landscape:col-span-4 sticky top-16 lg:top-24 flex-col bg-white rounded-3xl shadow-sm border border-brand-brown/10 h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-7rem)] overflow-hidden">
+                <div className="p-2.5 px-4 lg:p-4 border-b border-brand-brown/10 bg-brand-bg flex justify-between items-center flex-shrink-0">
+                  <h2 className="text-lg lg:text-xl font-calistoga text-brand-brown">Orden</h2>
+                  <div className="flex items-center gap-2">
+                    <span className="bg-brand-green text-white font-sans text-[10px] lg:text-xs py-0.5 px-2.5 lg:py-1 lg:px-3 rounded-full font-bold">{totalItems} items</span>
+                    <button onClick={clearCart} className="text-red-500 hover:text-red-700 p-1" title="Vaciar">
+                      <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
                 </div>
-              ) : (
-                <ul className="space-y-2 lg:space-y-3">
-                  {cart.map(item => {
-                    const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
-                    return (
-                      <li key={item.id} className="flex justify-between items-center p-2 lg:p-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
-                        <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
-                        <div className="flex-1 pl-2.5 lg:pl-3 pr-2 min-w-0">
-                          <p className="font-bold text-brand-brown text-xs lg:text-sm leading-tight truncate">{cartTitle}</p>
-                          <div className="flex items-center gap-1 flex-wrap mt-0.5 lg:mt-0">
-                            {cartSubtitle && <span className={`text-[7px] lg:text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 lg:px-1.5 rounded shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
-                            <p className="text-[10px] lg:text-xs text-brand-green font-bold">${item.price}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center w-[70px] lg:w-[90px] xl:w-[100px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-6 lg:h-8 overflow-hidden flex-shrink-0">
-                          <button onClick={() => removeFromCart(item.id)} className="w-5 lg:w-8 h-full bg-white hover:text-red-500 font-bold text-xs lg:text-sm">-</button>
-                          <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs lg:text-sm text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
-                          <button onClick={() => addToCart(item)} className="w-5 lg:w-8 h-full bg-white hover:text-brand-green font-bold text-xs lg:text-sm">+</button>
-                        </div>
-                      </li>
-                    )
-                  })}
-                </ul>
-              )}
-            </div>
-            
-            <div className="p-3 lg:p-4 border-t border-brand-brown/10 bg-white flex-shrink-0 space-y-2 lg:space-y-3">
-              <div className="flex justify-between items-end">
-                <span className="text-xs lg:text-sm font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
-                <span className="text-xl lg:text-3xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
-              </div>
-              <label className="flex items-center justify-between bg-emerald-50/50 px-2.5 py-1.5 lg:p-3 rounded-lg border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors">
-                <div className="flex items-center gap-1.5">
-                  <svg className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                  <span className="text-[9px] lg:text-[10px] font-bold text-emerald-800">WhatsApp</span>
+                
+                <div className="flex-1 overflow-y-auto p-2.5 lg:p-4 bg-brand-bg/30 flex flex-col justify-start lg:justify-start">
+                  {cart.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center opacity-70 h-full min-h-[120px] lg:min-h-[200px]">
+                      <span className="text-3xl lg:text-4xl mb-1 lg:mb-2">🛒</span>
+                      <p className="text-xs lg:text-sm font-bold text-brand-brown text-center">El carrito está vacío</p>
+                    </div>
+                  ) : (
+                    <ul className="space-y-2 lg:space-y-3">
+                      {cart.map(item => {
+                        const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
+                        return (
+                          <li key={item.id} className="flex justify-between items-center p-2 lg:p-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
+                            <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
+                            <div className="flex-1 pl-2.5 lg:pl-3 pr-2 min-w-0">
+                              <p className="font-bold text-brand-brown text-xs lg:text-sm leading-tight truncate">{cartTitle}</p>
+                              <div className="flex items-center gap-1 flex-wrap mt-0.5 lg:mt-0">
+                                {cartSubtitle && <span className={`text-[7px] lg:text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 lg:px-1.5 rounded shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
+                                <p className="text-[10px] lg:text-xs text-brand-green font-bold">${item.price}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center w-[70px] lg:w-[90px] xl:w-[100px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-6 lg:h-8 overflow-hidden flex-shrink-0">
+                              <button onClick={() => removeFromCart(item.id)} className="w-5 lg:w-8 h-full bg-white hover:text-red-500 font-bold text-xs lg:text-sm">-</button>
+                              <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs lg:text-sm text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
+                              <button onClick={() => addToCart(item)} className="w-5 lg:w-8 h-full bg-white hover:text-brand-green font-bold text-xs lg:text-sm">+</button>
+                            </div>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
                 </div>
-                <input type="checkbox" checked={sendWhatsApp} onChange={() => { const newVal = !sendWhatsApp; setSendWhatsApp(newVal); localStorage.setItem('sendWhatsApp', newVal); }} className="w-3 h-3 lg:w-4 lg:h-4 accent-emerald-600 rounded cursor-pointer" />
-              </label>
-              <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-2.5 lg:py-4 rounded-xl font-black text-xs lg:text-sm transition-all shadow-md uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting || cart.length === 0 || !activeClient ? 'bg-gray-300 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark active:scale-[0.98]'}`}>
-                {isSubmitting ? '...' : cart.length === 0 ? 'Carrito Vacío' : 'Cobrar Orden'}
-              </button>
-            </div>
-          </div>
-        )}
+                
+                <div className="p-3 lg:p-4 border-t border-brand-brown/10 bg-white flex-shrink-0 space-y-2 lg:space-y-3">
+                  <div className="flex justify-between items-end">
+                    <span className="text-xs lg:text-sm font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
+                    <span className="text-xl lg:text-3xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
+                  </div>
+                  <label className="flex items-center justify-between bg-emerald-50/50 px-2.5 py-1.5 lg:p-3 rounded-lg border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors">
+                    <div className="flex items-center gap-1.5">
+                      <svg className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
+                      <span className="text-[9px] lg:text-[10px] font-bold text-emerald-800">WhatsApp</span>
+                    </div>
+                    <input type="checkbox" checked={sendWhatsApp} onChange={() => { const newVal = !sendWhatsApp; setSendWhatsApp(newVal); localStorage.setItem('sendWhatsApp', newVal); }} className="w-3 h-3 lg:w-4 lg:h-4 accent-emerald-600 rounded cursor-pointer" />
+                  </label>
+                  <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-2.5 lg:py-4 rounded-xl font-black text-xs lg:text-sm transition-all shadow-md uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting || cart.length === 0 || !activeClient ? 'bg-gray-300 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark active:scale-[0.98]'}`}>
+                    {isSubmitting ? '...' : cart.length === 0 ? 'Carrito Vacío' : 'Cobrar Orden'}
+                  </button>
+                </div>
+              </div>
+            )}
       </div>
 
       {/* MODAL DE GASTOS OPERATIVOS */}
