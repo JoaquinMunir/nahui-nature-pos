@@ -76,12 +76,12 @@ const formatProduct = (product) => {
 };
 
 const SUPPLIERS = [
-  { id: 1, name: "Cecina", emoji: "🥩", link: "https://www.proveedordecarne.com/catalogo" },
-  { id: 2, name: "Chips", emoji: "🌿", link: "https://wa.me/523121234567" },
-  { id: 3, name: "Lentejas", emoji: "🌶", link: "https://m.me/empaquescolima" },
-  { id: 4, name: "Maicitos", emoji: "🌽", link: "https://wa.me/523121234567" },
-  { id: 5, name: "Obleas", emoji: "🌾", link: "https://wa.me/523121234567" },
-  { id: 6, name: "Platanitos", emoji: "🍌", link: "https://wa.me/523121234567" },
+  { id: 1, name: "Cecina", emoji: "🥩", link: "https://wa.me/5213318957640" },
+  { id: 2, name: "Chips", emoji: "🌿", link: "https://wa.me/5213310643081" },
+  { id: 3, name: "Lentejas", emoji: "🌶", link: "https://wa.me/5218128683071" },
+  { id: 4, name: "Maicitos", emoji: "🌽", link: "https://wa.me/5213328286378" },
+  { id: 5, name: "Obleas", emoji: "🌾", link: "https://wa.me/5217353384879" },
+  { id: 6, name: "Platanitos", emoji: "🍌", link: "https://wa.me/5213121129537" },
 ];
 
 function App() {
