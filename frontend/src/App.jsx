@@ -1266,20 +1266,23 @@ function App() {
                             </button>
                           </div>
 
-                          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-lg:landscape:grid-cols-3 max-lg:landscape:gap-3">
                             {categoryNames.map(categoryName => {
                               const items = groupedProducts[categoryName];
                               const { catColor } = formatProduct(items[0]);
                               const coverImage = CATEGORY_COVERS[categoryName];
                               const itemsInCartForCategory = items.reduce((acc, item) => acc + (cart.find(c => c.id === item.id)?.quantity || 0), 0);
                               return (
-                                <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
-                                  <div className="h-1.5 w-full" style={{ backgroundColor: catColor }}></div>
-                                  <div className="aspect-[4/3] relative overflow-hidden bg-brand-bg flex items-center justify-center">
-                                    {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
-                                    {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 bg-brand-green text-white w-8 h-8 flex items-center justify-center rounded-full font-bold shadow-lg border-2 border-white">{itemsInCartForCategory}</div>}
+                                <div key={categoryName} onClick={() => openCategoryModal(categoryName)} className="bg-white rounded-2xl max-lg:landscape:rounded-xl shadow-sm border border-brand-green/10 overflow-hidden cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group relative flex flex-col h-full">
+                                  <div className="h-1.5 max-lg:landscape:h-1 w-full" style={{ backgroundColor: catColor }}></div>
+                                  <div className="aspect-[4/3] max-lg:landscape:aspect-[16/9] relative overflow-hidden bg-brand-bg flex items-center justify-center">
+                                    {coverImage ? <img src={coverImage} alt={categoryName} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 text-transparent" /> : <span className="text-5xl max-lg:landscape:text-2xl font-black text-brand-brown/20 uppercase tracking-widest">{categoryName.substring(0,3)}</span>}
+                                    {itemsInCartForCategory > 0 && <div className="absolute top-3 right-3 max-lg:landscape:top-1.5 max-lg:landscape:right-1.5 bg-brand-green text-white w-8 h-8 max-lg:landscape:w-5 max-lg:landscape:h-5 max-lg:landscape:text-[10px] flex items-center justify-center rounded-full font-bold shadow-lg border-2 max-lg:landscape:border border-white">{itemsInCartForCategory}</div>}
                                   </div>
-                                  <div className="p-5 flex-1 flex flex-col justify-center text-center"><h2 className="text-2xl font-bold text-brand-brown leading-tight">{categoryName}</h2><p className="text-sm text-gray-500 mt-2 font-medium">{items.length} variants disponibles</p></div>
+                                  <div className="p-5 max-lg:landscape:p-2 flex-1 flex flex-col justify-center text-center">
+                                    <h2 className="text-2xl max-lg:landscape:text-sm font-bold text-brand-brown leading-tight">{categoryName}</h2>
+                                    <p className="text-sm max-lg:landscape:text-[9px] text-gray-500 mt-2 max-lg:landscape:mt-0.5 font-medium">{items.length} variants disponibles</p>
+                                  </div>
                                 </div>
                               )
                             })}
