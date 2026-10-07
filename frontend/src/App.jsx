@@ -1841,11 +1841,13 @@ function App() {
           </label>
 
           <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-4 rounded-xl font-black text-lg transition-all shadow-lg uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark shadow-brand-green/30 active:scale-[0.98]'}`}>
-            {isSubmitting ? 'Procesando...' : 'Cobrar Orden'}
+          {isSubmitting ? 'Procesando...' : 'Cobrar Orden'}
           </button>
         </div>
       </div>
     </div>
-  )
+  </div> 
+);
 }
-export default App
+
+export default App;
