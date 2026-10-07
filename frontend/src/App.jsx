@@ -716,8 +716,8 @@ function App() {
   const renderRouteButtons = () => (
     <>
       {isOfflineMode && (
-        <div className="inline-flex bg-amber-100 text-amber-800 px-2.5 py-1.5 rounded-lg font-bold text-[10px] sm:text-xs shadow-sm items-center gap-1.5 border border-amber-200" title="Modo sin conexión">
-          <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
+        <div className="inline-flex bg-amber-100 text-amber-800 px-3.5 py-1.5 sm:px-4.5 sm:py-2 rounded-xl font-bold text-[10px] sm:text-xs uppercase tracking-wider shadow-sm items-center justify-center gap-1.5 border border-amber-300" title="Modo sin conexión">          
+        <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span></span>
           <span className="max-lg:landscape:hidden">Sin conexión</span>
         </div>
       )}
@@ -763,13 +763,9 @@ function App() {
         </div>
       </div>
 
-      {/* --- CABECERA PRINCIPAL (DESKTOP/PORTRAIT) Y SIDEBAR (LANDSCAPE) --- */}
-      <header className={`bg-brand-bg/95 backdrop-blur-md shadow-sm z-40 w-full transition-all 
-                         max-lg:landscape:fixed max-lg:landscape:left-0 max-lg:landscape:top-0 max-lg:landscape:h-screen max-lg:landscape:w-[60px] max-lg:landscape:border-r max-lg:landscape:border-brand-brown/10 max-lg:landscape:bg-white max-lg:landscape:pt-[60px]
-                         ${isStoreView ? 'max-lg:landscape:hidden' : 'sticky top-0 border-b border-brand-brown/10'}`}>
-        
-        {/* FILA 1: LOGO Y TÍTULO (Intacta, solo Desktop/Portrait) */}
-        <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto max-lg:landscape:hidden">
+      {/* --- FILA 1: LOGO Y TÍTULO (Normal, NO sticky. Desaparece al hacer scroll) --- */}
+      <div className="w-full bg-brand-bg max-lg:landscape:hidden">
+        <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto">
           <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
             <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
             <h1 className="flex items-baseline gap-1 sm:gap-2">
@@ -783,9 +779,14 @@ function App() {
             </p>
           </div>
         </div>
+      </div>
 
-        {/* FILA 2: CARRUSEL Y BOTONES DE RUTA (En la misma línea para Desktop) */}
-        <div className="px-3 pb-3 sm:px-4 sm:pb-4 md:px-10 max-w-[1400px] mx-auto w-full flex justify-between items-center gap-4 max-lg:landscape:flex-col max-lg:landscape:px-1 max-lg:landscape:gap-3 max-lg:landscape:mt-2">
+      {/* --- FILA 2: CARRUSEL Y BOTONES (Sticky en PC/Vertical, Sidebar lateral en Horizontal) --- */}
+      <header className={`bg-brand-bg/95 backdrop-blur-md z-40 w-full transition-all 
+                         max-lg:landscape:fixed max-lg:landscape:left-0 max-lg:landscape:top-0 max-lg:landscape:h-screen max-lg:landscape:w-[60px] max-lg:landscape:border-r max-lg:landscape:border-brand-brown/10 max-lg:landscape:bg-white max-lg:landscape:pt-[60px]
+                         ${isStoreView ? 'max-lg:landscape:hidden' : 'sticky top-0 border-b border-brand-brown/10 shadow-sm'}`}>
+        
+        <div className="px-3 py-3 sm:px-4 sm:pb-3 md:px-10 max-w-[1400px] mx-auto w-full flex justify-between items-center gap-4 max-lg:landscape:flex-col max-lg:landscape:px-1 max-lg:landscape:gap-3 max-lg:landscape:mt-2">
           
           {/* CARRUSEL DE NAVEGACIÓN */}
           <div className="flex overflow-x-auto gap-2 flex-1 w-full max-lg:landscape:flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
@@ -815,7 +816,7 @@ function App() {
             </button>
           </div>
 
-          {/* BOTONES DE RUTA (En la misma línea que el carrusel para Desktop/Portrait) */}
+          {/* BOTONES DE RUTA Y ESTADO (En la misma línea que el carrusel en PC) */}
           <div className="flex items-center gap-2 flex-shrink-0 max-lg:landscape:hidden">
             {renderRouteButtons()}
           </div>
@@ -825,7 +826,9 @@ function App() {
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="flex-1 flex flex-col min-w-0 relative max-lg:landscape:pl-[60px]">
         
-        {/* --- GRID DE CONTENIDO PRINCIPAL --- */}        <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
+        {/* --- GRID DE CONTENIDO PRINCIPAL --- */}
+
+          <div className="p-3 sm:p-4 lg:p-10 pt-4 lg:pt-6 max-w-[1400px] mx-auto w-full pb-32 landscape:grid landscape:grid-cols-12 landscape:gap-6 landscape:items-start flex-1">
             
             <div className={`w-full space-y-4 ${isStoreView ? 'landscape:col-span-8' : 'landscape:col-span-12'}`}>
               {showInventory ? (
