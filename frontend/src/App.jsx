@@ -4,6 +4,8 @@ import { db } from './db'
 
 import AppAlertModal from './components/modals/AppAlertModal';
 import ExpenseModal from './components/modals/ExpenseModal';
+import ShiftReportModal from './components/modals/ShiftReportModal';
+import RouteLoadModal from './components/modals/RouteLoadModal';
 
 const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
 
@@ -1366,152 +1368,27 @@ function App() {
       <ExpenseModal expenseModal={expenseModal} setExpenseModal={setExpenseModal} handleAddExpense={handleAddExpense} />
       <AppAlertModal appAlert={appAlert} onClose={() => setAppAlert({ ...appAlert, isOpen: false })} />
 
-      {/* MODAL: REPORTE DE CORTE DE CAJA (FIN DE TURNO) */}
-      {showShiftReport && (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowShiftReport(false)}></div>
-          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
-            
-            <div className="bg-brand-brown p-6 text-white text-center relative flex-shrink-0">
-              <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-3 shadow-inner">
-                <span className="text-3xl">📊</span>
-              </div>
-              <h3 className="text-2xl font-calistoga mb-1 tracking-wide">Corte de Ruta</h3>
-              <p className="text-brand-bg/80 text-xs font-bold uppercase tracking-widest">Auditoría del Turno Actual</p>
-            </div>
-            
-            <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
-              <div className="flex justify-between items-center mb-4 pb-4 border-b border-brand-brown/10">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Ingresos por Ventas</p>
-                  <p className="text-sm font-medium text-brand-brown">{shiftStats.orderCount} pedidos completados</p>
-                </div>
-                <span className="text-xl font-black text-brand-green">+ ${shiftStats.totalSales.toFixed(2)}</span>
-              </div>
+<ShiftReportModal 
+        showShiftReport={showShiftReport} 
+        setShowShiftReport={setShowShiftReport} 
+        shiftStats={shiftStats} 
+        expenses={expenses} 
+        mobileInventory={mobileInventory} 
+        products={products} 
+        confirmEndRoute={confirmEndRoute} 
+      />
 
-              <div className="flex justify-between items-center mb-6 pb-4 border-b border-brand-brown/10">
-                <div>
-                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Gastos Operativos</p>
-                  <p className="text-sm font-medium text-brand-brown">{expenses.length} conceptos registrados</p>
-                </div>
-                <span className="text-xl font-black text-red-500">- ${shiftStats.totalExpenses.toFixed(2)}</span>
-              </div>
-
-              <div className="bg-white rounded-2xl p-5 border border-brand-brown/10 mb-6 shadow-sm relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-green"></div>
-                <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1">Efectivo Neto a Entregar</p>
-                <p className="text-4xl font-black text-brand-brown">${shiftStats.netCash.toFixed(2)}</p>
-              </div>
-
-              <div>
-                 <p className="text-[10px] font-bold text-brand-green uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                   <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                   Mercancía a devolver (Camioneta)
-                 </p>
-                 <div className="max-h-32 overflow-y-auto bg-white rounded-xl p-3 border border-brand-brown/10 shadow-sm">
-                   {mobileInventory.filter(i => i.stock_quantity > 0).length === 0 ? (
-                      <p className="text-xs text-gray-400 text-center font-bold my-2 uppercase tracking-widest">Camioneta vacía</p>
-                   ) : (
-                      mobileInventory.filter(i => i.stock_quantity > 0).map(inv => {
-                        const prod = products.find(p => String(p.id) === String(inv.product_id));
-                        if(!prod) return null;
-                        const isSingle = prod.name.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") === 'unico';
-                        const name = isSingle ? prod.category : `${prod.category} - ${prod.name}`;
-                        return (
-                          <div key={inv.product_id} className="flex justify-between items-center text-sm mb-2 last:mb-0 border-b border-gray-50 pb-1 last:border-0 last:pb-0">
-                             <span className="text-brand-brown font-medium truncate pr-2 text-xs">{name}</span>
-                             <span className="font-black text-brand-green bg-brand-green/10 px-2 py-0.5 rounded shadow-sm text-xs">{inv.stock_quantity} u.</span>
-                          </div>
-                        )
-                      })
-                   )}
-                 </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-white border-t border-brand-brown/10 flex gap-3 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
-              <button type="button" onClick={() => setShowShiftReport(false)} className="flex-1 bg-gray-50 text-gray-500 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition-colors border border-gray-200 uppercase tracking-wider text-xs shadow-sm">Revisar algo</button>
-              <button type="button" onClick={confirmEndRoute} className="flex-1 bg-brand-green text-white font-black py-3.5 rounded-xl hover:bg-brand-green-dark transition-colors shadow-md active:scale-95 uppercase tracking-wider text-xs">Confirmar Cierre</button>
-            </div>
-           </div>
-          </div>
-      )}
-
-      
-      {/* MODAL RÁPIDO DE CARGA INICIAL DE CAMIONETA */}
-      {showRouteLoadModal && (
-        <div className="fixed inset-0 z-[80] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setShowRouteLoadModal(false)}></div>
-          <div className="bg-white rounded-3xl shadow-2xl relative w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
-
-            <div className="bg-blue-600 p-6 max-lg:landscape:p-3 text-white flex justify-between items-center flex-shrink-0">
-              <div>
-                <h3 className="text-2xl max-lg:landscape:text-lg font-calistoga tracking-wide flex items-center gap-3 max-lg:landscape:gap-2">
-                  <span className="text-3xl max-lg:landscape:text-xl">🚚</span> Carga de Vehículo
-                </h3>
-                <p className="text-blue-100 text-xs max-lg:landscape:text-[9px] uppercase tracking-widest mt-1 max-lg:landscape:mt-0 font-bold">Traspaso Rápido (Central ➔ Móvil)</p>
-              </div>
-              <button onClick={() => setShowRouteLoadModal(false)} className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-full flex items-center justify-center transition-colors">
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-
-            <div className="p-6 overflow-y-auto flex-1 bg-brand-bg">
-              <div className="bg-white rounded-2xl border border-brand-brown/10 shadow-sm overflow-hidden">
-                {products.map(product => {
-                  const { cartTitle, cartSubtitle, catColor } = formatProduct(product);
-                  const stockCasa = centralInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
-
-                  if (stockCasa === 0) return null;
-
-                  return (
-                    <div key={product.id} className="flex justify-between items-center p-3 border-b border-gray-100 last:border-0 hover:bg-gray-50">
-                      <div className="flex items-center gap-3 overflow-hidden pr-3">
-                        <div className="w-2 h-8 rounded-full flex-shrink-0" style={{ backgroundColor: catColor }}></div>
-                        <div className="truncate">
-                          <p className="text-sm font-bold text-brand-brown truncate">{cartTitle}</p>
-                          {cartSubtitle && <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{cartSubtitle}</p>}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 flex-shrink-0">
-                        <div className="text-right hidden sm:block">
-                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">En Bodega</p>
-                          <p className="text-sm font-black text-brand-brown">{stockCasa}</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            min="0"
-                            max={stockCasa}
-                            placeholder="0"
-                            value={routeLoadCart[product.id] || ''}
-                            onChange={(e) => setRouteLoadCart(prev => ({...prev, [product.id]: parseInt(e.target.value) || 0}))}
-                            className="w-16 bg-brand-bg border border-brand-brown/20 rounded-lg px-2 py-1.5 text-center font-bold text-blue-600 focus:border-blue-600 outline-none"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-                {products.filter(p => (centralInventory.find(i => String(i.product_id) === String(p.id))?.stock_quantity || 0) > 0).length === 0 && (
-                  <div className="p-8 text-center text-gray-500 font-bold text-sm">Bodega Central vacía.<br/>No hay mercancía para traspasar.</div>
-                )}
-              </div>
-            </div>
-
-            <div className="p-4 bg-white border-t border-brand-brown/10 flex-shrink-0 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.02)]">
-              <button
-                onClick={handleBulkRouteLoad}
-                disabled={isSubmitting}
-                className={`w-full text-white font-black py-4 rounded-xl transition-all shadow-md active:scale-95 uppercase tracking-wider text-sm flex items-center justify-center gap-2 ${isSubmitting ? 'bg-gray-400' : 'bg-blue-600 hover:bg-blue-700'}`}
-              >
-                {isSubmitting ? 'Transfiriendo...' : 'Confirmar Carga y Salir'}
-              </button>
-            </div>
-
-          </div>
-        </div>
-      )}
+      <RouteLoadModal 
+        showRouteLoadModal={showRouteLoadModal} 
+        setShowRouteLoadModal={setShowRouteLoadModal} 
+        products={products} 
+        formatProduct={formatProduct} 
+        centralInventory={centralInventory} 
+        routeLoadCart={routeLoadCart} 
+        setRouteLoadCart={setRouteLoadCart} 
+        handleBulkRouteLoad={handleBulkRouteLoad} 
+        isSubmitting={isSubmitting} 
+      />
 
       {/* MODAL PERSONALIZADO DE TRASPASO LOGÍSTICO */}
       {transferModal.isOpen && transferModal.product && (
