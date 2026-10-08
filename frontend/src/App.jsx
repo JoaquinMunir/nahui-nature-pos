@@ -8,6 +8,8 @@ import ShiftReportModal from './components/modals/ShiftReportModal';
 import RouteLoadModal from './components/modals/RouteLoadModal';
 import TransferModal from './components/modals/TransferModal';
 import RestockModal from './components/modals/RestockModal';
+import POSHeader from './components/pos/POSHeader';
+import CartSidebar from './components/pos/CartSidebar';
 
 const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
 
@@ -755,81 +757,16 @@ function App() {
 
   return (
       <div className="min-h-screen relative bg-brand-bg flex flex-col max-lg:landscape:pt-[60px]">
-        
-        {/* --- BARRA SUPERIOR EXCLUSIVA PARA MÓVIL HORIZONTAL --- */}
-        {/* Eliminamos el condicional 'isStoreView' para que esta barra NO desaparezca */}
-        <div className="hidden max-lg:landscape:flex fixed top-0 left-0 right-0 h-[60px] bg-brand-bg/95 backdrop-blur-md border-b border-brand-brown/10 z-50 px-4 items-center justify-between transition-all">
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <img src="/icon-192.png" alt="Logo" className="w-8 h-8 object-contain drop-shadow-sm" />
-            <h1 className="flex items-baseline gap-1">
-              <span className="font-calistoga text-brand-brown uppercase text-lg tracking-tight">Nahui</span>
-              <span className="font-satisfy text-brand-green lowercase text-xl">nature</span>
-            </h1>
-          </div>
-          <div className="flex items-center gap-2">
-            {renderRouteButtons()}
-          </div>
-        </div>
-
-        {/* --- FILA 1: LOGO Y TÍTULO (Normal, NO sticky. Desaparece al hacer scroll) --- */}
-        <div className="w-full bg-brand-bg max-lg:landscape:hidden">
-          <div className="px-3 py-3 sm:px-4 sm:pt-4 md:px-10 md:pt-10 flex items-center justify-between w-full max-w-[1400px] mx-auto">
-            <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-              <img src="/icon-192.png" alt="Logo Nahui Nature" className="w-12 h-12 sm:w-16 sm:h-16 md:w-24 md:h-24 object-contain drop-shadow-sm" />
-              <h1 className="flex items-baseline gap-1 sm:gap-2">
-                <span className="font-calistoga text-brand-brown uppercase text-2xl sm:text-4xl md:text-6xl tracking-tight">Nahui</span>
-                <span className="font-satisfy text-brand-green lowercase text-3xl sm:text-5xl md:text-7xl">nature</span>
-              </h1>
-            </div>
-            <div className="flex-shrink flex items-center justify-end">
-              <p className="text-brand-brown/70 font-bold text-xs md:text-sm uppercase tracking-widest whitespace-nowrap">
-                Punto de Venta Móvil
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* --- FILA 2: CARRUSEL Y BOTONES (Sticky en PC/Vertical, BOTONES FLOTANTES CIRCULARES en Horizontal) --- */}
-        <header className="bg-brand-bg/95 backdrop-blur-md z-40 w-full transition-all sticky top-0 border-b border-brand-brown/10 shadow-sm 
-                          max-lg:landscape:fixed max-lg:landscape:left-3 max-lg:landscape:top-[80px] max-lg:landscape:w-auto max-lg:landscape:border-none max-lg:landscape:bg-transparent max-lg:landscape:shadow-none">
-          
-          <div className="px-3 py-3 sm:px-4 sm:pb-3 md:px-10 max-w-[1400px] mx-auto w-full flex justify-between items-center gap-4 max-lg:landscape:flex-col max-lg:landscape:px-0 max-lg:landscape:gap-3 max-lg:landscape:mt-0">
-            
-            {/* CARRUSEL DE NAVEGACIÓN (Se transforma en esferas flotantes a la izquierda) */}
-            <div className="flex overflow-x-auto gap-2 flex-1 w-full max-lg:landscape:flex-col [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <button 
-                onClick={() => { setShowOrders(false); setShowInventory(false); }} 
-                className={`border-2 font-bold px-4 py-2 max-lg:landscape:w-12 max-lg:landscape:h-12 max-lg:landscape:p-0 rounded-xl max-lg:landscape:rounded-full transition-all shadow-sm max-lg:landscape:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap flex-shrink-0 hover:scale-105 ${!showOrders && !showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-                title="Tienda"
-              >
-                <svg className="w-4 h-4 max-lg:landscape:w-6 max-lg:landscape:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
-                <span className="max-lg:landscape:hidden text-sm">Tienda</span>
-              </button>
-              <button 
-                onClick={() => { setShowOrders(true); setShowInventory(false); }} 
-                className={`border-2 font-bold px-4 py-2 max-lg:landscape:w-12 max-lg:landscape:h-12 max-lg:landscape:p-0 rounded-xl max-lg:landscape:rounded-full transition-all shadow-sm max-lg:landscape:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap flex-shrink-0 hover:scale-105 ${showOrders ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-                title="Ventas"
-              >
-                <svg className="w-4 h-4 max-lg:landscape:w-6 max-lg:landscape:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                <span className="max-lg:landscape:hidden text-sm">Ventas</span>
-              </button>
-              <button 
-                onClick={() => { setShowInventory(true); setShowOrders(false); }} 
-                className={`border-2 font-bold px-4 py-2 max-lg:landscape:w-12 max-lg:landscape:h-12 max-lg:landscape:p-0 rounded-xl max-lg:landscape:rounded-full transition-all shadow-sm max-lg:landscape:shadow-xl flex items-center justify-center gap-2 whitespace-nowrap flex-shrink-0 hover:scale-105 ${showInventory ? 'bg-brand-brown text-white border-brand-brown' : 'bg-white text-brand-brown border-brand-brown hover:bg-brand-brown/10'}`}
-                title="Bodega"
-              >
-                <svg className="w-4 h-4 max-lg:landscape:w-6 max-lg:landscape:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
-                <span className="max-lg:landscape:hidden text-sm">Bodega</span>
-              </button>
-            </div>
-
-            {/* BOTONES DE RUTA Y ESTADO (En la misma línea que el carrusel en PC) */}
-            <div className="flex items-center gap-2 flex-shrink-0 max-lg:landscape:hidden">
-              {renderRouteButtons()}
-            </div>
-          </div>
-        </header>
-
+      
+      <POSHeader 
+        renderRouteButtons={renderRouteButtons}
+        isStoreView={isStoreView}
+        showOrders={showOrders}
+        setShowOrders={setShowOrders}
+        showInventory={showInventory}
+        setShowInventory={setShowInventory}
+      />
+      
       {/* --- CONTENIDO PRINCIPAL --- */}
       <div className="flex-1 flex flex-col min-w-0 relative max-lg:landscape:pl-[80px]">
         
@@ -1302,71 +1239,25 @@ function App() {
               )}
             </div>
 
-            {/* === PANEL DERECHO (CARRITO FIJO EN HORIZONTAL) === */}
-            {isStoreView && (
-              <div className="hidden landscape:flex landscape:col-span-4 sticky top-16 lg:top-24 flex-col bg-white rounded-3xl shadow-sm border border-brand-brown/10 h-[calc(100vh-4.5rem)] lg:h-[calc(100vh-7rem)] overflow-hidden">
-                <div className="p-2.5 px-4 lg:p-4 border-b border-brand-brown/10 bg-brand-bg flex justify-between items-center flex-shrink-0">
-                  <h2 className="text-lg lg:text-xl font-calistoga text-brand-brown">Orden</h2>
-                  <div className="flex items-center gap-2">
-                    <span className="bg-brand-green text-white font-sans text-[10px] lg:text-xs py-0.5 px-2.5 lg:py-1 lg:px-3 rounded-full font-bold">{totalItems} items</span>
-                    <button onClick={clearCart} className="text-red-500 hover:text-red-700 p-1" title="Vaciar">
-                      <svg className="w-4 h-4 lg:w-5 lg:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  </div>
-                </div>
-                
-                <div className="flex-1 overflow-y-auto p-2.5 lg:p-4 bg-brand-bg/30 flex flex-col justify-start lg:justify-start">
-                  {cart.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center opacity-70 h-full min-h-[120px] lg:min-h-[200px]">
-                      <span className="text-3xl lg:text-4xl mb-1 lg:mb-2">🛒</span>
-                      <p className="text-xs lg:text-sm font-bold text-brand-brown text-center">El carrito está vacío</p>
-                    </div>
-                  ) : (
-                    <ul className="space-y-2 lg:space-y-3">
-                      {cart.map(item => {
-                        const { cartTitle, cartSubtitle, cartSubtitleColor, catColor } = formatProduct(item)
-                        return (
-                          <li key={item.id} className="flex justify-between items-center p-2 lg:p-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 relative overflow-hidden">
-                            <div className="absolute left-0 top-0 bottom-0 w-1.5" style={{ backgroundColor: catColor }}></div>
-                            <div className="flex-1 pl-2.5 lg:pl-3 pr-2 min-w-0">
-                              <p className="font-bold text-brand-brown text-xs lg:text-sm leading-tight truncate">{cartTitle}</p>
-                              <div className="flex items-center gap-1 flex-wrap mt-0.5 lg:mt-0">
-                                {cartSubtitle && <span className={`text-[7px] lg:text-[8px] font-bold uppercase tracking-widest px-1 py-0.5 lg:px-1.5 rounded shadow-sm whitespace-nowrap ${cartSubtitleColor}`}>{cartSubtitle}</span>}
-                                <p className="text-[10px] lg:text-xs text-brand-green font-bold">${item.price}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center w-[70px] lg:w-[90px] xl:w-[100px] justify-between bg-brand-bg rounded-lg border border-brand-brown/10 h-6 lg:h-8 overflow-hidden flex-shrink-0">
-                              <button onClick={() => removeFromCart(item.id)} className="w-5 lg:w-8 h-full bg-white hover:text-red-500 font-bold text-xs lg:text-sm">-</button>
-                              <input type="number" value={item.quantity} onChange={(e) => handleSetQuantity(item, e.target.value)} className="w-full text-center font-black text-xs lg:text-sm text-brand-brown bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} />
-                              <button onClick={() => addToCart(item)} className="w-5 lg:w-8 h-full bg-white hover:text-brand-green font-bold text-xs lg:text-sm">+</button>
-                            </div>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  )}
-                </div>
-                
-                <div className="p-3 lg:p-4 border-t border-brand-brown/10 bg-white flex-shrink-0 space-y-2 lg:space-y-3">
-                  <div className="flex justify-between items-end">
-                    <span className="text-xs lg:text-sm font-bold text-brand-brown uppercase tracking-widest font-calistoga">Total</span>
-                    <span className="text-xl lg:text-3xl font-black text-brand-green tracking-tighter">${totalOrder.toFixed(2)}</span>
-                  </div>
-                  <label className="flex items-center justify-between bg-emerald-50/50 px-2.5 py-1.5 lg:p-3 rounded-lg border border-emerald-100 cursor-pointer hover:bg-emerald-50 transition-colors">
-                    <div className="flex items-center gap-1.5">
-                      <svg className="w-3.5 h-3.5 lg:w-5 lg:h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>
-                      <span className="text-[9px] lg:text-[10px] font-bold text-emerald-800">WhatsApp</span>
-                    </div>
-                    <input type="checkbox" checked={sendWhatsApp} onChange={() => { const newVal = !sendWhatsApp; setSendWhatsApp(newVal); localStorage.setItem('sendWhatsApp', newVal); }} className="w-3 h-3 lg:w-4 lg:h-4 accent-emerald-600 rounded cursor-pointer" />
-                  </label>
-                  <button onClick={handleCheckout} disabled={isSubmitting || cart.length === 0 || !activeClient} className={`w-full text-white py-2.5 lg:py-4 rounded-xl font-black text-xs lg:text-sm transition-all shadow-md uppercase tracking-wide flex justify-center items-center gap-2 ${isSubmitting || cart.length === 0 || !activeClient ? 'bg-gray-300 cursor-not-allowed' : 'bg-brand-green hover:bg-brand-green-dark active:scale-[0.98]'}`}>
-                    {isSubmitting ? '...' : cart.length === 0 ? 'Carrito Vacío' : 'Cobrar Orden'}
-                  </button>
-                </div>
-              </div>
-            )}
-      </div>
-
+      <CartSidebar 
+        cart={cart}
+        isCartOpen={isCartOpen}
+        setIsCartOpen={setIsCartOpen}
+        isStoreView={isStoreView}
+        totalItems={totalItems}
+        totalOrder={totalOrder}
+        sendWhatsApp={sendWhatsApp}
+        setSendWhatsApp={setSendWhatsApp}
+        isSubmitting={isSubmitting}
+        activeClient={activeClient}
+        removeFromCart={removeFromCart}
+        handleSetQuantity={handleSetQuantity}
+        addToCart={addToCart}
+        clearCart={clearCart}
+        formatProduct={formatProduct}
+        handleCheckout={handleCheckout}
+      />
+      
       <ExpenseModal expenseModal={expenseModal} setExpenseModal={setExpenseModal} handleAddExpense={handleAddExpense} />
       <AppAlertModal appAlert={appAlert} onClose={() => setAppAlert({ ...appAlert, isOpen: false })} />
 
@@ -1539,6 +1430,7 @@ function App() {
       </div>
     </div>
   </div> 
+</div> 
 );
 }
 
