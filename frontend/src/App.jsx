@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { db } from './db' 
 
+const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
+
 import AppAlertModal from './components/modals/AppAlertModal';
 import ExpenseModal from './components/modals/ExpenseModal';
 import ShiftReportModal from './components/modals/ShiftReportModal';
@@ -10,8 +12,9 @@ import TransferModal from './components/modals/TransferModal';
 import RestockModal from './components/modals/RestockModal';
 import POSHeader from './components/pos/POSHeader';
 import CartSidebar from './components/pos/CartSidebar';
+import ClientDirectory from './components/pos/ClientDirectory';
+import CategoryModal from './components/pos/CategoryModal';
 
-const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
 
 const ENDPOINTS = {
   products: `${API_URL}/products`,
@@ -1111,62 +1114,17 @@ function App() {
                         </div>
 
                       ) : !activeClient ? (
-                        <div className="animate-in fade-in duration-300">
-                          <div className="mb-6 max-lg:landscape:mb-3 flex flex-col sm:flex-row max-lg:landscape:flex-row sm:items-center justify-between gap-4 max-lg:landscape:gap-2">
-                            <div className="flex items-center gap-3">
-                              <h2 className="text-2xl max-lg:landscape:text-lg font-calistoga text-brand-brown">Directorio</h2>
-                              <span className="bg-brand-brown/10 text-brand-brown px-3 py-1 max-lg:landscape:px-2 max-lg:landscape:py-0.5 rounded-full text-xs max-lg:landscape:text-[10px] font-bold uppercase tracking-wider">{clients.length} tiendas</span>
-                            </div>
-                            <button onClick={() => setIsAddingClient(true)} className="bg-white border-2 border-brand-green text-brand-green font-bold px-5 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-1.5 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green hover:text-white transition-all shadow-sm flex items-center justify-center gap-2 max-lg:landscape:text-xs">
-                              <svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                              Nuevo Cliente
-                            </button>
-                          </div>
-                          
-                          <div className="space-y-4 max-lg:landscape:space-y-0 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-3">
-                            {locationNames.map(locationName => {
-                              const localClients = groupedClients[locationName];
-                              const isExpanded = expandedLocations[locationName];
-                              return (
-                                <div key={locationName} className={`bg-white rounded-2xl max-lg:landscape:rounded-xl shadow-sm border border-brand-green/10 overflow-hidden transition-all ${isExpanded ? 'max-lg:landscape:col-span-2' : ''}`}>
-                                  <button onClick={() => toggleLocation(locationName)} className="w-full p-5 max-lg:landscape:p-3 flex justify-between items-center hover:bg-brand-bg transition-colors">
-                                    <div className="flex items-center gap-3 max-lg:landscape:gap-2">
-                                      <div className="w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full bg-brand-green/10 flex items-center justify-center text-brand-green"><svg className="w-5 h-5 max-lg:landscape:w-4 max-lg:landscape:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg></div>
-                                      <div className="text-left"><h3 className="text-xl max-lg:landscape:text-base font-bold text-brand-brown leading-tight">{locationName}</h3><p className="text-sm max-lg:landscape:text-[10px] text-gray-500 font-medium">{localClients.length} tiendas</p></div>
-                                    </div>
-                                    <svg className={`w-6 h-6 max-lg:landscape:w-5 max-lg:landscape:h-5 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
-                                  </button>
-                                  {isExpanded && (
-                                    <div className="border-t border-gray-100 bg-brand-bg/30 max-lg:landscape:grid max-lg:landscape:grid-cols-2 max-lg:landscape:gap-2 max-lg:landscape:p-2">
-                                      {localClients.map(client => (
-                                        <div key={client.id} className="p-4 max-lg:landscape:p-3 border-b max-lg:landscape:border border-gray-100 max-lg:landscape:rounded-xl max-lg:landscape:bg-white last:border-0 max-lg:landscape:last:border flex flex-col sm:flex-row sm:items-center max-lg:landscape:flex-col max-lg:landscape:items-stretch justify-between gap-4 max-lg:landscape:gap-3 hover:bg-white transition-colors shadow-sm max-lg:landscape:shadow-none">
-                                          <div>
-                                            <h4 className="text-lg max-lg:landscape:text-sm font-black text-brand-green leading-tight">{client.name}</h4>
-                                            <p className="text-sm max-lg:landscape:text-[10px] text-brand-brown font-medium mt-0.5 flex items-start gap-1.5"><svg className="w-4 h-4 max-lg:landscape:w-3 max-lg:landscape:h-3 text-brand-brown/50 mt-[2px] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>{client.address || "Sin referencia"}</p>
-                                            <div className="flex flex-col max-lg:landscape:flex-row max-lg:landscape:flex-wrap gap-2 mt-2 max-lg:landscape:mt-1.5">
-                                              {client.contact && <p className="text-xs max-lg:landscape:text-[9px] text-gray-500 flex items-center gap-1.5 font-medium"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>{client.contact}</p>}
-                                              {client.phone_number && (() => {
-                                                const cleanPhone = client.phone_number.replace(/\D/g, '');
-                                                const waLink = cleanPhone.length === 10 ? `https://wa.me/52${cleanPhone}` : `https://wa.me/${cleanPhone}`;
-                                                return (
-                                                  <div className="flex items-center gap-2">
-                                                    <a href={`tel:${cleanPhone}`} className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-brand-green hover:bg-brand-green hover:text-white transition-colors bg-brand-green/10 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>Llamar</a>
-                                                    <a href={waLink} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs max-lg:landscape:text-[9px] font-bold text-emerald-600 hover:bg-emerald-600 hover:text-white transition-colors bg-emerald-50 border border-emerald-100 px-2.5 py-1.5 max-lg:landscape:px-2 max-lg:landscape:py-1 rounded-lg max-lg:landscape:rounded-md shadow-sm"><svg className="w-3.5 h-3.5 max-lg:landscape:w-3 max-lg:landscape:h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51a12.8 12.8 0 00-.57-.01c-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" /></svg>WhatsApp</a>
-                                                  </div>
-                                                );
-                                              })()}
-                                            </div>
-                                          </div>
-                                          <button onClick={() => setActiveClient(client)} className="bg-brand-green text-white font-bold px-6 py-2.5 max-lg:landscape:px-3 max-lg:landscape:py-2 rounded-xl max-lg:landscape:rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 whitespace-nowrap shadow-sm max-lg:landscape:text-xs">Iniciar Venta</button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  )}
-                                </div>
-                              )
-                            })}
-                          </div>
-                        </div>
+
+                        <ClientDirectory 
+                        clients={clients}
+                        groupedClients={groupedClients}
+                        locationNames={locationNames}
+                        expandedLocations={expandedLocations}
+                        toggleLocation={toggleLocation}
+                        setActiveClient={setActiveClient}
+                        setIsAddingClient={setIsAddingClient}
+                      />
+
                       ) : (
                         <div className="animate-in fade-in zoom-in-95 duration-300">
                           
@@ -1306,59 +1264,19 @@ function App() {
         isSubmitting={isSubmitting} 
       />
 
-      {selectedCategory && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onClick={() => setSelectedCategory(null)}></div>
-          <div className="bg-brand-bg w-full max-w-5xl max-h-[95vh] rounded-2xl sm:rounded-3xl shadow-2xl relative flex flex-col overflow-hidden animate-in fade-in zoom-in duration-200">
-            
-            <div className="bg-white p-4 sm:p-6 max-lg:landscape:py-3 max-lg:landscape:px-6 border-b border-brand-brown/10 flex justify-between items-center shadow-sm z-10 flex-shrink-0">
-              <div><h2 className="text-2xl sm:text-3xl max-lg:landscape:text-2xl font-calistoga text-brand-brown leading-none">{selectedCategory}</h2><p className="text-brand-green font-bold text-xs sm:text-sm max-lg:landscape:text-xs tracking-widest uppercase mt-1">Selecciona por gramaje</p></div>
-              <button onClick={() => setSelectedCategory(null)} className="bg-brand-bg text-brand-brown hover:bg-red-100 hover:text-red-500 w-10 h-10 max-lg:landscape:w-8 max-lg:landscape:h-8 rounded-full flex items-center justify-center transition-colors flex-shrink-0"><svg className="w-6 h-6 max-lg:landscape:w-5 max-lg:landscape:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" /></svg></button>
-            </div>
-            
-            <div className="p-2 sm:p-6 max-lg:landscape:p-4 overflow-y-auto flex-1">
-              {Object.keys(groupedProducts[selectedCategory].reduce((acc, item) => { const w = item.weight_g || '0'; if (!acc[w]) acc[w] = []; acc[w].push(item); return acc; }, {})).sort((a,b) => Number(a) - Number(b)).map(weight => {
-                const subItems = groupedProducts[selectedCategory].filter(i => (i.weight_g || '0') == weight); const isExpanded = expandedWeights[weight];                return (
-                  <div key={weight} className="mb-4 max-lg:landscape:mb-3 bg-white rounded-xl shadow-sm border border-brand-brown/5 overflow-hidden">
-                    <button onClick={() => toggleWeight(weight)} className="w-full bg-brand-brown/5 p-4 max-lg:landscape:p-3 flex justify-between items-center hover:bg-brand-brown/10 transition-colors"><span className="font-bold text-brand-brown text-lg max-lg:landscape:text-base">Presentación {weight}g <span className="text-brand-green text-sm max-lg:landscape:text-xs ml-2">({subItems.length} sabores)</span></span><svg className={`w-5 h-5 text-brand-brown transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg></button>
-                    {isExpanded && (
-                      <div className="grid grid-cols-1 max-lg:landscape:grid-cols-2 gap-0 max-lg:landscape:gap-2 p-0 max-lg:landscape:p-2 bg-gray-50/50">
-                        {subItems.map(product => {
-                          const quantity = cart.find(item => item.id === product.id)?.quantity || 0; const { badge, catColor } = formatProduct(product);
-                          return (
-                            <div key={product.id} className="p-3 sm:p-4 max-lg:landscape:p-2 border-b max-lg:landscape:border border-gray-100 max-lg:landscape:rounded-xl max-lg:landscape:bg-white flex flex-row items-center gap-3 sm:gap-4 hover:bg-gray-50 transition-colors shadow-sm">
-                              <div className="w-16 h-16 sm:w-20 sm:h-20 max-lg:landscape:w-12 max-lg:landscape:h-12 rounded-lg relative flex-shrink-0 bg-brand-bg overflow-hidden flex items-center justify-center shadow-sm">
-                                {product.image_url ? <img src={product.image_url} alt={product.name} className="w-full h-full object-cover text-transparent" /> : <div className="w-full h-full flex items-center justify-center text-white" style={{ backgroundColor: catColor }}><span className="font-black text-2xl max-lg:landscape:text-lg opacity-70 tracking-tighter">{product.name.substring(0,2).toUpperCase()}</span></div>}
-                              </div>
-                              <div className="flex-1 flex flex-col justify-center min-w-0">
-                                <div className="flex items-center gap-2 mb-1 flex-wrap">{badge ? <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest px-2 py-0.5 max-lg:landscape:px-1.5 rounded shadow-sm whitespace-nowrap ${badge.colorClass}`}>{badge.text}</span> : <span className="text-xs font-bold text-brand-brown">ÚNICO</span>}</div>
-                                <span className="text-lg sm:text-xl max-lg:landscape:text-base font-black text-brand-green leading-none truncate">${product.price}</span>
-                              </div>
-                              <div className="w-[110px] sm:w-[130px] max-lg:landscape:w-[100px] flex-shrink-0">
-                                {quantity > 0 ? (
-                                  <div className="flex items-center justify-between bg-white rounded-xl overflow-hidden border border-brand-green/40 h-[40px] sm:h-[44px] max-lg:landscape:h-[36px] shadow-sm"><button onClick={() => removeFromCart(product.id)} className="w-8 sm:w-10 max-lg:landscape:w-8 h-full flex items-center justify-center text-brand-green hover:bg-brand-green hover:text-white transition-colors text-xl font-bold">-</button><input type="number" value={quantity} onChange={(e) => handleSetQuantity(product, e.target.value)} className="w-full text-center font-bold text-brand-brown text-base sm:text-lg max-lg:landscape:text-sm bg-transparent outline-none appearance-none m-0" style={{ WebkitAppearance: 'none', MozAppearance: 'textfield' }} /><button onClick={() => addToCart(product)} className="w-8 sm:w-10 max-lg:landscape:w-8 h-full flex items-center justify-center text-brand-green hover:bg-brand-green hover:text-white transition-colors text-xl font-bold">+</button></div>
-                                ) : (
-                                  <button onClick={() => addToCart(product)} className="w-full h-[40px] sm:h-[44px] max-lg:landscape:h-[36px] bg-white border-2 border-brand-green text-brand-green font-bold rounded-xl hover:bg-brand-green hover:text-white active:scale-[0.98] transition-all text-xs sm:text-sm uppercase tracking-wider shadow-sm">Agregar</button>
-                                )}
-                              </div>
-                            </div>
-                          )
-                        })}
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-            
-            <div className="bg-white border-t border-brand-brown/10 p-3 sm:p-4 max-lg:landscape:py-2 flex justify-center flex-shrink-0 z-10 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-              <button onClick={() => setSelectedCategory(null)} className="w-full sm:w-auto bg-brand-brown text-white font-bold py-3 px-8 max-lg:landscape:py-2 rounded-xl hover:bg-brand-brown/90 transition-colors uppercase tracking-wider text-sm max-lg:landscape:text-xs shadow-md active:scale-95">Volver a Categorías</button>
-            </div>
-            
-          </div>
-        </div>
-      )}
-
+      <CategoryModal 
+        selectedCategory={selectedCategory}
+        setSelectedCategory={setSelectedCategory}
+        groupedProducts={groupedProducts}
+        expandedWeights={expandedWeights}
+        toggleWeight={toggleWeight}
+        cart={cart}
+        addToCart={addToCart}
+        removeFromCart={removeFromCart}
+        handleSetQuantity={handleSetQuantity}
+        formatProduct={formatProduct}
+      />
+      
       {cart.length > 0 && (
         <button onClick={() => setIsCartOpen(true)} className={`fixed bottom-8 right-8 z-40 bg-brand-green hover:bg-brand-green-dark text-white p-4 rounded-full shadow-[0_10px_25px_rgba(91,138,60,0.4)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3 ${isStoreView ? 'max-lg:landscape:hidden' : ''}`}>
           <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
