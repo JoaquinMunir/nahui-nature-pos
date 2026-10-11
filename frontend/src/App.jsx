@@ -31,7 +31,6 @@ function App() {
   const [appAlert, setAppAlert] = useState({ isOpen: false, title: '', message: '', type: 'error' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
-  const [saleMode, setSaleMode] = useState(() => (localStorage.getItem('isOnRoad') === 'true' ? 'mobile' : 'central'));
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedWeights, setExpandedWeights] = useState({});
   const [expandedLocations, setExpandedLocations] = useState({});
@@ -47,19 +46,19 @@ function App() {
     handleAddCentralStock, handleTransferToMobile,
   } = useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting });
 
-  // 3. Carrito
+  // 3. Sesión de ruta (define el modo de venta que usa el carrito)
+  const {
+    showShiftReport, setShowShiftReport, shiftStats, isOnRoad, expenses,
+    expenseModal, setExpenseModal, handleStartRoute, handleAddExpense,
+    handleEndRoute, confirmEndRoute, saleMode, setSaleMode,
+  } = useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setShowOrders, setShowRouteLoadModal });
+
+  // 4. Carrito
   const {
     cart, isCartOpen, setIsCartOpen, addToCart, removeFromCart,
     handleSetQuantity, clearCart, totalOrder, totalItems,
   } = useCart({ saleMode, mobileInventory, centralInventory, setAppAlert });
-
-  // 4. Sesión de ruta
-  const {
-    showShiftReport, setShowShiftReport, shiftStats, isOnRoad, expenses,
-    expenseModal, setExpenseModal, handleStartRoute, handleAddExpense,
-    handleEndRoute, confirmEndRoute,
-  } = useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setShowOrders, setShowRouteLoadModal, setSaleMode });
-
+  
   // 5. Datos maestros, sincronización y cobro
   const {
     products, clients, setClients, routes, setRoutes, loading, error,

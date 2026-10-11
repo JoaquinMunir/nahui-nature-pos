@@ -2,10 +2,11 @@ import { useState } from 'react';
 import axios from 'axios';
 import { db } from '../db';
 
-export function useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setShowOrders, setShowRouteLoadModal, setSaleMode }) {
+export function useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setShowOrders, setShowRouteLoadModal }) {
   const [showShiftReport, setShowShiftReport] = useState(false);
   const [shiftStats, setShiftStats] = useState({ totalSales: 0, totalExpenses: 0, orderCount: 0, netCash: 0 });
   const [isOnRoad, setIsOnRoad] = useState(() => localStorage.getItem('isOnRoad') === 'true');
+  const [saleMode, setSaleMode] = useState(() => (localStorage.getItem('isOnRoad') === 'true' ? 'mobile' : 'central'));
   const [shiftStartTime, setShiftStartTime] = useState(() => localStorage.getItem('shiftStartTime') || null);
   const [expenses, setExpenses] = useState(() => JSON.parse(localStorage.getItem('routeExpenses')) || []);
   const [expenseModal, setExpenseModal] = useState({ isOpen: false, concept: '', amount: '' });
@@ -98,6 +99,7 @@ export function useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setS
     showShiftReport, setShowShiftReport,
     shiftStats, setShiftStats,
     isOnRoad, setIsOnRoad,
+    saleMode, setSaleMode,
     shiftStartTime, setShiftStartTime,
     expenses, setExpenses,
     expenseModal, setExpenseModal,
