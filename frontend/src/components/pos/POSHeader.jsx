@@ -1,6 +1,5 @@
 export default function POSHeader({
   routeActions,
-  isStoreView,
   showOrders,
   setShowOrders,
   showInventory,

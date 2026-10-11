@@ -58,7 +58,7 @@ function App() {
     cart, isCartOpen, setIsCartOpen, addToCart, removeFromCart,
     handleSetQuantity, clearCart, totalOrder, totalItems,
   } = useCart({ saleMode, mobileInventory, centralInventory, setAppAlert });
-  
+
   // 5. Datos maestros, sincronización y cobro
   const {
     products, clients, setClients, routes, setRoutes, loading, error,
@@ -104,7 +104,7 @@ function App() {
             onEndRoute={handleEndRoute}
             onOpenExpense={() => setExpenseModal({ isOpen: true, concept: '', amount: '' })}
           />
-        }        isStoreView={isStoreView}
+        }       
         showOrders={showOrders}
         setShowOrders={setShowOrders}
         showInventory={showInventory}

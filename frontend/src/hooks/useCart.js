@@ -9,13 +9,9 @@ export function useCart({ saleMode, mobileInventory, centralInventory, setAppAle
     const requestedQty = existing ? existing.quantity + 1 : 1;
     
     // Verificación dinámica de stock según el modo de venta
-    let availableStock = 0;
-    if (saleMode === 'mobile') {
-      availableStock = mobileInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
-    } else {
-      availableStock = centralInventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
-    }
-
+    const inventory = saleMode === 'mobile' ? mobileInventory : centralInventory;
+    const availableStock = inventory.find(i => String(i.product_id) === String(product.id))?.stock_quantity || 0;
+    
     if (requestedQty > availableStock) {
       setAppAlert({
         isOpen: true,

@@ -47,7 +47,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
       } catch (saveError) {
         console.error("Dexie bloqueó el guardado:", saveError);
       }
-    } catch (error) {
+    } catch {
       console.warn("Sin conexión: Cargando inventarios desde la memoria del dispositivo...");
       try {
         const localCentral = await db.central_inventory.toArray();
@@ -117,7 +117,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const itemsToUpdate = Object.entries(restockCart).filter(([id, qty]) => qty > 0);
+      const itemsToUpdate = Object.entries(restockCart).filter(([, qty]) => qty > 0);
       if (itemsToUpdate.length === 0) {
         setAppAlert({ isOpen: true, title: 'Atención', message: 'Agrega al menos una cantidad para reabastecer.', type: 'warning' });
         setIsSubmitting(false);
@@ -131,7 +131,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
       setRestockCart({});
       fetchInventories(); 
       setAppAlert({ isOpen: true, title: 'Éxito', message: '¡Reabastecimiento exitoso! La Bodega Central ha sido actualizada.', type: 'success' });
-    } catch (error) {
+    } catch {
       setAppAlert({ isOpen: true, title: 'Error', message: 'Error al conectar con la base de datos para el reabastecimiento.', type: 'error' });
     } finally {
       setIsSubmitting(false);
@@ -143,7 +143,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      const itemsToTransfer = Object.entries(routeLoadCart).filter(([id, qty]) => qty > 0);
+      const itemsToTransfer = Object.entries(routeLoadCart).filter(([, qty]) => qty > 0);
       if (itemsToTransfer.length === 0) {
         setShowRouteLoadModal(false); 
         return;
@@ -168,7 +168,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
       setShowRouteLoadModal(false);
       setRouteLoadCart({});
       setAppAlert({ isOpen: true, title: '¡Camioneta Lista!', message: 'Mercancía cargada a la unidad exitosamente. ¡Buen viaje!', type: 'success' });
-    } catch (error) {
+    } catch {
       setAppAlert({ isOpen: true, title: 'Error', message: 'Hubo un problema al cargar la camioneta.', type: 'error' });
     } finally {
       setIsSubmitting(false);
