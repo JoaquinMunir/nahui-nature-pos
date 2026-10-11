@@ -1,8 +1,4 @@
-import { useState, useEffect } from 'react'
-import axios from 'axios'
-import { db } from './db' 
-
-const API_URL = import.meta.env.VITE_API_URL || "https://nahui-nature-api.onrender.com";
+import { useState } from 'react';
 
 import { ENDPOINTS, CATEGORY_COVERS, formatProduct, SUPPLIERS } from './utils/constants';
 
@@ -24,51 +20,57 @@ import StoreGrid from './components/pos/StoreGrid';
 
 import { usePOSData } from './hooks/usePOSData';
 import { useCart } from './hooks/useCart';
-import { useInventory } from './hooks/useInventory';   
+import { useInventory } from './hooks/useInventory';
 import { useRouteSession } from './hooks/useRouteSession';
 import { useClients } from './hooks/useClients';
 
 function App() {
-  // 1. ESTADOS BASE (No dependen de ningún hook)
+  // 1. Estado de UI local
   const [appAlert, setAppAlert] = useState({ isOpen: false, title: '', message: '', type: 'error' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
-  const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [searchOrder, setSearchOrder] = useState('');
   const [filterDate, setFilterDate] = useState('');
-  const [saleMode, setSaleMode] = useState(() => localStorage.getItem('isOnRoad') === 'true' ? 'mobile' : 'central');
+  const [saleMode, setSaleMode] = useState(() => (localStorage.getItem('isOnRoad') === 'true' ? 'mobile' : 'central'));
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedWeights, setExpandedWeights] = useState({});
   const [expandedLocations, setExpandedLocations] = useState({});
 
-  // 2. HOOK DE INVENTARIO
+  // 2. Inventario central y móvil
   const {
-    searchInv, setSearchInv, showInventory, setShowInventory, centralInventory, setCentralInventory, mobileInventory, setMobileInventory,
-    showRouteLoadModal, setShowRouteLoadModal, routeLoadCart, setRouteLoadCart, stockInputs, setStockInputs, transferModal, setTransferModal,
-    expandedInvCategories, toggleInvCategory, showRestockModal, setShowRestockModal, restockCart, setRestockCart, fetchInventories, handleBulkRestock, handleBulkRouteLoad
+    searchInv, setSearchInv, showInventory, setShowInventory,
+    centralInventory, setCentralInventory, mobileInventory, setMobileInventory,
+    showRouteLoadModal, setShowRouteLoadModal, routeLoadCart, setRouteLoadCart,
+    stockInputs, setStockInputs, transferModal, setTransferModal,
+    showRestockModal, setShowRestockModal, restockCart, setRestockCart,
+    fetchInventories, handleBulkRestock, handleBulkRouteLoad,
   } = useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting });
 
-  // 3. HOOK DE CARRITO
+  // 3. Carrito
   const {
-    cart, setCart, isCartOpen, setIsCartOpen, addToCart, removeFromCart, handleSetQuantity, clearCart, totalOrder, totalItems
+    cart, isCartOpen, setIsCartOpen, addToCart, removeFromCart,
+    handleSetQuantity, clearCart, totalOrder, totalItems,
   } = useCart({ saleMode, mobileInventory, centralInventory, setAppAlert });
 
-  // 4. HOOK DE SESIÓN DE RUTA
+  // 4. Sesión de ruta
   const {
-    showShiftReport, setShowShiftReport, shiftStats, setShiftStats, isOnRoad, setIsOnRoad, shiftStartTime, setShiftStartTime,
-    expenses, setExpenses, expenseModal, setExpenseModal, handleStartRoute, handleAddExpense, handleEndRoute, confirmEndRoute
+    showShiftReport, setShowShiftReport, shiftStats, isOnRoad, expenses,
+    expenseModal, setExpenseModal, handleStartRoute, handleAddExpense,
+    handleEndRoute, confirmEndRoute,
   } = useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setShowOrders, setShowRouteLoadModal, setSaleMode });
 
-  // 5. NUEVO: HOOK MAESTRO DE DATOS Y PAGOS
+  // 5. Datos maestros, sincronización y cobro
   const {
-    products, setProducts, clients, setClients, routes, setRoutes, loading, error, isOfflineMode, ordersHistory, setOrdersHistory,
-    activeClient, setActiveClient, sendWhatsApp, setSendWhatsApp, handleCheckout
+    products, clients, setClients, routes, setRoutes, loading, error,
+    isOfflineMode, ordersHistory, activeClient, setActiveClient,
+    sendWhatsApp, setSendWhatsApp, handleCheckout,
   } = usePOSData({ ENDPOINTS, setAppAlert, fetchInventories, saleMode, setMobileInventory, setCentralInventory, isOnRoad, clearCart, setIsSubmitting });
 
-  // 6. HOOK DE FORMULARIOS CLIENTES
+  // 6. Alta de clientes
   const {
-    isAddingClient, setIsAddingClient, isLocating, setIsLocating, clientForm, setClientForm, captureLocation, handleCreateClient
+    isAddingClient, setIsAddingClient, isLocating, clientForm,
+    setClientForm, captureLocation, handleCreateClient,
   } = useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting });
 
   // 7. VARIABLES DERIVADAS
@@ -181,7 +183,6 @@ function App() {
                 setFilterDate={setFilterDate}
                 filteredOrders={filteredOrders} 
                 totalFilteredRevenue={totalFilteredRevenue} 
-                isLoadingOrders={isLoadingOrders}
                 expandedOrderId={expandedOrderId} 
                 setExpandedOrderId={setExpandedOrderId}
               />

@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function SalesHistoryPanel({
   searchOrder, setSearchOrder, filterDate, setFilterDate, 
-  filteredOrders, totalFilteredRevenue, isLoadingOrders, 
+  filteredOrders, totalFilteredRevenue, 
   expandedOrderId, setExpandedOrderId
 }) {
   return (
@@ -30,9 +30,7 @@ export default function SalesHistoryPanel({
         </div>
       </div>
 
-      {isLoadingOrders ? (
-        <p className="text-brand-green font-bold text-lg animate-pulse">Consultando base de datos...</p>
-      ) : filteredOrders.length === 0 ? (
+    {filteredOrders.length === 0 ? (
         <div className="bg-white p-8 rounded-2xl border border-brand-brown/10 text-center shadow-sm">
           <p className="text-gray-500 font-bold">No se encontraron ventas con estos filtros.</p>
         </div>
