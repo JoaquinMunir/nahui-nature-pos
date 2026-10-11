@@ -12,11 +12,8 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
   const [routeLoadCart, setRouteLoadCart] = useState({});
   const [stockInputs, setStockInputs] = useState({});
   const [transferModal, setTransferModal] = useState({ isOpen: false, product: null, stockCasa: 0, qty: '' });
-  const [expandedInvCategories, setExpandedInvCategories] = useState({});
   const [showRestockModal, setShowRestockModal] = useState(false);
   const [restockCart, setRestockCart] = useState({}); 
-
-  const toggleInvCategory = (cat) => setExpandedInvCategories(prev => ({ ...prev, [cat]: !prev[cat] }));
 
   // Descarga y sincronización local
   const fetchInventories = useCallback(async () => {
@@ -140,7 +137,6 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     routeLoadCart, setRouteLoadCart,
     stockInputs, setStockInputs,
     transferModal, setTransferModal,
-    expandedInvCategories, toggleInvCategory,
     showRestockModal, setShowRestockModal,
     restockCart, setRestockCart,
     fetchInventories,

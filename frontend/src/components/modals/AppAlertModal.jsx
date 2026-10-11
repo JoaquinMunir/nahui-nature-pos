@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function AppAlertModal({ appAlert, onClose }) {
   if (!appAlert.isOpen) return null;
 

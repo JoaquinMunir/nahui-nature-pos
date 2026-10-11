@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function StoreGrid({
   activeClient, setActiveClient, saleMode, setSaleMode, clearCart, cart, 
   categoryNames, groupedProducts, formatProduct, CATEGORY_COVERS, openCategoryModal

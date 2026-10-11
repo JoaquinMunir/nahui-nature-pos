@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function AddClientForm({
   setIsAddingClient, handleCreateClient, clientForm, setClientForm, 
   isSubmitting, captureLocation, isLocating, routes

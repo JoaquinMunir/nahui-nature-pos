@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function CartSidebar({
   cart, isCartOpen, setIsCartOpen, isStoreView, totalItems, totalOrder,
   sendWhatsApp, setSendWhatsApp, isSubmitting, activeClient,

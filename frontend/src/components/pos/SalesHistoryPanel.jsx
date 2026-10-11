@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function SalesHistoryPanel({
   searchOrder, setSearchOrder, filterDate, setFilterDate, 
   filteredOrders, totalFilteredRevenue, 

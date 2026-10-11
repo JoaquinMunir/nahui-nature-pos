@@ -1,5 +1,3 @@
-import React from 'react';
-
 export default function ExpenseModal({ expenseModal, setExpenseModal, handleAddExpense }) {
   if (!expenseModal.isOpen) return null;
 
