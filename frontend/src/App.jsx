@@ -24,15 +24,13 @@ import { useCart } from './hooks/useCart';
 import { useInventory } from './hooks/useInventory';
 import { useRouteSession } from './hooks/useRouteSession';
 import { useClients } from './hooks/useClients';
+import { useSalesHistory } from './hooks/useSalesHistory';
 
 function App() {
   // 1. Estado de UI local
   const [appAlert, setAppAlert] = useState({ isOpen: false, title: '', message: '', type: 'error' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showOrders, setShowOrders] = useState(false);
-  const [expandedOrderId, setExpandedOrderId] = useState(null);
-  const [searchOrder, setSearchOrder] = useState('');
-  const [filterDate, setFilterDate] = useState('');
   const [saleMode, setSaleMode] = useState(() => (localStorage.getItem('isOnRoad') === 'true' ? 'mobile' : 'central'));
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedWeights, setExpandedWeights] = useState({});
@@ -66,6 +64,7 @@ function App() {
     products, clients, setClients, routes, setRoutes, loading, error,
     isOfflineMode, ordersHistory, activeClient, setActiveClient,
     sendWhatsApp, setSendWhatsApp, handleCheckout,
+    groupedProducts, categoryNames, groupedClients, locationNames
   } = usePOSData({ ENDPOINTS, setAppAlert, fetchInventories, saleMode, setMobileInventory, setCentralInventory, isOnRoad, clearCart, setIsSubmitting });
 
   // 6. Alta de clientes
@@ -74,27 +73,14 @@ function App() {
     setClientForm, captureLocation, handleCreateClient,
   } = useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting });
 
-  // 7. VARIABLES DERIVADAS
-  const filteredOrders = ordersHistory.filter(order => {
-    const term = searchOrder.toLowerCase();
-    const matchSearch = (order.client_name || '').toLowerCase().includes(term) || (order.client_location || '').toLowerCase().includes(term) || (order.client_address || '').toLowerCase().includes(term);
-    let matchDate = true;
-    if (filterDate) {
-      const orderDate = new Date(order.created_at);
-      const localDateStr = `${orderDate.getFullYear()}-${String(orderDate.getMonth() + 1).padStart(2, '0')}-${String(orderDate.getDate()).padStart(2, '0')}`;
-      matchDate = localDateStr === filterDate;
-    }
-    return matchSearch && matchDate;
-  });
-    
-  const totalFilteredRevenue = filteredOrders.reduce((sum, order) => sum + Number(order.total_amount), 0);
+  // 7. Historial de ventas
+  const {
+    searchOrder, setSearchOrder, filterDate, setFilterDate,
+    expandedOrderId, setExpandedOrderId, filteredOrders, totalFilteredRevenue,
+  } = useSalesHistory(ordersHistory);
+
+  // 8. Estado de la vista
   const isStoreView = !showInventory && !showOrders && activeClient;
-
-  const groupedProducts = products.reduce((acc, product) => { if (!acc[product.category]) acc[product.category] = []; acc[product.category].push(product); return acc; }, {});
-  const categoryNames = Object.keys(groupedProducts).sort();
-
-  const groupedClients = clients.reduce((acc, client) => { if (!acc[client.location]) acc[client.location] = []; acc[client.location].push(client); return acc; }, {});
-  const locationNames = Object.keys(groupedClients).sort();
 
   const openCategoryModal = (categoryName) => {
     const initialWeightsState = {};

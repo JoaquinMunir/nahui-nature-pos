@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { db } from '../db';
 import { formatProduct } from '../utils/constants';
+import { groupBy } from '../utils/groupBy';
 
 export function usePOSData({ 
   ENDPOINTS, setAppAlert, fetchInventories, saleMode, 
@@ -17,6 +18,10 @@ export function usePOSData({
   const [ordersHistory, setOrdersHistory] = useState([]);
   const [activeClient, setActiveClient] = useState(null);
   const [sendWhatsApp, setSendWhatsApp] = useState(() => localStorage.getItem('sendWhatsApp') !== 'false');
+  const groupedProducts = useMemo(() => groupBy(products, (product) => product.category), [products]);
+  const categoryNames = useMemo(() => Object.keys(groupedProducts).sort(), [groupedProducts]);
+  const groupedClients = useMemo(() => groupBy(clients, (client) => client.location), [clients]);
+  const locationNames = useMemo(() => Object.keys(groupedClients).sort(), [groupedClients]);
 
   // Controladores de estado de red
   useEffect(() => {
@@ -211,7 +216,8 @@ export function usePOSData({
   return {
     products, setProducts, clients, setClients, routes, setRoutes,
     loading, error, isOfflineMode, ordersHistory, setOrdersHistory,
-    activeClient, setActiveClient, sendWhatsApp, setSendWhatsApp,
+    activeClient, setActiveClient, sendWhatsApp, setSendWhatsApp, 
+    groupedProducts, categoryNames, groupedClients, locationNames,
     handleCheckout
   };
 }
