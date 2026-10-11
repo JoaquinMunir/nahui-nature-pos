@@ -1,9 +1,7 @@
-import axios from 'axios';
-
 export default function InventoryPanel({
   setShowRestockModal, searchInv, setSearchInv, products, formatProduct,
   centralInventory, mobileInventory, stockInputs, setStockInputs,
-  ENDPOINTS, setCentralInventory, setAppAlert, setTransferModal
+  setAppAlert, setTransferModal, onAddCentralStock
 }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -99,21 +97,7 @@ export default function InventoryPanel({
                     />
                     <button 
                       title="Ingresar mercancía al Centro"
-                      onClick={async () => {
-                        if(!inputValue || isNaN(inputValue) || Number(inputValue) <= 0) return;
-                        try {
-                          const res = await axios.post(`${ENDPOINTS.inventory}/add`, { product_id: product.id, quantity: Number(inputValue) });
-                          if (res.data.status === 'success') {
-                            setCentralInventory(prev => {
-                              const exists = prev.find(i => String(i.product_id) === String(product.id));
-                              if (exists) return prev.map(i => String(i.product_id) === String(product.id) ? { ...i, stock_quantity: res.data.new_stock } : i);
-                              return [...prev, { product_id: product.id, stock_quantity: res.data.new_stock }];
-                            });
-                            setStockInputs(prev => ({...prev, [product.id]: ''}));
-                            setAppAlert({ isOpen: true, title: 'Actualizado', message: 'Ingresado a central.', type: 'success' });
-                          }
-                        } catch (error) { setAppAlert({ isOpen: true, title: 'Error', message: 'No se pudo ingresar.', type: 'error' }); }
-                      }}
+                      onClick={() => onAddCentralStock(product.id)}
                       className="bg-brand-green text-white font-bold px-3 py-2 rounded-lg hover:bg-brand-green-dark transition-all active:scale-95 shadow-sm flex items-center gap-1.5"
                     >
                       <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" /></svg>

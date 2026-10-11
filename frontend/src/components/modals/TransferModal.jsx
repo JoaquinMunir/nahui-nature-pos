@@ -1,13 +1,8 @@
-import axios from 'axios';
-
 export default function TransferModal({
   transferModal,
   setTransferModal,
   formatProduct,
-  setCentralInventory,
-  setMobileInventory,
-  setAppAlert,
-  ENDPOINTS
+  onSubmit
 }) {
   if (!transferModal.isOpen || !transferModal.product) return null;
 
@@ -25,35 +20,7 @@ export default function TransferModal({
         </div>
         
         <form 
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const qty = parseInt(transferModal.qty, 10);
-            if (isNaN(qty) || qty <= 0) return alert("Ingresa un número válido.");
-            if (qty > transferModal.stockCasa) return alert(`❌ No puedes traspasar ${qty}. Solo hay ${transferModal.stockCasa}.`);
-            
-            try {
-              const res = await axios.post(ENDPOINTS.transfer, {
-                product_id: transferModal.product.id,
-                quantity: qty,
-                route_name: "Ruta 1"
-              });
-              
-              if (res.data.status === 'success') {
-                setCentralInventory(prev => prev.map(i => 
-                  String(i.product_id) === String(transferModal.product.id) 
-                  ? { ...i, stock_quantity: res.data.new_central_stock } : i
-                ));
-                setMobileInventory(prev => {
-                  const exists = prev.find(i => String(i.product_id) === String(transferModal.product.id));
-                  if (exists) return prev.map(i => String(i.product_id) === String(transferModal.product.id) ? { ...i, stock_quantity: res.data.new_mobile_stock } : i);
-                  return [...prev, { product_id: transferModal.product.id, stock_quantity: res.data.new_mobile_stock }];
-                });
-                setTransferModal({ isOpen: false, product: null, stockCasa: 0, qty: '' });
-              }
-            } catch (error) {
-              setAppAlert({ isOpen: true, title: 'Error', message: 'Error de conexión al intentar el traspaso.', type: 'error' });
-            }
-          }} 
+          onSubmit={onSubmit}
           className="p-6"
         >
           <div className="mb-6 text-center">

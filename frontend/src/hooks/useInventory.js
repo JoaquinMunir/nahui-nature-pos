@@ -65,6 +65,53 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     fetchInventories(); 
   }, [fetchInventories]);
 
+    // Ingreso individual de mercancía a Bodega Central
+  const handleAddCentralStock = async (productId) => {
+    const quantity = Number(stockInputs[productId]);
+    if (!quantity || quantity <= 0) return;
+
+    try {
+      const res = await axios.post(`${ENDPOINTS.inventory}/add`, { product_id: productId, quantity });
+      if (res.data.status === 'success') {
+        setCentralInventory(prev => {
+          const exists = prev.find(i => String(i.product_id) === String(productId));
+          if (exists) return prev.map(i => String(i.product_id) === String(productId) ? { ...i, stock_quantity: res.data.new_stock } : i);
+          return [...prev, { product_id: productId, stock_quantity: res.data.new_stock }];
+        });
+        setStockInputs(prev => ({ ...prev, [productId]: '' }));
+        setAppAlert({ isOpen: true, title: 'Actualizado', message: 'Ingresado a central.', type: 'success' });
+      }
+    } catch {
+      setAppAlert({ isOpen: true, title: 'Error', message: 'No se pudo ingresar.', type: 'error' });
+    }
+  };
+
+  // Traspaso individual de Bodega Central a la unidad móvil
+  const handleTransferToMobile = async (e) => {
+    e.preventDefault();
+    const qty = parseInt(transferModal.qty, 10);
+    if (isNaN(qty) || qty <= 0) return alert('Ingresa un número válido.');
+    if (qty > transferModal.stockCasa) return alert(`❌ No puedes traspasar ${qty}. Solo hay ${transferModal.stockCasa}.`);
+
+    const productId = transferModal.product.id;
+    try {
+      const res = await axios.post(ENDPOINTS.transfer, { product_id: productId, quantity: qty, route_name: 'Ruta 1' });
+      if (res.data.status === 'success') {
+        setCentralInventory(prev => prev.map(i =>
+          String(i.product_id) === String(productId) ? { ...i, stock_quantity: res.data.new_central_stock } : i
+        ));
+        setMobileInventory(prev => {
+          const exists = prev.find(i => String(i.product_id) === String(productId));
+          if (exists) return prev.map(i => String(i.product_id) === String(productId) ? { ...i, stock_quantity: res.data.new_mobile_stock } : i);
+          return [...prev, { product_id: productId, stock_quantity: res.data.new_mobile_stock }];
+        });
+        setTransferModal({ isOpen: false, product: null, stockCasa: 0, qty: '' });
+      }
+    } catch {
+      setAppAlert({ isOpen: true, title: 'Error', message: 'Error de conexión al intentar el traspaso.', type: 'error' });
+    }
+  };
+
   // Lógica de Reabastecimiento Central
   const handleBulkRestock = async (e) => {
     e.preventDefault();
@@ -141,6 +188,8 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     restockCart, setRestockCart,
     fetchInventories,
     handleBulkRestock,
-    handleBulkRouteLoad
+    handleBulkRouteLoad,
+    handleAddCentralStock,
+    handleTransferToMobile
   };
 }

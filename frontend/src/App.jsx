@@ -44,6 +44,7 @@ function App() {
     stockInputs, setStockInputs, transferModal, setTransferModal,
     showRestockModal, setShowRestockModal, restockCart, setRestockCart,
     fetchInventories, handleBulkRestock, handleBulkRouteLoad,
+    handleAddCentralStock, handleTransferToMobile,
   } = useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting });
 
   // 3. Carrito
@@ -130,8 +131,7 @@ function App() {
                 mobileInventory={mobileInventory}
                 stockInputs={stockInputs}
                 setStockInputs={setStockInputs}
-                ENDPOINTS={ENDPOINTS}
-                setCentralInventory={setCentralInventory}
+                onAddCentralStock={handleAddCentralStock}
                 setAppAlert={setAppAlert}
                 setTransferModal={setTransferModal}
               />
@@ -256,14 +256,11 @@ function App() {
         isSubmitting={isSubmitting} 
       />
 
-      <TransferModal 
-        transferModal={transferModal} 
-        setTransferModal={setTransferModal} 
-        formatProduct={formatProduct} 
-        setCentralInventory={setCentralInventory} 
-        setMobileInventory={setMobileInventory} 
-        setAppAlert={setAppAlert} 
-        ENDPOINTS={ENDPOINTS} 
+      <TransferModal
+        transferModal={transferModal}
+        setTransferModal={setTransferModal}
+        formatProduct={formatProduct}
+        onSubmit={handleTransferToMobile}
       />
 
       <RestockModal 
