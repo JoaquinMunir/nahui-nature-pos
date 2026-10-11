@@ -1,5 +1,5 @@
 export default function POSHeader({
-  renderRouteButtons,
+  routeActions,
   isStoreView,
   showOrders,
   setShowOrders,
@@ -18,7 +18,7 @@ export default function POSHeader({
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          {renderRouteButtons()}
+          {routeActions}
         </div>
       </div>
 
@@ -75,7 +75,7 @@ export default function POSHeader({
 
           {/* BOTONES DE RUTA Y ESTADO */}
           <div className="flex items-center gap-2 flex-shrink-0 max-lg:landscape:hidden">
-            {renderRouteButtons()}
+            {routeActions}
           </div>
         </div>
       </header>
