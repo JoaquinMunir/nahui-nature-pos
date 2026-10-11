@@ -94,6 +94,36 @@ def get_clients():
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/clients")
+def create_client(client: ClientCreate):
+    conn = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # Idempotencia: la cola offline puede reenviar el mismo cliente
+        cursor.execute("SELECT id FROM clients WHERE id = %s", (client.id,))
+        if cursor.fetchone():
+            cursor.close()
+            conn.close()
+            return {"status": "success", "message": "El cliente ya estaba sincronizado."}
+
+        cursor.execute(
+            """INSERT INTO clients (id, name, contact, phone_number, address, location, latitude, longitude, route_name, is_active)
+               VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, true)""",
+            (client.id, client.name, client.contact, client.phone_number, client.address,
+             client.location, client.latitude, client.longitude, client.route_name)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return {"status": "success", "message": "Client registered successfully"}
+    except Exception as e:
+        print(f"Database error: {e}")
+        if conn:
+            conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+
 # ENDPOINT RESTAURADO: Obtener el catálogo de rutas
 @app.get("/routes")
 def get_routes():

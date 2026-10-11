@@ -1,0 +1,17 @@
+# Archivos de texto: se guardan y se descargan siempre con LF
+* text=auto eol=lf
+
+# Scripts nativos de Windows: requieren CRLF para ejecutarse correctamente
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binarios: Git nunca debe intentar convertirlos
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.webp  binary
+*.ico   binary
+*.woff  binary
+*.woff2 binary
