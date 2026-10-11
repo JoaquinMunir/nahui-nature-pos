@@ -54,9 +54,9 @@ export function usePOSData({
           try {
             const res = await axios.post(ENDPOINTS.clients, client);
             if (res.data.status === 'success') await db.sync_clients_queue.delete(client.id);
-          } catch (err) { break; }
+          } catch { break; }
         }
-      } catch (err) {}
+      } catch (err) { console.error('Error leyendo la cola de clientes:', err); }
 
       try {
         const offlineOrders = await db.sync_queue.toArray();
@@ -69,7 +69,7 @@ export function usePOSData({
             else break; 
           }
         }
-      } catch (err) {}
+      } catch (err) { console.error('Error leyendo la cola de ventas:', err); }
 
       try {
         const offlineSessions = await db.sync_sessions_queue.toArray();
@@ -77,9 +77,9 @@ export function usePOSData({
           try {
             const res = await axios.post(ENDPOINTS.sessions, session);
             if (res.data.status === 'success') await db.sync_sessions_queue.delete(session.id);
-          } catch (err) { break; }
+          } catch { break; }
         }
-      } catch (err) {}
+      } catch (err) { console.error('Error leyendo la cola de cortes:', err); }
     };
     
     const fetchInitialData = async () => {
@@ -183,7 +183,7 @@ export function usePOSData({
         clearCart(); setActiveClient(null); 
       }
       fetchInventories();
-    } catch (error) {
+    	} catch {
       try {
         await db.sync_queue.add(payload);
         if (sendWhatsApp) sendWhatsAppTicket(activeClient, cart, totalOrder);
@@ -208,6 +208,7 @@ export function usePOSData({
 
         updateLocalHistory(); clearCart(); setActiveClient(null);
       } catch (dbError) { 
+        console.error('Error guardando la venta offline:', dbError);
         setAppAlert({ isOpen: true, title: 'Error Crítico', message: 'Error al procesar la orden offline.', type: 'error' });
       }
     } finally { setIsSubmitting(false); }

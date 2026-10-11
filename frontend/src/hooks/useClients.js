@@ -24,7 +24,7 @@ export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClien
         }));
         setIsLocating(false);
       },
-      (error) => {
+      () => {
         setAppAlert({ isOpen: true, title: 'Permiso Denegado', message: 'No se pudo obtener la ubicación. Verifica los permisos de GPS.', type: 'error' });
         setIsLocating(false);
       },
@@ -61,13 +61,14 @@ export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClien
       await db.clients.add(newClient);
       setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
       setAppAlert({ isOpen: true, title: '¡Éxito!', message: 'Cliente registrado exitosamente.', type: 'success' });
-    } catch (error) {
+    } catch {
       try {
         await db.clients.add(newClient);
         await db.sync_clients_queue.add(newClient);
         setClients(prev => [...(prev || []), newClient].sort((a, b) => a.location.localeCompare(b.location) || a.name.localeCompare(b.name)));
         setAppAlert({ isOpen: true, title: 'Guardado Local', message: 'Modo sin conexión: El cliente se guardó en tu dispositivo.', type: 'warning' });
       } catch (dbError) {
+        console.error('Error guardando el cliente localmente:', dbError);
         setAppAlert({ isOpen: true, title: 'Error Crítico', message: 'Error de almacenamiento local.', type: 'error' });
       }
     } finally {
