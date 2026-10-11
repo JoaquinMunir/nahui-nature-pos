@@ -84,6 +84,7 @@ export function useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setS
     }
 
     setIsOnRoad(false);
+    setSaleMode('central');
     setShiftStartTime(null);
     setExpenses([]); 
     localStorage.removeItem('isOnRoad');
