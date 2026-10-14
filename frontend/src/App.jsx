@@ -71,7 +71,7 @@ function App() {
   const {
     isAddingClient, setIsAddingClient, isLocating, clientForm,
     setClientForm, captureLocation, handleCreateClient,
-  } = useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting });
+  } = useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting, locationNames });
 
   // 7. Historial de ventas
   const {
@@ -163,7 +163,8 @@ function App() {
                         isSubmitting={isSubmitting} 
                         captureLocation={captureLocation} 
                         isLocating={isLocating} 
-                        routes={routes} 
+                        routes={routes}
+                        locationNames={locationNames}
                       />
 
                     ) : !activeClient ? (

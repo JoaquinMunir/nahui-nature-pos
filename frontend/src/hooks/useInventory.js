@@ -67,7 +67,7 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
     fetchInventories();
   }, [fetchInventories]);
 
-    // Ingreso individual de mercancía a Bodega Central
+  // Ingreso individual de mercancía a Bodega Central
   const handleAddCentralStock = async (productId) => {
     const quantity = Number(stockInputs[productId]);
     if (!quantity || quantity <= 0) return;

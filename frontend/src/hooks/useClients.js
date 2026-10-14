@@ -2,7 +2,14 @@ import { useState } from 'react';
 import axios from 'axios';
 import { db } from '../db';
 
-export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting }) {
+// Si el valor escrito coincide con uno existente (sin importar mayúsculas ni espacios),
+// devuelve la escritura ya registrada para no duplicar agrupadores.
+const matchExisting = (value, existingValues) => {
+  const clean = (value || '').trim().replace(/\s+/g, ' ');
+  return existingValues.find((option) => option.toLowerCase() === clean.toLowerCase()) ?? clean;
+};
+
+export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting, locationNames}) {
   const [isAddingClient, setIsAddingClient] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
   const [clientForm, setClientForm] = useState({
@@ -38,9 +45,10 @@ export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClien
 
     const finalLatitude = clientForm.latitude !== '' ? parseFloat(clientForm.latitude) : null;
     const finalLongitude = clientForm.longitude !== '' ? parseFloat(clientForm.longitude) : null;
-    const routeNameStr = (clientForm.route_name || "").trim();
+    const routeNameStr = matchExisting(clientForm.route_name, (routes || []).map(r => r.name));
+    const locationStr = matchExisting(clientForm.location, locationNames || []);
 
-    const routeExists = (routes || []).some(r => r?.name?.toLowerCase() === routeNameStr.toLowerCase());
+    const routeExists = (routes || []).some(r => r.name === routeNameStr);
     if (!routeExists && routeNameStr !== "") {
       const newRoute = { id: crypto.randomUUID(), name: routeNameStr };
       setRoutes(prev => [...(prev || []), newRoute].sort((a,b) => a.name.localeCompare(b.name)));
@@ -49,6 +57,7 @@ export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClien
 
     const newClient = {
       ...clientForm,
+      location: locationStr,
       route_name: routeNameStr,
       latitude: finalLatitude,
       longitude: finalLongitude,

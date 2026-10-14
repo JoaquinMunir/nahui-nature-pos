@@ -1,6 +1,6 @@
 export default function AddClientForm({
   setIsAddingClient, handleCreateClient, clientForm, setClientForm, 
-  isSubmitting, captureLocation, isLocating, routes
+  isSubmitting, captureLocation, isLocating, routes, locationNames
 }) {
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
@@ -34,7 +34,21 @@ export default function AddClientForm({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-bold text-brand-brown mb-1">Comunidad / Colonia (Agrupador) *</label>
-              <input required type="text" value={clientForm.location} onChange={e => setClientForm({...clientForm, location: e.target.value})} placeholder="Ej. Los Asmoles, Centro..." className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors" />
+              <input
+                required
+                type="text"
+                list="comunidades-registradas"
+                value={clientForm.location}
+                onChange={e => setClientForm({...clientForm, location: e.target.value})}
+                placeholder="Escribe o selecciona una comunidad..."
+                className="w-full bg-brand-bg rounded-xl border border-brand-brown/10 p-3 outline-none focus:border-brand-green transition-colors text-brand-brown"
+              />
+              <datalist id="comunidades-registradas">
+                {(locationNames || []).map(name => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
+              <p className="text-[10px] text-gray-400 mt-1.5 ml-1">Selecciona una existente o teclea una nueva.</p>
             </div>
             <div>
               <label className="block text-sm font-bold text-brand-brown mb-1">Ruta Asignada *</label>
