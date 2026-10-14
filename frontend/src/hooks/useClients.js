@@ -3,10 +3,15 @@ import axios from 'axios';
 import { db } from '../db';
 
 // Si el valor escrito coincide con uno existente (sin importar mayúsculas ni espacios),
+/// Clave de comparación: sin acentos, sin mayúsculas. "Armería" y "armeria" → "armeria".
+const toMatchKey = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+// Si el valor escrito coincide con uno existente (sin importar mayúsculas, acentos ni espacios),
 // devuelve la escritura ya registrada para no duplicar agrupadores.
 const matchExisting = (value, existingValues) => {
   const clean = (value || '').trim().replace(/\s+/g, ' ');
-  return existingValues.find((option) => option.toLowerCase() === clean.toLowerCase()) ?? clean;
+  const key = toMatchKey(clean);
+  return existingValues.find((option) => toMatchKey(option) === key) ?? clean;
 };
 
 export function useClients({ ENDPOINTS, setAppAlert, routes, setRoutes, setClients, setIsSubmitting, locationNames}) {

@@ -19,10 +19,10 @@ export function usePOSData({
   const [activeClient, setActiveClient] = useState(null);
   const [sendWhatsApp, setSendWhatsApp] = useState(() => localStorage.getItem('sendWhatsApp') !== 'false');
   const groupedProducts = useMemo(() => groupBy(products, (product) => product.category), [products]);
-  const categoryNames = useMemo(() => Object.keys(groupedProducts).sort(), [groupedProducts]);
+  const categoryNames = useMemo(() => Object.keys(groupedProducts).sort((a, b) => a.localeCompare(b, 'es')), [groupedProducts]);
   const groupedClients = useMemo(() => groupBy(clients, (client) => client.location), [clients]);
-  const locationNames = useMemo(() => Object.keys(groupedClients).sort(), [groupedClients]);
-
+  const locationNames = useMemo(() => Object.keys(groupedClients).sort((a, b) => a.localeCompare(b, 'es')), [groupedClients]);
+  
   // Controladores de estado de red
   useEffect(() => {
     const handleOffline = () => {
