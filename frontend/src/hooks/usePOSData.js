@@ -14,7 +14,7 @@ export function usePOSData({
   const [routes, setRoutes] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [isOfflineMode, setIsOfflineMode] = useState(false);
+  const [isOfflineMode, setIsOfflineMode] = useState(() => !navigator.onLine);
   const [ordersHistory, setOrdersHistory] = useState([]);
   const [activeClient, setActiveClient] = useState(null);
   const [sendWhatsApp, setSendWhatsApp] = useState(() => localStorage.getItem('sendWhatsApp') !== 'false');
@@ -37,7 +37,6 @@ export function usePOSData({
 
     window.addEventListener('offline', handleOffline);  
     window.addEventListener('online', handleOnline);
-    if (!navigator.onLine) setIsOfflineMode(true);
 
     return () => {
       window.removeEventListener('offline', handleOffline);

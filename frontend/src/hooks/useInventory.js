@@ -62,7 +62,9 @@ export function useInventory({ ENDPOINTS, setAppAlert, setIsSubmitting }) {
   }, [ENDPOINTS.inventory, ENDPOINTS.mobileInventory]);
 
   useEffect(() => {
-    fetchInventories(); 
+    // Carga inicial: los setState ocurren después del await, no durante el efecto.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchInventories();
   }, [fetchInventories]);
 
     // Ingreso individual de mercancía a Bodega Central
