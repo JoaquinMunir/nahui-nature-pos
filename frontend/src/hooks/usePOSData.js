@@ -122,10 +122,13 @@ export function usePOSData({
             setProducts(localProducts); setClients(localClients); setRoutes(localRoutes);
             setIsOfflineMode(true); 
           } else { setError("Error: El servidor no responde y no hay datos guardados localmente."); }
-        } catch (localErr) { setError("Error de almacenamiento local."); }
+        } catch (localErr) {
+          console.error('Error leyendo datos locales:', localErr);
+          setError('Error de almacenamiento local.');
+        }
       } finally { setLoading(false); }
     };
-    
+
     fetchInitialData();
   }, [ENDPOINTS]);
 

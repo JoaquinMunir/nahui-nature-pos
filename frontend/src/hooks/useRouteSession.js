@@ -73,7 +73,7 @@ export function useRouteSession({ ENDPOINTS, setAppAlert, setShowInventory, setS
 
     try {
       await axios.post(ENDPOINTS.sessions, sessionPayload);
-    } catch (error) {
+    } catch {
       await db.sync_sessions_queue.add(sessionPayload).catch(()=>{});
       setAppAlert({ 
         isOpen: true, 
